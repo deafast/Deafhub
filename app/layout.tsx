@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = "https://www.deafhub.cc";
-const siteName = "DEAF|HUB";
+const siteName = "DEAF|HUB Esports";
 const siteDescription = "Premium esports platform for Deaf and Hard of Hearing gamers.";
 
 export const metadata: Metadata = {
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/icon.png",
     shortcut: "/favicon.ico",
-    apple: "/brand/dh.png",
+    apple: "/apple-icon.png",
   },
 };
 
