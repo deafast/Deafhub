@@ -56,9 +56,13 @@ export default function CS2MVPShowcase() {
     ];
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 py-10">
-            <MVPFlipCard data={players[0]} />
-            <MVPFlipCard data={players[1]} />
+        <div className="flex flex-row items-center justify-center gap-2 xs:gap-4 md:gap-8 py-6 md:py-10 w-full perspective-1000 overflow-hidden">
+            <div className="flex-1 min-w-0 flex justify-center">
+                <MVPFlipCard data={players[0]} />
+            </div>
+            <div className="flex-1 min-w-0 flex justify-center">
+                <MVPFlipCard data={players[1]} />
+            </div>
         </div>
     );
 }

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: siteName,
-    template: `%s — ${siteName}`,
+    template: `%s | ${siteName}`,
   },
   description: siteDescription,
   applicationName: siteName,
@@ -35,24 +35,24 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/brand/dh.png",
-        width: 500,
-        height: 500,
+        url: "/brand/logo_circle.png",
+        width: 512,
+        height: 512,
         alt: siteName,
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: siteName,
     description: siteDescription,
-    images: ["/brand/dh.png"],
+    images: ["/brand/logo_circle.png"],
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    shortcut: [{ url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+    icon: "/brand/tab_logo.jpg",
+    shortcut: "/brand/tab_logo.jpg",
+    apple: "/brand/tab_logo.jpg",
   },
 };
 
@@ -74,11 +74,9 @@ export default function RootLayout({
       >
         <Providers>
           <Preloader />
-          <SmoothScroll>
-            <Header />
-            <main className="flex-1 pb-20 md:pb-0">{children}</main>
-            <BottomNav />
-          </SmoothScroll>
+          <Header />
+          <main className="flex-1 pb-20 md:pb-0">{children}</main>
+          <BottomNav />
         </Providers>
       </body>
     </html>

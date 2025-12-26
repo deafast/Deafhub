@@ -23,55 +23,49 @@ export default function TournamentHub() {
     ];
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-white selection:text-black py-20 px-6">
-            <div className="container mx-auto max-w-5xl">
+        <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-white selection:text-black py-6 sm:py-10 px-4 sm:px-6">
+            <div className="container mx-auto max-w-7xl">
 
                 {/* Header */}
-                <header className="mb-12 text-center md:text-left">
-                    <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none border-l-8 border-white pl-6">
-                        {t.tournamentsPage.selectArena}
-                    </h1>
-                    <p className="mt-4 text-sm md:text-base text-white/40 max-w-2xl pl-6">
-                        {t.tournamentsPage.chooseField}
-                    </p>
+                <header className="mb-6 sm:mb-8 flex flex-col lg:flex-row lg:items-center justify-between border-l-4 border-white pl-4 sm:pl-6 gap-4 sm:gap-6">
+                    <div className="flex flex-col">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black italic uppercase tracking-tighter leading-none">
+                            {t.tournamentsPage.selectArena}
+                        </h1>
+                        <p className="mt-2 text-[9px] sm:text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
+                            {t.tournamentsPage.chooseField}
+                        </p>
+                    </div>
+
+                    {/* Navigation moved to header for compactness */}
+                    <nav className="flex items-center relative z-30">
+                        <div className="inline-flex bg-white/[0.02] border border-white/10 p-1 rounded-xl relative backdrop-blur-sm">
+                            {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => setActiveGame(item.id)}
+                                    className={cn(
+                                        "relative px-4 sm:px-8 py-2.5 sm:py-3 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] transition-all duration-300 cursor-pointer overflow-hidden",
+                                        activeGame === item.id ? "text-white" : "text-white/30 hover:text-white/60"
+                                    )}
+                                >
+                                    {activeGame === item.id && (
+                                        <motion.div
+                                            layoutId="hubActiveTab"
+                                            className={cn("absolute inset-0 rounded-lg opacity-20 -z-10", item.color)}
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <span className="relative z-10 pointer-events-none">{item.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
                 </header>
 
-                {/* Navigation */}
-                <nav className="mb-12 flex justify-center md:justify-start relative z-30">
-                    <div className="inline-flex bg-white/[0.03] border border-white/5 p-1 rounded-2xl relative">
-                        {navItems.map((item) => (
-                            <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => {
-                                    setActiveGame(item.id);
-                                }}
-                                className={cn(
-                                    "relative px-10 py-4 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer overflow-hidden",
-                                    activeGame === item.id ? "text-white" : "text-white/30 hover:text-white/60"
-                                )}
-                            >
-                                {activeGame === item.id && (
-                                    <motion.div
-                                        layoutId="hubActiveTab"
-                                        className={cn("absolute inset-0 rounded-xl opacity-20 -z-10", item.color)}
-                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                    />
-                                )}
-                                <span className="relative z-10 pointer-events-none">{item.label}</span>
-                                {activeGame === item.id && (
-                                    <motion.div
-                                        layoutId="hubActiveGlow"
-                                        className={cn("absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full pointer-events-none", item.color)}
-                                    />
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </nav>
-
                 {/* Content */}
-                <main className="relative min-h-[500px] border border-white/5 rounded-3xl bg-neutral-900/20 overflow-hidden p-8">
+                <main className="relative min-h-[500px] border border-white/5 rounded-2xl sm:rounded-3xl bg-neutral-900/20 overflow-hidden p-4 sm:p-8">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeGame}

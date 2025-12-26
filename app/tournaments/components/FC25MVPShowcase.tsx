@@ -30,7 +30,7 @@ export default function FC25MVPShowcase() {
     };
 
     return (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-6 md:py-12">
             <MVPFlipCard data={playerData} />
         </div>
     );

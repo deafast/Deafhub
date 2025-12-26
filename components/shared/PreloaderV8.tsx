@@ -3,124 +3,150 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
+// Локальные кадры: public/preloader/1.jpg ... 6.jpg
 const FLIP_IMAGES = [
-    'url("https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop")',
-    'url("https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1920&auto=format&fit=crop")',
-    'url("https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=1920&auto=format&fit=crop")',
-    'url("https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=1920&auto=format&fit=crop")',
-    'url("https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=1920&auto=format&fit=crop")',
-    'url("https://images.unsplash.com/photo-1560253023-3ee5d647fbba?q=80&w=1920&auto=format&fit=crop")',
-    'url("https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=1920&auto=format&fit=crop")',
+    'url("/preloader/1.jpg")',
+    'url("/preloader/2.jpg")',
+    'url("/preloader/3.jpg")',
+    'url("/preloader/4.jpg")',
+    'url("/preloader/5.jpg")',
+    'url("/preloader/6.jpg")',
 ];
 
+/**
+ * PreloaderV8 - Sharp Edge / Marvel Edition.
+ * КРАСНАЯ ЗОНА: Решена проблема черных прямоугольников из фото пользователя.
+ * Исправлено: Удален "Internal Flipping Backdrop" (который создавал коробку) 
+ * и применен режим экрана для букв.
+ */
 export default function PreloaderV8() {
     const [isLoading, setIsLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
+
     const [isFlipping, setIsFlipping] = useState(true);
     const [currentFrame, setCurrentFrame] = useState(0);
+    const [bgReady, setBgReady] = useState(false);
+
+    const exitDelayMs = 2600;     // общий выход
+    const stopFlipMs = 2200;      // стоп-кадр
 
     useEffect(() => {
-        // Phase 1: Rapid flipping
+        setIsMounted(true);
+        if (sessionStorage.getItem('dh_intro_seen')) {
+            setIsLoading(false);
+            return;
+        }
+
+        if (!isLoading) return;
+
+        // Предзагрузка первого кадра для плавного входа (как просил юзер)
+        const img = new Image();
+        img.src = "/preloader/1.jpg";
+        img.onload = () => setBgReady(true);
+        img.onerror = () => setBgReady(true);
+
         const interval = setInterval(() => {
-            if (isFlipping) {
-                setCurrentFrame((prev) => (prev + 1) % FLIP_IMAGES.length);
-            }
-        }, 50); // Balanced cinematic flicker (50ms)
+            if (!isFlipping) return;
+            setCurrentFrame((prev) => (prev + 1) % FLIP_IMAGES.length);
+        }, 40);
 
-        // Phase 2: Stop flipping and show stable logo
-        const stopTimer = setTimeout(() => {
-            setIsFlipping(false);
-        }, 2200);
+        const stopTimer = setTimeout(() => setIsFlipping(false), stopFlipMs);
 
-        // Phase 3: Total Exit (30ms after flipping stops)
         const exitTimer = setTimeout(() => {
             setIsLoading(false);
-        }, 2230);
+            sessionStorage.setItem('dh_intro_seen', 'true');
+        }, exitDelayMs);
 
         return () => {
             clearInterval(interval);
             clearTimeout(stopTimer);
             clearTimeout(exitTimer);
         };
-    }, [isFlipping]);
+    }, [isFlipping, isLoading]);
+
+    if (!isLoading) return null;
 
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             {isLoading && (
                 <motion.div
+                    key="dh-preloader"
+                    id="dh-preloader-container"
                     initial={{ opacity: 1 }}
-                    exit={{ opacity: 0, scale: 1.1, filter: 'brightness(2) blur(30px)' }}
-                    transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
+                    exit={{
+                        opacity: 0,
+                        scale: 1.05,
+                        filter: 'brightness(1.25)',
+                        transition: { duration: 0.55, ease: [0.76, 0, 0.24, 1] },
+                    }}
                     className="fixed inset-0 z-[99999] flex items-center justify-center bg-black overflow-hidden"
                     style={{ width: '100vw', height: '100vh' }}
                 >
+                    {/* ФИКС F5: Скрипт защиты от мерцания */}
+                    <script dangerouslySetInnerHTML={{
+                        __html: `
+            if (sessionStorage.getItem('dh_intro_seen')) {
+              document.getElementById('dh-preloader-container').style.display = 'none';
+            }
+          `}} />
+
                     {/* FULL SCREEN FLIPPING BACKGROUND */}
                     <motion.div
+                        initial={{ opacity: 0 }}
                         animate={{
-                            opacity: isFlipping ? 0.35 : 0.05,
-                            filter: isFlipping ? 'grayscale(0.8) brightness(0.6)' : 'grayscale(1) brightness(0.1)'
+                            opacity: !bgReady ? 0 : (isFlipping ? 0.35 : 0.08),
+                            filter: isFlipping ? 'grayscale(0.85) brightness(0.55)' : 'grayscale(1) brightness(0.12)',
                         }}
-                        className="absolute inset-0 transition-all duration-700"
+                        transition={{ duration: 0.4 }}
+                        className="absolute inset-0 pointer-events-none"
                         style={{
-                            backgroundImage: FLIP_IMAGES[currentFrame],
+                            backgroundImage: bgReady ? FLIP_IMAGES[currentFrame] : 'none',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                         }}
                     />
 
                     {/* CENTRAL LOGO REVEAL */}
-                    <div className="relative flex flex-col items-center">
-
-                        {/* The Logo Container - ZERO BORDERS */}
+                    <div className="relative flex flex-col items-center pointer-events-none">
                         <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
+                            initial={{ scale: 0.9, opacity: 0 }}
                             animate={{
-                                scale: isFlipping ? 1 : 1.05, // Subtle scale up on stop
+                                scale: isFlipping ? 1 : 1.03,
                                 opacity: 1,
                             }}
-                            transition={{ duration: 0.8, ease: "circOut" }}
-                            className="relative p-8 flex items-center justify-center overflow-visible"
+                            transition={{ duration: 0.7, ease: 'circOut' }}
+                            className="relative p-8 flex items-center justify-center overflow-visible bg-transparent"
+                            style={{ mixBlendMode: 'screen' }} // ВАЖНО: Удаляет любые черные артефакты клиппинга
                         >
-                            {/* Internal Flipping Backdrop */}
-                            <motion.div
-                                animate={{ opacity: isFlipping ? 1 : 0 }}
-                                className="absolute inset-0 z-0"
-                                style={{
-                                    backgroundImage: FLIP_IMAGES[currentFrame],
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                    filter: 'brightness(2.5) contrast(1.5)'
-                                }}
-                            />
+                            {/* Internal Flipping Backdrop УДАЛЕН - он создавал черный прямоугольник на фото */}
 
-                            {/* Text Mask (The Core) - REDUCED SIZE */}
-                            <div className="relative z-10 flex items-center gap-4 md:gap-8">
+                            <div className="relative z-10 flex items-center gap-4 md:gap-8 bg-transparent">
                                 <motion.h1
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#EAFBFF',
                                         backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
                                     }}
-                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tightest uppercase leading-none"
+                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
-                                        WebkitBackgroundClip: isFlipping ? 'text' : 'none',
-                                        backgroundClip: isFlipping ? 'text' : 'none',
+                                        WebkitBackgroundClip: isFlipping ? 'text' : 'unset',
+                                        backgroundClip: isFlipping ? 'text' : 'unset',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
-                                        filter: isFlipping ? 'brightness(4) contrast(2)' : 'none',
+                                        filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
+                                        backgroundColor: 'transparent'
                                     }}
                                 >
                                     DEAF
                                 </motion.h1>
 
-                                {/* THE CENTRAL BAR | (Slanted as requested) - ADAPTED SIZE */}
+                                {/* THE CENTRAL BAR | */}
                                 <motion.div
                                     animate={{
-                                        height: isFlipping ? "60px" : "120px",
-                                        backgroundColor: "#22D3EE",
-                                        boxShadow: isFlipping
-                                            ? "0 0 20px #22D3EE"
-                                            : "0 0 60px rgba(34,211,238,1)",
+                                        height: isFlipping ? '60px' : '120px',
+                                        backgroundColor: '#22D3EE',
+                                        boxShadow: isFlipping ? '0 0 18px #22D3EE' : '0 0 44px rgba(34,211,238,0.9)',
                                     }}
-                                    transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+                                    transition={{ duration: 0.45, type: 'spring', stiffness: 120, damping: 18 }}
                                     className="w-[4px] md:w-[8px] z-20 rounded-sm skew-x-[-20deg]"
                                 />
 
@@ -129,61 +155,59 @@ export default function PreloaderV8() {
                                         color: isFlipping ? 'transparent' : '#22D3EE',
                                         backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
                                     }}
-                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tightest uppercase leading-none"
+                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
-                                        WebkitBackgroundClip: isFlipping ? 'text' : 'none',
-                                        backgroundClip: isFlipping ? 'text' : 'none',
+                                        WebkitBackgroundClip: isFlipping ? 'text' : 'unset',
+                                        backgroundClip: isFlipping ? 'text' : 'unset',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
-                                        filter: isFlipping ? 'brightness(4) contrast(2)' : 'none',
+                                        filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
+                                        backgroundColor: 'transparent'
                                     }}
                                 >
                                     HUB
                                 </motion.h1>
                             </div>
 
-                            {/* Final Neon Flare when flipping stops */}
+                            {/* Final Neon Flare (без blur) */}
                             {!isFlipping && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.5 }}
-                                    animate={{ opacity: 1, scale: 2 }}
-                                    className="absolute inset-0 bg-[#22D3EE]/10 blur-[100px] pointer-events-none"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                        boxShadow: '0 0 80px rgba(34,211,238,0.22)',
+                                    }}
                                 />
                             )}
                         </motion.div>
 
-                        {/* Bottom Slogan - COMPACT SIZE */}
-                        <div className="mt-8 text-center px-4">
-                            <motion.div
-                                initial={{ y: 50, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                className="space-y-4"
-                            >
-                                <div className="flex items-center justify-center gap-4">
-                                    <motion.div
-                                        animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.2 : 0.6 }}
-                                        className="h-[2px] bg-[#22D3EE]"
-                                    />
-                                    <span className="text-sm md:text-2xl font-black italic tracking-[0.4em] text-white/90 uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                                        PLATFORM
-                                    </span>
-                                    <motion.div
-                                        animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.2 : 0.6 }}
-                                        className="h-[2px] bg-[#22D3EE]"
-                                    />
-                                </div>
-                            </motion.div>
+                        {/* Bottom Slogan */}
+                        <div className="mt-8 text-center px-4 bg-transparent">
+                            <div className="flex items-center justify-center gap-4 bg-transparent">
+                                <motion.div
+                                    animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.25 : 0.7 }}
+                                    className="h-[2px] bg-[#22D3EE]"
+                                />
+                                <span className="text-sm md:text-2xl font-black italic tracking-[0.35em] text-white/90 uppercase">
+                                    PLATFORM
+                                </span>
+                                <motion.div
+                                    animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.25 : 0.7 }}
+                                    className="h-[2px] bg-[#22D3EE]"
+                                />
+                            </div>
                         </div>
                     </div>
 
                     {/* Cinematic Stripes */}
                     <div className="absolute inset-0 opacity-10 pointer-events-none">
-                        {[...Array(30)].map((_, i) => (
+                        {Array.from({ length: 30 }).map((_, i) => (
                             <div key={i} className="h-px w-full bg-white/10 mb-4" />
                         ))}
                     </div>
-                </motion.div>
+                </motion.div >
             )}
-        </AnimatePresence>
+        </AnimatePresence >
     );
 }

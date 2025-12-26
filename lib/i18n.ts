@@ -4,22 +4,22 @@ export const translations = {
       home: "Home",
       live: "Live",
       tournaments: "Tournaments",
-      team: "Team",
+      team: "Teams",
       profile: "Profile",
       signin: "Sign In",
-      espPlatform: "ESPORTS PLATFORM"
+      espPlatform: "DEAF|HUB PLATFORM"
     },
     hero: {
       title: "DEAF|HUB ESPORTS",
-      subtitle: "The ultimate platform for Deaf and Hard of Hearing gamers.",
-      joinNow: "Join Now",
-      viewTournaments: "View Tournaments",
-      evolution: "Esports Evolution"
+      subtitle: "Competitive platform for Deaf players — teams, tournaments and matches.",
+      joinNow: "CREATE PROFILE",
+      viewTournaments: "BROWSE TOURNAMENTS",
+      evolution: "COMPETITIVE HUB"
     },
     features: {
-      pro: { title: "PRO LEAGUES", desc: "Compete at the highest level." },
-      teams: { title: "ELITE TEAMS", desc: "Join the world class rosters." },
-      pay: { title: "INSTANT PAY", desc: "Fastest withdrawals in esports." }
+      pro: { title: "COMMUNITY CUPS", desc: "Monthly cups for verified teams and free agents." },
+      teams: { title: "TEAM HUB", desc: "Create a roster, manage roles and review requests." },
+      pay: { title: "MATCH CENTER", desc: "Live status, results and season history." }
     },
     stats: {
       players: "Players",
@@ -144,38 +144,118 @@ export const translations = {
         finished: "FINISHED"
       },
       games: {
-        cs2: { name: "CS 2", desc: "Professional League" },
-        dota2: { name: "Dota 2", desc: "Championship Series" },
-        fc25: { name: "FC 25", desc: "Pro Open" }
+        cs2: { name: "CS 2", desc: "Season 1" },
+        dota2: { name: "Dota 2", desc: "Season 1" },
+        fc25: { name: "FC 25", desc: "Open" }
       },
-      filters: {
-        all: "All Events",
-        euro: "Europe",
-        live: "Live Now"
+    },
+    dotaLadder: {
+      play_5x5: "5v5 — Captain’s Mode",
+      play_cm: "OPEN MATCHES",
+      games_limit: "Games limit",
+      win_points: "Win points",
+      lose_points: "Lose points",
+      entry_fee: "Entry fee",
+      free: "FREE",
+      days: "DAYS",
+      prize_pool: "Prize Pool — TBD",
+      prizes: "PRIZES",
+      rank: "Rank",
+      player: "Player",
+      country: "Country",
+      points: "Points",
+      wins: "Wins",
+      loses: "Loses",
+      winrate: "Win Rate",
+      updated: "Updated",
+      ago: "ago",
+      standing: "Leaderboard",
+      weekly_ladder: "DEAF|HUB — Dota 2 Season 1",
+      desc: "Structured matches with drafting, points and leaderboard ranking.",
+      future_plan: "Roadmap — Captains Mode",
+      six_months: "In Development"
+    },
+    cs2Ladder: {
+      play_5x5: "5v5 Competitive",
+      play_premier: "PLAY PREMIER",
+      games_limit: "Games limit",
+      win_points: "Elo points",
+      lose_points: "Elo loss",
+      entry_fee: "Entry fee",
+      free: "FREE",
+      days: "DAYS",
+      prize_pool: "Prize Pool — TBD",
+      prizes: "PRIZES",
+      rank: "Rank",
+      player: "Player",
+      country: "Country",
+      rating: "Rating",
+      adr: "ADR",
+      kd: "K/D",
+      hs: "HS%",
+      wins: "Wins",
+      matches: "Matches",
+      updated: "Updated",
+      ago: "ago",
+      standing: "Leaderboard",
+      weekly_ladder: "DEAF|HUB — CS2 Season 1",
+      desc: "Tactical matches with Elo points and ranking.",
+      future_plan: "Roadmap",
+      six_months: "In Development"
+    },
+    teamHub: {
+      system_status: "SYSTEM STATUS: ACTIVE",
+      hub_main: "HUB TERMINAL",
+      hub_sub: "Team Hub",
+      teams_title: "TEAMS",
+      scanning: "SCANNING TEAMS...",
+      search_placeholder: "Search teams...",
+      slots_label: "SLOTS",
+      roster_label: "ROSTER",
+      rating_label: "RATING",
+      agents_title: "FREE AGENTS",
+      rank_label: "RANK",
+      invite_tooltip: "Invite",
+      publish_lfp: "+ PUBLISH LFP",
+      roles: {
+        dota: {
+          pos1: "POS 1",
+          pos2: "POS 2",
+          pos3: "POS 3",
+          pos4: "POS 4",
+          pos5: "POS 5"
+        },
+        cs2: {
+          sniper: "SNIPER",
+          entry: "ENTRY",
+          lurker: "LURKER",
+          igl: "IGL",
+          support: "SUPPORT"
+        }
       }
     }
   },
   ru: {
     nav: {
       home: "Главная",
-      live: "Лайв",
+      live: "Live",
       tournaments: "Турниры",
-      team: "Команда",
+      team: "Команды",
       profile: "Профиль",
       signin: "Войти",
-      espPlatform: "КИБЕРСПОРТИВНАЯ ПЛАТФОРМА"
+      espPlatform: "DEAF|HUB PLATFORM"
     },
     hero: {
       title: "DEAF|HUB ESPORTS",
-      subtitle: "Ультимативная платформа для глухих и слабослышащих геймеров.",
-      joinNow: "Присоединиться",
-      viewTournaments: "Смотреть турниры",
-      evolution: "Эволюция киберспорта"
+      subtitle: "Киберспортивная платформа DEAF-сообщества: команды, турниры и матчи.",
+      joinNow: "СОЗДАТЬ ПРОФИЛЬ",
+      viewTournaments: "ТУРНИРЫ",
+      evolution: "КОНКУРЕНТНЫЙ ХАБ"
     },
     features: {
-      pro: { title: "ПРО-ЛИГИ", desc: "Соревнуйтесь на высшем уровне." },
-      teams: { title: "ЭЛИТНЫЕ КОМАНДЫ", desc: "Присоединяйтесь к лучшим составам мира." },
-      pay: { title: "МГНОВЕННЫЕ ВЫПЛАТЫ", desc: "Самый быстрый вывод в киберспорте." }
+      pro: { title: "COMMUNITY CUPS", desc: "Monthly cups for verified teams and players." },
+      teams: { title: "TEAM HUB", desc: "Create a roster, manage roles and review requests." },
+      pay: { title: "MATCH CENTER", desc: "Live status, results and season history." }
     },
     stats: {
       players: "Игроков",
@@ -300,14 +380,94 @@ export const translations = {
         finished: "ЗАВЕРШЕН"
       },
       games: {
-        cs2: { name: "CS 2", desc: "Профессиональная Лига" },
-        dota2: { name: "Dota 2", desc: "Серия Чемпионатов" },
-        fc25: { name: "FC 25", desc: "Pro Open" }
+        cs2: { name: "CS 2", desc: "Сезон 1" },
+        dota2: { name: "Dota 2", desc: "Сезон 1" },
+        fc25: { name: "FC 25", desc: "Open" }
       },
-      filters: {
-        all: "Все события",
-        euro: "Европа",
-        live: "В эфире"
+    },
+    dotaLadder: {
+      play_5x5: "5v5 — Captain’s Mode",
+      play_cm: "МАТЧИ",
+      games_limit: "Лимит игр",
+      win_points: "Очки за победу",
+      lose_points: "Очки за поражение",
+      entry_fee: "Вход",
+      free: "БЕСПЛАТНО",
+      days: "ДНЕЙ",
+      prize_pool: "Призовой фонд — TBD",
+      prizes: "ПРИЗОВ",
+      rank: "Ранг",
+      player: "Игрок",
+      country: "Страна",
+      points: "Очки",
+      wins: "Побед",
+      loses: "Поражений",
+      winrate: "Винрейт",
+      updated: "Обновлено",
+      ago: "назад",
+      standing: "Таблица лидеров",
+      weekly_ladder: "DEAF|HUB — Dota 2 Сезон 1",
+      desc: "Структурированные матчи с драфтом, очками и таблицей лидеров.",
+      future_plan: "План — Captains Mode",
+      six_months: "В разработке"
+    },
+    cs2Ladder: {
+      play_5x5: "5v5 Competitive",
+      play_premier: "ПРЕМЬЕР-РЕЖИМ",
+      games_limit: "Лимит игр",
+      win_points: "Очки Elo",
+      lose_points: "Потеря Elo",
+      entry_fee: "Вход",
+      free: "БЕСПЛАТНО",
+      days: "ДНЕЙ",
+      prize_pool: "Призовой фонд — TBD",
+      prizes: "ПРИЗОВ",
+      rank: "Ранг",
+      player: "Игрок",
+      country: "Страна",
+      rating: "Рейтинг",
+      adr: "ADR",
+      kd: "K/D",
+      hs: "HS%",
+      wins: "Побед",
+      matches: "Матчей",
+      updated: "Обновлено",
+      ago: "назад",
+      standing: "Таблица лидеров",
+      weekly_ladder: "DEAF|HUB — CS2 Сезон 1",
+      desc: "Тактические матчи с очками Elo и рейтингом.",
+      future_plan: "План",
+      six_months: "В разработке"
+    },
+    teamHub: {
+      system_status: "СТАТУС СИСТЕМЫ: АКТИВНО",
+      hub_main: "HUB TERMINAL",
+      hub_sub: "Центр команд",
+      teams_title: "КОМАНДЫ",
+      scanning: "ПОИСК КОМАНД…",
+      search_placeholder: "Поиск команд…",
+      slots_label: "МЕСТ",
+      roster_label: "СОСТАВ",
+      rating_label: "РЕЙТИНГ",
+      agents_title: "СВОБОДНЫЕ ИГРОКИ",
+      rank_label: "РАНГ",
+      invite_tooltip: "Пригласить",
+      publish_lfp: "+ ОПУБЛИКОВАТЬ LFP",
+      roles: {
+        dota: {
+          pos1: "POS 1",
+          pos2: "POS 2",
+          pos3: "POS 3",
+          pos4: "POS 4",
+          pos5: "POS 5"
+        },
+        cs2: {
+          sniper: "СНАЙПЕР",
+          entry: "ЭНТРИ",
+          lurker: "ЛЮРКЕР",
+          igl: "ИГЛ",
+          support: "САППОРТ"
+        }
       }
     }
   }

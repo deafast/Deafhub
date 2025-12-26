@@ -56,16 +56,20 @@ export default function DotaMVPShowcase() {
     ];
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-center gap-12 py-10 perspective-1000">
-            <MVPFlipCard data={players[0]} />
-
-            <div className="hidden md:flex flex-col items-center gap-4 opacity-30">
-                <div className="h-20 w-[1px] bg-gradient-to-t from-transparent via-white to-transparent" />
-                <span className="text-xs font-black italic text-amber-500 rotate-90 my-4">VS</span>
-                <div className="h-20 w-[1px] bg-gradient-to-b from-transparent via-white to-transparent" />
+        <div className="flex flex-row items-center justify-center gap-2 xs:gap-4 sm:gap-6 md:gap-12 py-6 md:py-10 perspective-1000 w-full overflow-hidden">
+            <div className="flex-1 min-w-0 flex justify-center">
+                <MVPFlipCard data={players[0]} />
             </div>
 
-            <MVPFlipCard data={players[1]} />
+            <div className="hidden xs:flex flex-col items-center gap-2 md:gap-4 opacity-30 flex-shrink-0">
+                <div className="h-10 md:h-20 w-[1px] bg-gradient-to-t from-transparent via-white to-transparent" />
+                <span className="text-[8px] md:text-xs font-black italic text-amber-500 rotate-90 my-2 md:my-4">VS</span>
+                <div className="h-10 md:h-20 w-[1px] bg-gradient-to-b from-transparent via-white to-transparent" />
+            </div>
+
+            <div className="flex-1 min-w-0 flex justify-center">
+                <MVPFlipCard data={players[1]} />
+            </div>
         </div>
     );
 }

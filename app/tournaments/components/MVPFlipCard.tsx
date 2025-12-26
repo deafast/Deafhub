@@ -58,7 +58,10 @@ export default function MVPFlipCard({ data }: { data: MVPData }) {
     const theme = themeColors[data.game] || themeColors.dota;
 
     return (
-        <div className="relative w-[340px] h-[480px] perspective-1000 group cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+        <div
+            className="relative w-full max-w-[280px] sm:max-w-[340px] perspective-1000 group cursor-pointer mx-auto h-auto min-h-[380px] xs:min-h-[420px] sm:min-h-[480px] min-w-0 flex-shrink"
+            onClick={() => setIsFlipped(!isFlipped)}
+        >
             <motion.div
                 initial={false}
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -68,7 +71,7 @@ export default function MVPFlipCard({ data }: { data: MVPData }) {
                 {/* FRONT: Visual Identity */}
                 <div
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-[32px] p-1 backface-hidden overflow-hidden bg-[#0A0C10] border",
+                        "absolute inset-0 w-full h-full rounded-2xl sm:rounded-[32px] p-1 backface-hidden overflow-hidden bg-[#0A0C10] border",
                         theme.border,
                         theme.glow
                     )}
@@ -76,7 +79,7 @@ export default function MVPFlipCard({ data }: { data: MVPData }) {
                     <div className={cn("absolute inset-0 bg-gradient-to-br opacity-50", theme.gradient)} />
 
                     {/* Character/Icon Container */}
-                    <div className="relative h-[240px] w-full overflow-hidden rounded-t-[28px] bg-neutral-900/50">
+                    <div className="relative h-[120px] xs:h-[180px] sm:h-[240px] w-full overflow-hidden rounded-t-[20px] sm:rounded-t-[28px] bg-neutral-900/50">
                         <div className="absolute inset-0 flex items-center justify-center opacity-20">
                             <div className="w-[120px] h-[120px] border-2 border-white/5 rounded-full animate-ping" />
                         </div>
@@ -89,31 +92,31 @@ export default function MVPFlipCard({ data }: { data: MVPData }) {
                     </div>
 
                     {/* Content */}
-                    <div className="relative p-6 pt-0 flex flex-col h-[230px] justify-between">
+                    <div className="relative p-4 sm:p-6 pt-0 flex flex-col flex-grow justify-between">
                         <div>
-                            <div className="flex justify-between items-start mb-2">
-                                <h3 className="text-2xl font-black italic text-white uppercase tracking-tighter leading-none">
+                            <div className="flex justify-between items-start mb-1 sm:mb-2">
+                                <h3 className="text-sm xs:text-xl sm:text-2xl font-black italic text-white uppercase tracking-tighter leading-none truncate pr-1">
                                     {data.front.name}
                                 </h3>
-                                <span className={cn("text-lg font-[1000] italic leading-none", theme.accent)}>
+                                <span className={cn("text-xs xs:text-base sm:text-lg font-[1000] italic leading-none whitespace-nowrap", theme.accent)}>
                                     {data.front.rating}
                                 </span>
                             </div>
-                            <p className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-[0.2em] mb-6">
+                            <p className="text-[7px] xs:text-[10px] font-mono font-bold text-white/40 uppercase tracking-[0.2em] mb-3 sm:mb-6 truncate pr-1">
                                 TEAM: {data.front.team}
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-6">
+                        <div className="grid grid-cols-2 gap-1.5 xs:gap-3 sm:gap-4 border-t border-white/5 pt-3 sm:pt-6">
                             {data.front.stats.map((stat, i) => (
-                                <div key={i} className="flex flex-col gap-1">
-                                    <span className="text-[8px] font-mono text-white/30 uppercase tracking-widest">{stat.label}</span>
-                                    <span className="text-lg font-black text-white italic leading-none">{stat.value}</span>
+                                <div key={i} className="flex flex-col gap-0 sm:gap-1">
+                                    <span className="text-[6px] xs:text-[8px] font-mono text-white/30 uppercase tracking-[0.1em] sm:tracking-widest truncate">{stat.label}</span>
+                                    <span className="text-[10px] xs:text-base sm:text-lg font-black text-white italic leading-none truncate">{stat.value}</span>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="flex justify-end gap-2 mt-4">
+                        <div className="flex justify-end gap-1.5 sm:gap-2 mt-2 sm:mt-4">
                             <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                             <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                             <div className={cn("w-1.5 h-1.5 rounded-full", theme.accent)} />
@@ -124,7 +127,7 @@ export default function MVPFlipCard({ data }: { data: MVPData }) {
                 {/* BACK: Data & Intel */}
                 <div
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-[32px] p-8 backface-hidden overflow-hidden bg-[#0D131A] border flex flex-col justify-between",
+                        "absolute inset-0 w-full h-full rounded-2xl sm:rounded-[32px] p-6 sm:p-8 backface-hidden overflow-hidden bg-[#0D131A] border flex flex-col justify-between",
                         theme.border,
                         theme.glow
                     )}

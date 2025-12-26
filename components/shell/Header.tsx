@@ -38,18 +38,24 @@ export default function Header() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-none transition-all duration-300">
-            <div className="container mx-auto flex h-20 items-center justify-between px-4">
+            <div className="container mx-auto flex h-16 sm:h-20 items-center justify-between px-3 sm:px-4">
                 {/* Left: Logo */}
                 <div className="flex items-center gap-4">
-                    <Link href="/" className="flex items-center gap-3">
-                        <div className="relative h-10 w-10">
-                            <Image src="/brand/dh.png" alt="DEAF HUB" fill className="object-contain" />
+                    <Link href="/" className="flex items-center gap-2 sm:gap-4 group">
+                        <div className="relative h-10 w-10 sm:h-14 sm:w-14 translate-x-1 sm:translate-x-3 transition-all duration-500 group-hover:scale-110">
+                            {/* Header Logo - Transparent Shield */}
+                            <Image
+                                src="/brand/header_logo.png"
+                                alt="DEAF HUB"
+                                fill
+                                className="object-contain"
+                            />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-xl font-bold tracking-tighter text-[#EAFBFF]">
+                            <span className="text-base sm:text-xl font-bold tracking-tighter text-[#EAFBFF]">
                                 DEAF <span className="text-[#22D3EE]">|</span> <span className="text-[#22D3EE]">HUB</span>
                             </span>
-                            <span className="text-[10px] font-medium tracking-[0.2em] text-[#22D3EE]/80 uppercase">
+                            <span className="text-[8px] sm:text-[10px] font-medium tracking-[0.2em] text-[#22D3EE]/80 uppercase">
                                 {t.nav.espPlatform}
                             </span>
                         </div>
@@ -70,8 +76,8 @@ export default function Header() {
                 </nav>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-4">
-                    <div className="relative flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur-sm overflow-hidden">
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="relative flex items-center gap-0.5 sm:gap-1 rounded-full border border-white/10 bg-white/5 p-0.5 sm:p-1 backdrop-blur-sm overflow-hidden scale-90 sm:scale-100">
                         {/* Smooth sliding background highlight */}
                         <div className="absolute inset-0 flex p-1">
                             <motion.div
@@ -102,7 +108,7 @@ export default function Header() {
 
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="outline" className="h-10 rounded-xl border-[#22D3EE]/30 bg-[#22D3EE]/5 text-[#22D3EE] hover:bg-[#22D3EE] hover:text-[#0A0F14]">
+                            <Button variant="outline" className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl border-[#22D3EE]/30 bg-[#22D3EE]/5 text-[#22D3EE] hover:bg-[#22D3EE] hover:text-[#0A0F14] text-xs sm:text-sm">
                                 {t.nav.signin}
                             </Button>
                         </DialogTrigger>
