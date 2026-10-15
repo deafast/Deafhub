@@ -1,0 +1,56 @@
+-- Transactional integration test. No test users, tournaments or results persist.
+begin;
+create temp table dh_fixture(a uuid,b uuid,c uuid);
+insert into dh_fixture values(gen_random_uuid(),gen_random_uuid(),gen_random_uuid());
+insert into auth.users(id,email,aud,role) select id,id::text||'@deafhub-test.invalid','authenticated','authenticated' from (select a id from dh_fixture union all select b from dh_fixture union all select c from dh_fixture) s;
+insert into public.profiles(id,nickname,region) select id,'Test player','europe' from (select a id from dh_fixture union all select b from dh_fixture union all select c from dh_fixture) s;
+insert into public.hub_organizers(user_id) select a from dh_fixture;
+grant select on dh_fixture to authenticated;
+set local role authenticated;
+do $$
+declare a uuid;b uuid;c uuid;ta uuid;tb uuid;tid uuid;ea uuid;eb uuid;mid uuid;rv uuid;blocked boolean;counter int;
+begin
+ select f.a,f.b,f.c into a,b,c from dh_fixture f;
+ perform set_config('request.jwt.claim.sub',a::text,true);
+ select (public.hub_action('create_team',jsonb_build_object('name','QA A '||left(a::text,12),'game','fc'))->>'id')::uuid into ta;
+ perform public.hub_action('create_tournament',jsonb_build_object('title','Rollback tournament','game','fc','starts_at',now()+interval '2 days','rules','Internal test only, rolled back after assertions','roster_size',1));
+ select id,rules_version into tid,rv from public.hub_tournaments where organizer_id=a;
+ blocked:=false;
+ begin perform public.hub_action('register',jsonb_build_object('team_id',ta,'tournament_id',tid,'accepted',true,'rules_version',gen_random_uuid())); exception when others then if SQLERRM='Read and accept current rules' then blocked:=true;else raise;end if;end;
+ if not blocked then raise exception 'FAIL stale rules accepted';end if;
+ perform public.hub_action('register',jsonb_build_object('team_id',ta,'tournament_id',tid,'accepted',true,'rules_version',rv));
+ select id into ea from public.hub_entries where team_id=ta;
+ perform set_config('request.jwt.claim.sub',b::text,true);
+ select (public.hub_action('create_team',jsonb_build_object('name','QA B '||left(b::text,12),'game','fc'))->>'id')::uuid into tb;
+ perform public.hub_action('register',jsonb_build_object('team_id',tb,'tournament_id',tid,'accepted',true,'rules_version',rv));
+ select id into eb from public.hub_entries where team_id=tb;
+ blocked:=false;
+ begin perform public.hub_action('review_entry',jsonb_build_object('entry_id',ea,'status','approved'));exception when others then if SQLERRM='Organizer required' then blocked:=true;else raise;end if;end;
+ if not blocked then raise exception 'FAIL player approved entry';end if;
+ if exists(select 1 from public.hub_invites where team_id=ta) then raise exception 'FAIL captain invitation leaked';end if;
+ if exists(select 1 from public.profiles where id=a) then raise exception 'FAIL private profile leaked';end if;
+ perform set_config('request.jwt.claim.sub',a::text,true);
+ perform public.hub_action('review_entry',jsonb_build_object('entry_id',ea,'status','approved'));
+ perform public.hub_action('review_entry',jsonb_build_object('entry_id',eb,'status','approved'));
+ perform public.hub_action('create_match',jsonb_build_object('tournament_id',tid,'entry_a',ea,'entry_b',eb,'starts_at',now()+interval '2 days'));
+ select id into mid from public.hub_matches where tournament_id=tid;
+ perform set_config('request.jwt.claim.sub',c::text,true);
+ blocked:=false;
+ begin perform public.hub_action('finish_match',jsonb_build_object('match_id',mid,'score_a',2,'score_b',1));exception when others then if SQLERRM='Organizer required' then blocked:=true;else raise;end if;end;
+ if not blocked then raise exception 'FAIL player forged result';end if;
+ perform set_config('request.jwt.claim.sub',a::text,true);
+ perform public.hub_action('finish_match',jsonb_build_object('match_id',mid,'score_a',2,'score_b',1));
+ select wins into counter from public.hub_player_stats where user_id=a;
+ if counter is distinct from 1 then raise exception 'FAIL winner statistics';end if;
+ select wins into counter from public.hub_player_stats where user_id=b;
+ if counter is distinct from 0 then raise exception 'FAIL loser statistics';end if;
+ blocked:=false;
+ begin perform public.hub_action('finish_match',jsonb_build_object('match_id',mid,'score_a',9,'score_b',1));exception when others then if SQLERRM='Result already confirmed' then blocked:=true;else raise;end if;end;
+ if not blocked then raise exception 'FAIL confirmed result overwritten';end if;
+ perform public.hub_action('finish_tournament',jsonb_build_object('tournament_id',tid));
+ if has_table_privilege('authenticated','public.steam_nonces','select') or has_table_privilege('authenticated','public.steam_accounts','insert') then raise exception 'FAIL Steam private grants';end if;
+end $$;
+reset role;
+select 'PASS: team, registration, roster snapshot, organizer permissions, results, statistics, private profiles and invitations' as result;
+rollback;
+

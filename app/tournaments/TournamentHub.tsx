@@ -1,10 +1,2 @@
-'use client';
-import { useState } from 'react';
-import Link from 'next/link';
-import { useLanguageStore } from '@/store/useLanguageStore';
-export default function TournamentHub() {
- const ru = useLanguageStore(s => s.language === 'ru');
- const [game,setGame] = useState('all');
- const [query,setQuery] = useState('');
- return <section className="mx-auto max-w-6xl px-5 py-14"><p className="text-xs tracking-widest text-[#22D3EE]">TOURNAMENT HUB</p><h1 className="mt-4 text-4xl font-black">{ru ? 'Турниры DeafHub' : 'DeafHub tournaments'}</h1><p className="mt-4 text-white/60">{ru ? 'Только подтверждённые события и результаты.' : 'Confirmed events and results only.'}</p><div className="mt-8 flex flex-wrap gap-4"><label className="flex-1 text-sm">{ru ? 'Поиск турнира' : 'Search tournaments'}<input value={query} onChange={e => setQuery(e.target.value)} type="search" className="mt-2 h-12 w-full rounded-2xl border border-white/15 bg-[#0D131A] px-4" placeholder={ru ? 'Название турнира' : 'Tournament name'} /></label><label className="text-sm">{ru ? 'Игра' : 'Game'}<select value={game} onChange={e => setGame(e.target.value)} className="mt-2 block h-12 rounded-2xl border border-white/15 bg-[#0D131A] px-4"><option value="all">{ru ? 'Все игры' : 'All games'}</option><option value="dota">Dota 2</option><option value="cs2">CS2</option><option value="fc">EA Sports FC</option></select></label></div><div className="mt-8 rounded-3xl border border-white/10 bg-[#0D131A] p-8" role="status"><h2 className="text-xl font-bold">{query || game !== 'all' ? (ru ? 'Подходящих турниров пока нет' : 'No matching tournaments yet') : (ru ? 'Первый турнир ещё не объявлен' : 'The first tournament has not been announced')}</h2><p className="mt-4 max-w-2xl leading-7 text-white/60">{ru ? 'Регистрация пока закрыта. Дата, состав, формат, правила, взнос и призовой фонд появятся в карточке подтверждённого турнира. Рейтинг начнётся с реальных результатов.' : 'Registration is not open. Dates, roster, format, rules, entry fees and prizes will appear with a confirmed tournament. Rankings will begin with real results.'}</p><div className="mt-6 flex flex-wrap gap-6 text-[#22D3EE]"><Link href="/rules">{ru ? 'Условия участия' : 'Participation rules'}</Link><Link href="/contact">{ru ? 'Организаторам и спонсорам' : 'Organizers and sponsors'}</Link></div></div></section>;
-}
+import HubPanel from '@/components/hub/HubPanel';
+export default function TournamentHub(){return <section className="mx-auto max-w-6xl px-5 py-12"><HubPanel section="tournaments"/></section>;}

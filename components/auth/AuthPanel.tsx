@@ -6,23 +6,25 @@ import { createClient } from '@/lib/supabase/client';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { Button } from '@/components/ui/button';
 
-export default function AuthPanel() {
+export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }) {
     const ru = useLanguageStore((state) => state.language === 'ru');
     const router = useRouter();
     const stopWaiting = useRef<(() => void) | null>(null);
     useEffect(() => () => stopWaiting.current?.(), []);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
+    const [steamEnabled, setSteamEnabled] = useState(false);
+    useEffect(() => { let active = true; void fetch('/auth/steam/status').then(r => r.json()).then(d => { if (active) setSteamEnabled(d.enabled === true); }).catch(() => {}); return () => { active = false; }; }, []);
     const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
 
-    async function googleSignIn() {
+    async function providerSignIn(provider: 'google' | 'steam') {
         setError('');
         const supabase = createClient();
-        if (!supabase || !googleEnabled) return;
+        if (!supabase || (provider === 'google' ? !googleEnabled : !steamEnabled)) return;
         // Open synchronously from the click so popup blockers can recognise the gesture.
-        const popup = window.open('about:blank', 'deafhub-google-login', 'popup=yes,width=500,height=680');
+        const popup = window.open('about:blank', 'deafhub-provider-login', 'popup=yes,width=500,height=680');
         if (!popup) {
-            setError(ru ? 'Разрешите всплывающее окно для входа через Google и нажмите ещё раз.' : 'Allow the Google sign-in popup and try again.');
+            setError(ru ? 'Разрешите всплывающее окно для входа и нажмите ещё раз.' : 'Allow the sign-in popup and try again.');
             return;
         }
         setBusy(true);
@@ -33,14 +35,14 @@ export default function AuthPanel() {
         stopWaiting.current = stop;
         try {
             popup.sessionStorage.setItem('deafhub-auth-popup', '1');
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: `${window.location.origin}/auth/callback`, skipBrowserRedirect: true },
-            });
+            let destination = '/auth/steam';
+            if (provider === 'google') {
+                const { data, error } = await supabase.auth.signInWithOAuth({provider: 'google',options: {redirectTo: `${window.location.origin}/auth/callback`, skipBrowserRedirect: true}});
+                if (error || !data.url) throw error || new Error('Missing URL');
+                destination = data.url;
+            }
             if (cancelled) return;
-            if (error || !data.url) throw error || new Error('Missing URL');
-            popup.location.href = data.url;
-            const started = Date.now();
+            popup.location.href = destination;            const started = Date.now();
             let checking = false;
             timer = setInterval(async () => {
                 if (checking || cancelled) return;
@@ -48,7 +50,12 @@ export default function AuthPanel() {
                 try {
                     const { data: { user } } = await supabase.auth.getUser();
                     if (cancelled) return;
-                    if (user) {
+                    let complete = Boolean(user);
+                    if (provider === 'steam' && user) {
+                        const result = await fetch('/api/hub', { cache: 'no-store' });
+                        complete = result.ok && Boolean((await result.json()).steamId);
+                    }
+                    if (complete) {
                         stop();
                         setBusy(false);
                         router.replace('/profile');
@@ -73,16 +80,17 @@ export default function AuthPanel() {
         }
     }
     return <div className="grid gap-4">
-        <p className="text-sm text-white/60">{ru ? 'Войдите, чтобы создать профиль и управлять участием в турнирах.' : 'Sign in to create your profile and manage tournament entries.'}</p>
-        <Button type="button" disabled={busy || !googleEnabled} onClick={googleSignIn} className="h-12 w-full rounded-2xl bg-white text-black hover:bg-white/90">
+        {!steamOnly ? <p className="text-sm text-white/60">{ru ? 'Войдите, чтобы создать профиль и управлять участием в турнирах.' : 'Sign in to create your profile and manage tournament entries.'}</p> : null}
+        {!steamOnly ? <Button type="button" disabled={busy || !googleEnabled} onClick={() => void providerSignIn('google')} className="h-12 w-full rounded-2xl bg-white text-black hover:bg-white/90">
             {busy ? (ru ? 'Ожидание входа…' : 'Waiting for sign-in…') : (ru ? 'Продолжить с Google' : 'Continue with Google')}
-        </Button>
+        </Button> : null}
         {busy ? <button type="button" onClick={() => { stopWaiting.current?.(); setBusy(false); }} className="text-sm text-white/60 underline">{ru ? 'Отменить вход' : 'Cancel sign-in'}</button> : null}
-        {!googleEnabled ? <p className="text-xs text-white/50">{ru ? 'Вход через Google скоро станет доступен.' : 'Google sign-in will be available soon.'}</p> : null}
-        <Button type="button" disabled className="h-12 w-full rounded-2xl border border-white/15 bg-white/5 text-white">
-            {ru ? 'Продолжить со Steam' : 'Continue with Steam'}
+        {!googleEnabled && !steamOnly ? <p className="text-xs text-white/50">{ru ? 'Вход через Google скоро станет доступен.' : 'Google sign-in will be available soon.'}</p> : null}
+        <Button type="button" disabled={busy || !steamEnabled} onClick={() => void providerSignIn('steam')} className="h-12 w-full rounded-2xl border border-white/15 bg-white/5 text-white">
+            {ru ? (steamOnly ? 'Привязать Steam' : 'Продолжить со Steam') : (steamOnly ? 'Link Steam' : 'Continue with Steam')}
         </Button>
-        <p className="text-xs text-white/50">{ru ? 'Вход через Steam пока настраивается.' : 'Steam sign-in is being configured.'}</p>
+        {!steamEnabled ? <p className="text-xs text-white/50">{ru ? 'Вход через Steam пока настраивается.' : 'Steam sign-in is being configured.'}</p> : null}
         {error ? <p role="alert" className="text-sm text-red-300">{error}</p> : null}
     </div>;
 }
+
