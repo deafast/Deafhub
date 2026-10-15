@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -14,6 +14,8 @@ export default function AccountButton() {
     const router = useRouter();
     const [signedIn, setSignedIn] = useState(false);
     const [open, setOpen] = useState(false);
+    const dialogOpen = useRef(false);
+    useEffect(() => { dialogOpen.current = open; }, [open]);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
 
@@ -27,10 +29,13 @@ export default function AccountButton() {
         const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
             if (!active) return;
             setSignedIn(Boolean(session?.user));
-            if (session?.user) setOpen(false);
+            if (session?.user) {
+                if (dialogOpen.current) { router.replace('/profile'); router.refresh(); }
+                setOpen(false);
+            }
         });
         return () => { active = false; subscription.unsubscribe(); };
-    }, []);
+    }, [router]);
 
     async function signOut() {
         setBusy(true);
@@ -62,3 +67,4 @@ export default function AccountButton() {
         </DialogContent>
     </Dialog>;
 }
+
