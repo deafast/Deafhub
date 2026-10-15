@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://www.deafhub.cc";
 const siteName = "DEAF|HUB Esports";
-const siteDescription = "Premium esports platform for Deaf and Hard of Hearing gamers.";
+const siteDescription = "DeafHub — a community esports project for Deaf and hard of hearing players.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -82,3 +82,4 @@ export default function RootLayout({
     </html>
   );
 }
+

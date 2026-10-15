@@ -1,10 +1,10 @@
-﻿import type { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "DEAF|HUB",
     short_name: "DEAFHUB",
-    description: "Premium esports platform for Deaf and Hard of Hearing gamers.",
+    description: "DeafHub — a community esports project for Deaf and hard of hearing players.",
     start_url: "/",
     display: "standalone",
     background_color: "#0A0F14",
@@ -23,3 +23,4 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   };
 }
+
