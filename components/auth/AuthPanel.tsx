@@ -58,6 +58,7 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
                     if (complete) {
                         stop();
                         setBusy(false);
+                        window.dispatchEvent(new Event('deafhub:auth-complete'));
                         router.replace('/profile');
                         router.refresh();
                     } else if (Date.now() - started > 180000) {
@@ -93,5 +94,6 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
         {error ? <p role="alert" className="text-sm text-red-300">{error}</p> : null}
     </div>;
 }
+
 
 

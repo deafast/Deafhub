@@ -23,9 +23,20 @@ export default function AccountButton() {
         const client = createClient();
         if (!client) return;
         let active = true;
-        void client.auth.getUser().then(({ data }) => {
-            if (active) setSignedIn(Boolean(data.user));
-        }).catch(() => {});
+        const syncUser = () => {
+            void client.auth.getUser().then(({ data }) => {
+                if (!active) return;
+                setSignedIn(Boolean(data.user));
+                if (data.user && dialogOpen.current) {
+                    dialogOpen.current = false;
+                    setOpen(false);
+                    router.replace('/profile');
+                    router.refresh();
+                }
+            }).catch(() => {});
+        };
+        syncUser();
+        window.addEventListener('deafhub:auth-complete', syncUser);
         const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
             if (!active) return;
             setSignedIn(Boolean(session?.user));
@@ -34,7 +45,7 @@ export default function AccountButton() {
                 setOpen(false);
             }
         });
-        return () => { active = false; subscription.unsubscribe(); };
+        return () => { active = false; subscription.unsubscribe(); window.removeEventListener('deafhub:auth-complete', syncUser); };
     }, [router]);
 
     async function signOut() {
@@ -67,4 +78,5 @@ export default function AccountButton() {
         </DialogContent>
     </Dialog>;
 }
+
 
