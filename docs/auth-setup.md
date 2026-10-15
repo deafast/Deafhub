@@ -1,20 +1,22 @@
 # DeafHub authentication
 
-Account: nagatodeaf@gmail.com. Organization: DeafHub (iessmykfieoitnyqdrpv).
-Project: DeafHub (hvxvwgnnmazpptuenidv). Do not use another project's credentials.
+Owner: nagatodeaf@gmail.com. Organization: DeafHub (iessmykfieoitnyqdrpv).
+Supabase: DeafHub (hvxvwgnnmazpptuenidv). Never use another project's credentials.
 
-Required Vercel Preview variables:
+The requested sign-in methods are Google and Steam only. The email form and magic-link requests have been removed. VK is out of scope.
 
-- NEXT_PUBLIC_SUPABASE_URL: https://hvxvwgnnmazpptuenidv.supabase.co
-- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: the project's publishable key
-- NEXT_PUBLIC_GOOGLE_AUTH_ENABLED: true only after configuring and testing Google
+Preview variables:
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+- NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true only after Google is configured and tested
 
-Apply db/profiles.sql to this new project once. RLS restricts each user to their own profile. No service-role key is needed by the application.
+Google Cloud project DeafHub: caramel-limiter-511716-u1. Setup is blocked by Google's mandatory two-step verification on the owner's account. The owner must complete MFA before OAuth setup can continue.
+Create a Web OAuth client with the stable Preview origin and callback https://hvxvwgnnmazpptuenidv.supabase.co/auth/v1/callback. Configure its ID and secret in the correct Supabase project's Google provider. Keep secrets out of browser bundles and Git. The app's PKCE callback is /auth/callback.
 
-Email sign-in uses Supabase's default magic-link email, with a PKCE callback at /auth/callback. Open the link in the same browser that requested it. On the Free plan, custom templates require custom SMTP or a Send Email hook. Default sending is restricted to authorized team addresses; configure and verify custom SMTP before public launch. Do not disable email confirmation to work around delivery.
+Steam is not implemented yet: the disabled button explicitly says it is being configured. Steam uses OpenID 2.0, which cannot be passed as provider 'steam' to Supabase's OAuth API. A verified server-side OpenID integration and session bridge are still required. Do not enable the button until that flow has been implemented and tested.
 
-Set Site URL to the stable Preview branch URL and allow its exact /auth/callback redirect. No production credentials are configured in this setup.
+The profile schema is already installed. Do not rerun db/profiles.sql: its policies already exist. RLS restricts every user to their own profile. The application currently needs no service-role key.
 
-For Google, register an OAuth web client, add the Supabase callback URL, enable the provider, allow the stable Preview /auth/callback URL, and only then enable the Google button. VK ID needs a separately configured provider; it is not presented as operational.
+Site URL and exact allowed redirect use the stable Preview branch URL. Production is unchanged.
 
-Validation: signed-out /profile redirects to /sign-in; an email link creates a session; save/reload profile; sign out; second account cannot read/write the first profile. Contacts are unverified and private. Tournament payment/eligibility and captain-group access must not be inferred from these fields.
+Validation remaining: Google and Steam successful sign-in, profile save/reload, sign out, and a second account unable to access the first account's profile. Contacts are unverified and private; do not infer tournament payment or eligibility from them.
