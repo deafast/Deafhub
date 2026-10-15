@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguageStore } from '@/store/useLanguageStore';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import AccountButton from '@/components/auth/AccountButton';
+
 import { motion } from 'framer-motion';
 
 const GB_FLAG = (
@@ -106,26 +106,7 @@ export default function Header() {
                         </button>
                     </div>
 
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl border-[#22D3EE]/30 bg-[#22D3EE]/5 text-[#22D3EE] hover:bg-[#22D3EE] hover:text-[#0A0F14] text-xs sm:text-sm">
-                                {t.nav.signin}
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] rounded-3xl border-white/10 bg-[#0D131A] p-8">
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-bold text-center mb-6">{t.nav.signin}</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid gap-4">
-                                <Button className="h-12 w-full rounded-2xl bg-white text-black hover:bg-white/90">
-                                    Continue with Google
-                                </Button>
-                                <Button className="h-12 w-full rounded-2xl bg-[#4C75A3] text-white hover:bg-[#4C75A3]/90">
-                                    Continue with VK
-                                </Button>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                    <AccountButton />
                 </div>
             </div>
         </header>

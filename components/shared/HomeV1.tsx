@@ -5,9 +5,11 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { Button } from '@/components/ui/button';
 import { Trophy, Target, Zap, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function HomeV1() {
     const { t } = useLanguageStore();
+    const router = useRouter();
     const [isFirstMount, setIsFirstMount] = useState(true);
 
     useEffect(() => {
@@ -84,7 +86,7 @@ export default function HomeV1() {
                         transition={{ delay: 0.6, duration: 0.5 }}
                         className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto"
                     >
-                        <Button size="lg" className="h-14 sm:h-16 px-8 sm:px-12 rounded-none bg-[#22D3EE] text-black hover:bg-white transition-all duration-300 font-[1000] italic text-lg sm:text-xl uppercase skew-x-[-15deg] group overflow-hidden relative shadow-[0_10px_30px_rgba(34,211,238,0.3)]">
+                        <Button onClick={() => router.push('/profile')} size="lg" className="h-14 sm:h-16 px-8 sm:px-12 rounded-none bg-[#22D3EE] text-black hover:bg-white transition-all duration-300 font-[1000] italic text-lg sm:text-xl uppercase skew-x-[-15deg] group overflow-hidden relative shadow-[0_10px_30px_rgba(34,211,238,0.3)]">
                             <motion.div
                                 whileHover={{ x: 10 }}
                                 transition={springConfig}
@@ -93,7 +95,7 @@ export default function HomeV1() {
                                 {t.hero.joinNow} <ChevronRight className="w-6 h-6" />
                             </motion.div>
                         </Button>
-                        <Button variant="outline" size="lg" className="h-14 sm:h-16 px-8 sm:px-12 rounded-none border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300 font-[1000] italic text-lg sm:text-xl uppercase skew-x-[-15deg]">
+                        <Button onClick={() => router.push('/tournaments')} variant="outline" size="lg" className="h-14 sm:h-16 px-8 sm:px-12 rounded-none border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300 font-[1000] italic text-lg sm:text-xl uppercase skew-x-[-15deg]">
                             <span className="skew-x-[15deg]">{t.hero.viewTournaments}</span>
                         </Button>
                     </motion.div>
