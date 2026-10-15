@@ -52,8 +52,8 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
                     if (cancelled) return;
                     let complete = Boolean(user);
                     if (provider === 'steam' && user) {
-                        const result = await fetch('/api/hub', { cache: 'no-store' });
-                        complete = result.ok && Boolean((await result.json()).steamId);
+                        const result = await fetch('/auth/steam/status', { cache: 'no-store' });
+                        complete = result.ok && Boolean((await result.json()).linked);
                     }
                     if (complete) {
                         stop();
@@ -93,4 +93,5 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
         {error ? <p role="alert" className="text-sm text-red-300">{error}</p> : null}
     </div>;
 }
+
 
