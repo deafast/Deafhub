@@ -19,12 +19,11 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
     const locked = busy || formBusy;
     const [steamEnabled, setSteamEnabled] = useState(false);
     useEffect(() => { let active = true; void fetch('/auth/steam/status').then(r => r.json()).then(d => { if (active) setSteamEnabled(d.enabled === true); }).catch(() => {}); return () => { active = false; }; }, []);
-    const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
 
-    async function providerSignIn(provider: 'google' | 'steam') {
+    async function steamSignIn() {
         setError('');
         const supabase = createClient();
-        if (!supabase || (provider === 'google' ? !googleEnabled : !steamEnabled)) return;
+        if (!supabase || !steamEnabled) return;
         // Open synchronously from the click so popup blockers can recognise the gesture.
         const popup = window.open('about:blank', 'deafhub-provider-login', 'popup=yes,width=500,height=680');
         if (!popup) {
@@ -39,14 +38,8 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
         stopWaiting.current = stop;
         try {
             popup.sessionStorage.setItem('deafhub-auth-popup', '1');
-            let destination = '/auth/steam';
-            if (provider === 'google') {
-                const { data, error } = await supabase.auth.signInWithOAuth({provider: 'google',options: {redirectTo: `${window.location.origin}/auth/callback`, skipBrowserRedirect: true}});
-                if (error || !data.url) throw error || new Error('Missing URL');
-                destination = data.url;
-            }
             if (cancelled) return;
-            popup.location.href = destination;            const started = Date.now();
+            popup.location.href = '/auth/steam';            const started = Date.now();
             let checking = false;
             timer = setInterval(async () => {
                 if (checking || cancelled) return;
@@ -55,7 +48,7 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
                     const { data: { user } } = await supabase.auth.getUser();
                     if (cancelled) return;
                     let complete = Boolean(user);
-                    if (provider === 'steam' && user) {
+                    if (user) {
                         const result = await fetch('/auth/steam/status', { cache: 'no-store' });
                         complete = result.ok && Boolean((await result.json()).linked);
                     }
@@ -86,18 +79,13 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
     }
     return <div className="grid gap-4">
         {!steamOnly ? <div className="flex items-center gap-3 text-xs text-white/45"><span className="h-px flex-1 bg-white/10" /><span>{ru ? 'Войти через' : 'Sign in with'}</span><span className="h-px flex-1 bg-white/10" /></div> : null}
-        <div className={steamOnly ? 'grid' : 'grid grid-cols-2 gap-3'}>
-            {!steamOnly ? <Button type="button" aria-label={ru ? 'Войти через Google' : 'Sign in with Google'} disabled={locked || !googleEnabled} onClick={() => void providerSignIn('google')} className="h-12 min-w-0 gap-2.5 rounded-[10px] border border-[#747775] bg-white px-2 text-[#1F1F1F] hover:bg-[#F2F2F2]">
-                <Image src="/auth/google.svg" width={20} height={20} alt="" className="shrink-0" />
-                <span className="text-sm font-semibold">Google</span>
-            </Button> : null}
-            <Button type="button" aria-label={ru ? (steamOnly ? 'Привязать Steam' : 'Войти через Steam') : (steamOnly ? 'Link Steam' : 'Sign in with Steam')} disabled={locked || !steamEnabled} onClick={() => void providerSignIn('steam')} className="h-12 min-w-0 gap-2 rounded-[10px] border border-[#23456A] bg-[#0C2340] px-3 text-white hover:bg-[#123456]">
+        <div className="grid">
+            <Button type="button" aria-label={ru ? (steamOnly ? 'Привязать Steam' : 'Войти через Steam') : (steamOnly ? 'Link Steam' : 'Sign in with Steam')} disabled={locked || !steamEnabled} onClick={() => void steamSignIn()} className="h-12 min-w-0 gap-2 rounded-[10px] border border-[#23456A] bg-[#0C2340] px-3 text-white hover:bg-[#123456]">
                 <Image src="/auth/steam.svg" width={88} height={27} alt="Steam" className="h-auto w-[88px] shrink-0" />
                 {steamOnly ? <span>{ru ? 'Привязать' : 'Link'}</span> : null}
             </Button>
         </div>
         {busy ? <div role="status" className="flex items-center justify-between gap-2 text-xs text-white/60"><span>{ru ? 'Ожидание входа…' : 'Waiting for sign-in…'}</span><button type="button" onClick={() => { stopWaiting.current?.(); setBusy(false); }} className="text-[#22D3EE] hover:underline">{ru ? 'Отменить' : 'Cancel'}</button></div> : null}
-        {!googleEnabled && !steamOnly ? <p className="text-xs text-white/50">{ru ? 'Вход через Google скоро станет доступен.' : 'Google sign-in will be available soon.'}</p> : null}
         {!steamEnabled ? <p className="text-xs text-white/50">{ru ? 'Вход через Steam пока настраивается.' : 'Steam sign-in is being configured.'}</p> : null}
         {error ? <p role="alert" className="text-sm text-red-300">{error}</p> : null}
         {!steamOnly ? <>
