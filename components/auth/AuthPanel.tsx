@@ -87,11 +87,11 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
     return <div className="grid gap-4">
         {!steamOnly ? <div className="flex items-center gap-3 text-xs text-white/45"><span className="h-px flex-1 bg-white/10" /><span>{ru ? 'Войти через' : 'Sign in with'}</span><span className="h-px flex-1 bg-white/10" /></div> : null}
         <div className={steamOnly ? 'grid' : 'grid grid-cols-2 gap-3'}>
-            {!steamOnly ? <Button type="button" aria-label={ru ? 'Войти через Google' : 'Sign in with Google'} disabled={locked || !googleEnabled} onClick={() => void providerSignIn('google')} className="h-12 min-w-0 gap-1.5 rounded-xl border border-[#747775] bg-white px-2 text-[#1F1F1F] hover:bg-[#F2F2F2]">
-                <Image src="/auth/google.svg" width={32} height={32} alt="" className="shrink-0" />
+            {!steamOnly ? <Button type="button" aria-label={ru ? 'Войти через Google' : 'Sign in with Google'} disabled={locked || !googleEnabled} onClick={() => void providerSignIn('google')} className="h-12 min-w-0 gap-2.5 rounded-[10px] border border-[#747775] bg-white px-2 text-[#1F1F1F] hover:bg-[#F2F2F2]">
+                <Image src="/auth/google.svg" width={20} height={20} alt="" className="shrink-0" />
                 <span className="text-sm font-semibold">Google</span>
             </Button> : null}
-            <Button type="button" aria-label={ru ? (steamOnly ? 'Привязать Steam' : 'Войти через Steam') : (steamOnly ? 'Link Steam' : 'Sign in with Steam')} disabled={locked || !steamEnabled} onClick={() => void providerSignIn('steam')} className="h-12 min-w-0 gap-2 rounded-xl border border-[#23456A] bg-[#0C2340] px-3 text-white hover:bg-[#123456]">
+            <Button type="button" aria-label={ru ? (steamOnly ? 'Привязать Steam' : 'Войти через Steam') : (steamOnly ? 'Link Steam' : 'Sign in with Steam')} disabled={locked || !steamEnabled} onClick={() => void providerSignIn('steam')} className="h-12 min-w-0 gap-2 rounded-[10px] border border-[#23456A] bg-[#0C2340] px-3 text-white hover:bg-[#123456]">
                 <Image src="/auth/steam.svg" width={88} height={27} alt="Steam" className="h-auto w-[88px] shrink-0" />
                 {steamOnly ? <span>{ru ? 'Привязать' : 'Link'}</span> : null}
             </Button>
