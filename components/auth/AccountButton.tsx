@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import AuthPanel from './AuthPanel';
 
 export default function AccountButton() {
@@ -72,8 +72,8 @@ export default function AccountButton() {
 
     return <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild><Button variant="outline" className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl border-[#22D3EE]/30 bg-[#22D3EE]/5 text-[#22D3EE] hover:bg-[#22D3EE] hover:text-[#0A0F14] text-xs sm:text-sm">{ru ? 'Войти' : 'Sign In'}</Button></DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] rounded-3xl border-white/10 bg-[#0D131A] p-8">
-            <DialogHeader><DialogTitle className="text-2xl font-bold text-center mb-4">{ru ? 'Вход в DeafHub' : 'Sign in to DeafHub'}</DialogTitle></DialogHeader>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[400px] rounded-3xl border-white/10 bg-[#0D131A] p-6 sm:p-7">
+            <DialogHeader><DialogTitle className="text-center text-2xl font-bold">{ru ? 'Вход в ' : 'Sign in to '}<span className="text-[#22D3EE]">DeafHub</span></DialogTitle><DialogDescription className="sr-only">{ru ? 'Вход через Google, Steam или почту. Регистрация и восстановление пароля.' : 'Sign in with Google, Steam or email. Create an account or reset your password.'}</DialogDescription></DialogHeader>
             <AuthPanel />
         </DialogContent>
     </Dialog>;

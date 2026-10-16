@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import EmailAuth from './EmailAuth';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguageStore } from '@/store/useLanguageStore';
@@ -13,6 +15,8 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
     useEffect(() => () => stopWaiting.current?.(), []);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
+    const [formBusy, setFormBusy] = useState(false);
+    const locked = busy || formBusy;
     const [steamEnabled, setSteamEnabled] = useState(false);
     useEffect(() => { let active = true; void fetch('/auth/steam/status').then(r => r.json()).then(d => { if (active) setSteamEnabled(d.enabled === true); }).catch(() => {}); return () => { active = false; }; }, []);
     const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
@@ -81,19 +85,24 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
         }
     }
     return <div className="grid gap-4">
-        {!steamOnly ? <p className="text-sm text-white/60">{ru ? 'Войдите, чтобы создать профиль и управлять участием в турнирах.' : 'Sign in to create your profile and manage tournament entries.'}</p> : null}
-        {!steamOnly ? <Button type="button" disabled={busy || !googleEnabled} onClick={() => void providerSignIn('google')} className="h-12 w-full rounded-2xl bg-white text-black hover:bg-white/90">
-            {busy ? (ru ? 'Ожидание входа…' : 'Waiting for sign-in…') : (ru ? 'Продолжить с Google' : 'Continue with Google')}
-        </Button> : null}
-        {busy ? <button type="button" onClick={() => { stopWaiting.current?.(); setBusy(false); }} className="text-sm text-white/60 underline">{ru ? 'Отменить вход' : 'Cancel sign-in'}</button> : null}
+        {!steamOnly ? <div className="flex items-center gap-3 text-xs text-white/45"><span className="h-px flex-1 bg-white/10" /><span>{ru ? 'Войти через' : 'Sign in with'}</span><span className="h-px flex-1 bg-white/10" /></div> : null}
+        <div className={steamOnly ? 'grid' : 'grid grid-cols-2 gap-3'}>
+            {!steamOnly ? <Button type="button" aria-label={ru ? 'Войти через Google' : 'Sign in with Google'} disabled={locked || !googleEnabled} onClick={() => void providerSignIn('google')} className="h-12 min-w-0 gap-1.5 rounded-xl border border-[#747775] bg-white px-2 text-[#1F1F1F] hover:bg-[#F2F2F2]">
+                <Image src="/auth/google.svg" width={32} height={32} alt="" className="shrink-0" />
+                <span className="text-sm font-semibold">Google</span>
+            </Button> : null}
+            <Button type="button" aria-label={ru ? (steamOnly ? 'Привязать Steam' : 'Войти через Steam') : (steamOnly ? 'Link Steam' : 'Sign in with Steam')} disabled={locked || !steamEnabled} onClick={() => void providerSignIn('steam')} className="h-12 min-w-0 gap-2 rounded-xl border border-[#23456A] bg-[#0C2340] px-3 text-white hover:bg-[#123456]">
+                <Image src="/auth/steam.svg" width={88} height={27} alt="Steam" className="h-auto w-[88px] shrink-0" />
+                {steamOnly ? <span>{ru ? 'Привязать' : 'Link'}</span> : null}
+            </Button>
+        </div>
+        {busy ? <div role="status" className="flex items-center justify-between gap-2 text-xs text-white/60"><span>{ru ? 'Ожидание входа…' : 'Waiting for sign-in…'}</span><button type="button" onClick={() => { stopWaiting.current?.(); setBusy(false); }} className="text-[#22D3EE] hover:underline">{ru ? 'Отменить' : 'Cancel'}</button></div> : null}
         {!googleEnabled && !steamOnly ? <p className="text-xs text-white/50">{ru ? 'Вход через Google скоро станет доступен.' : 'Google sign-in will be available soon.'}</p> : null}
-        <Button type="button" disabled={busy || !steamEnabled} onClick={() => void providerSignIn('steam')} className="h-12 w-full rounded-2xl border border-white/15 bg-white/5 text-white">
-            {ru ? (steamOnly ? 'Привязать Steam' : 'Продолжить со Steam') : (steamOnly ? 'Link Steam' : 'Continue with Steam')}
-        </Button>
         {!steamEnabled ? <p className="text-xs text-white/50">{ru ? 'Вход через Steam пока настраивается.' : 'Steam sign-in is being configured.'}</p> : null}
         {error ? <p role="alert" className="text-sm text-red-300">{error}</p> : null}
+        {!steamOnly ? <>
+            <div className="flex items-center gap-3 text-xs text-white/40"><span className="h-px flex-1 bg-white/10" /><span>{ru ? 'или' : 'or'}</span><span className="h-px flex-1 bg-white/10" /></div>
+            <EmailAuth disabled={busy} onPendingChange={setFormBusy} />
+        </> : null}
     </div>;
 }
-
-
-
