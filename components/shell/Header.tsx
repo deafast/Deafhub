@@ -42,23 +42,14 @@ export default function Header() {
                 {/* Left: Logo */}
                 <div className="flex items-center gap-4">
                     <Link href="/" className="flex items-center gap-2 sm:gap-4 group">
-                        <div className="relative h-10 w-10 sm:h-14 sm:w-14 translate-x-1 sm:translate-x-3 transition-all duration-500 group-hover:scale-110">
-                            {/* Header Logo - Transparent Shield */}
-                            <Image
-                                src="/branding/deafhub-dh-transparent.png"
-                                alt="DEAF HUB"
-                                fill
-                                className="object-contain"
-                            />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-base sm:text-xl font-bold tracking-tighter text-[#EAFBFF]">
-                                DEAF <span className="text-[#22D3EE]">|</span> <span className="text-[#22D3EE]">HUB</span>
-                            </span>
-                            <span className="text-[8px] sm:text-[10px] font-medium tracking-[0.2em] text-[#22D3EE]/80 uppercase">
-                                {t.nav.espPlatform}
-                            </span>
-                        </div>
+                        <Image
+                            src="/branding/deafhub-wordmark-approved.png"
+                            alt="DeafHub Esports"
+                            width={2048}
+                            height={682}
+                            priority
+                            className="h-auto w-[150px] sm:w-[210px]"
+                        />
                     </Link>
                 </div>
 
