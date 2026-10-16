@@ -5,6 +5,7 @@ insert into auth.users(id,email,aud,role) values ('00000000-0000-4000-8000-00000
 insert into public.hub_organizers values ('00000000-0000-4000-8000-000000000001');
 insert into public.hub_teams(id,name,game,captain_id) values ('00000000-0000-4000-8000-000000000011','Engine QA A','fc','00000000-0000-4000-8000-000000000001'),('00000000-0000-4000-8000-000000000012','Engine QA B','fc','00000000-0000-4000-8000-000000000001');
 insert into public.hub_tournaments(id,title,game,organizer_id,starts_at,rules,roster_size) values ('00000000-0000-4000-8000-000000000021','Engine rollback QA','fc','00000000-0000-4000-8000-000000000001',now()+interval '1 day','Internal rollback test tournament rules',1);
+insert into public.hub_participation_policies(tournament_id,body,require_acceptance,bronze) values ('00000000-0000-4000-8000-000000000021','QA self-declaration regulations without medical documents',false,'none');
 insert into public.hub_entries(id,tournament_id,team_id,status,rules_version) select v.id,'00000000-0000-4000-8000-000000000021',v.team,'approved',t.rules_version from (values ('00000000-0000-4000-8000-000000000101'::uuid,'00000000-0000-4000-8000-000000000011'::uuid),('00000000-0000-4000-8000-000000000102'::uuid,'00000000-0000-4000-8000-000000000012'::uuid))v(id,team) cross join public.hub_tournaments t where t.id='00000000-0000-4000-8000-000000000021';
 insert into public.hub_entry_players values ('00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000001','Engine QA');
 set local role service_role;
