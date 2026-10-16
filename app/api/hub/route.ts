@@ -53,7 +53,7 @@ export async function POST(request:NextRequest) {
  const {action,...p}=parsed.data;
  const {data,error:rpcError}=await client.rpc('hub_action',{action,p});
  if(rpcError) {
-  const allowed=['Finish all matches first','Captain cannot leave the team','Membership not found','Captain required','Sign in required','Save your player nickname first','Invitation not found','Roster locked during tournament participation','Roster full','Captain and matching game required','Registration closed','Read and accept current rules','Roster size does not match tournament','A player is already registered','Organizer access required','Choose a future date','Organizer required','Entry is already in a match','Two approved entries required','Result already confirmed','Cannot close tournament'];
+  const allowed=['Complete player confirmations and organizer review first','Use tournament engine','Finish all matches first','Captain cannot leave the team','Membership not found','Captain required','Sign in required','Save your player nickname first','Invitation not found','Roster locked during tournament participation','Roster full','Captain and matching game required','Registration closed','Read and accept current rules','Roster size does not match tournament','A player is already registered','Organizer access required','Choose a future date','Organizer required','Entry is already in a match','Two approved entries required','Result already confirmed','Cannot close tournament'];
   const message=allowed.find(text=>rpcError.message===text);
   return NextResponse.json({error:message || (rpcError.code==='23505'?'This team, membership or entry already exists':'Could not save. Check fields and permissions.')},{status:400,headers});
  }
