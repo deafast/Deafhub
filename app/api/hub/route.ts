@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import type { State } from '@/lib/tournament/engine';
 const uuid=z.string().uuid();
 const game=z.enum(['dota2','cs2','fc']);
 const date=z.string().datetime({offset:true});
@@ -33,11 +34,13 @@ export async function GET() {
   client.from('hub_entry_players').select('entry_id').eq('user_id',user.id),
   client.from('hub_organizers').select('user_id').eq('user_id',user.id).maybeSingle(),
   client.from('steam_accounts').select('steam_id').eq('user_id',user.id).maybeSingle(),
-  client.from('hub_player_stats').select('matches,wins').eq('user_id',user.id).maybeSingle(),
+  client.from('hub_engines').select('tournament_id,revision,state').limit(500),
+  client.from('hub_all_player_stats').select('matches,wins,draws').eq('user_id',user.id).maybeSingle(),
  ]);
  if(results.some(r=>r.error)) return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
- const [teams,members,tournaments,entries,matches,invites,ownEntries,organizer,steam,stats]=results;
- return NextResponse.json({userId:user.id,teams:teams.data,members:members.data,tournaments:tournaments.data,entries:entries.data,matches:matches.data,invites:invites.data,ownEntryIds:ownEntries.data?.map(e=>e.entry_id),organizer:Boolean(organizer.data),steamId:steam.data?.steam_id||null,stats:stats.data||{matches:0,wins:0}},{headers});
+ const [teams,members,tournaments,entries,matches,invites,ownEntries,organizer,steam,engines,stats]=results;
+ const engineMatches=(engines.data||[]).flatMap(e=>(e.state as State).matches.filter(m=>m.a&&m.b&&['ready','finished'].includes(m.status)).map(m=>({id:`${e.tournament_id}/${m.id}`,tournament_id:e.tournament_id,entry_a:m.a!,entry_b:m.b!,starts_at:tournaments.data?.find(t=>t.id===e.tournament_id)?.starts_at,score_a:m.result?.kind==='played'?m.result.a:null,score_b:m.result?.kind==='played'?m.result.b:null,status:m.status==='ready'?'scheduled':'finished',engine_match:m.id,result_kind:m.result?.kind||null})));
+ return NextResponse.json({engines:engines.data||[],engineIds:engines.data?.map(e=>e.tournament_id)||[],userId:user.id,teams:teams.data,members:members.data,tournaments:tournaments.data,entries:entries.data,matches:[...(matches.data||[]),...engineMatches],invites:invites.data,ownEntryIds:ownEntries.data?.map(e=>e.entry_id),organizer:Boolean(organizer.data),steamId:steam.data?.steam_id||null,stats:stats.data||{matches:0,wins:0,draws:0}},{headers});
 }
 export async function POST(request:NextRequest) {
  if(request.headers.get('origin')!==request.nextUrl.origin) return NextResponse.json({error:'Forbidden'},{status:403,headers});
