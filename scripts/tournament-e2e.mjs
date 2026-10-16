@@ -29,15 +29,18 @@ async function api(path,actor,body,expected=200,headers={}){
 const qaDir=process.env.QA_DIR||join(tmpdir(),'deafhub-qa');mkdirSync(qaDir,{recursive:true,mode:0o700});
 const fixturePath=process.env.QA_FIXTURE||join(qaDir,'private.json');
 if(process.argv[2]==='prepare') {
- const owner=await account('owner'),outsider=await account('outsider');
+ const owner=await account('owner'),outsider=await account('outsider'),player2=await account('player2'),player3=await account('player3');
+ const actors=[owner,outsider,player2,player3].map(a=>({id:a.id,cookie:a.cookie}));
  const tid=randomUUID();tournaments.push(tid);
  for(let i=0;i<4;i++){teams.push(randomUUID());entries.push(randomUUID());}
- writeFileSync(fixturePath,JSON.stringify({owner:{id:owner.id,cookie:owner.cookie},outsider:{id:outsider.id,cookie:outsider.cookie},tid,teams,entries,users,run}),{mode:0o600});
+ writeFileSync(fixturePath,JSON.stringify({owner:{id:owner.id,cookie:owner.cookie},outsider:{id:outsider.id,cookie:outsider.cookie},tid,teams,entries,users,run,actors}),{mode:0o600});
  let sql=`begin;\ninsert into public.hub_organizers values ('${owner.id}');\ninsert into public.hub_tournaments(id,title,game,organizer_id,starts_at,rules,roster_size) values ('${tid}','QA engine ${run}','fc','${owner.id}',now()+interval '1 day','Disposable automated QA tournament; not a real competition.',1);\n`;
  for(let i=0;i<4;i++)sql+=`insert into public.hub_teams(id,name,game,captain_id) values ('${teams[i]}','QA ${run} ${i}','fc','${owner.id}');\ninsert into public.hub_entries(id,tournament_id,team_id,status,rules_version) select '${entries[i]}',id,'${teams[i]}','approved',rules_version from public.hub_tournaments where id='${tid}';\n`;
- sql+=`insert into public.hub_entry_players values ('${entries[0]}','${owner.id}','QA owner');\ncommit;\nselect 'QA fixture ready' as result;`;
+ sql+=`insert into public.hub_participation_policies(tournament_id,body,require_acceptance,bronze) values ('${tid}','QA self-declaration regulations; no medical documents',false,'lower_final');\n`;
+ for(let i=0;i<4;i++)sql+=`insert into public.hub_entry_players values ('${entries[i]}','${actors[i].id}','QA player ${i}');\n`;
+ sql+=`commit;\nselect 'QA fixture ready' as result;`;
  writeFileSync(join(qaDir,'setup.sql'),sql);
- const cleanup=`begin;\ndelete from public.hub_engine_audit where tournament_id='${tid}';\ndelete from public.hub_engines where tournament_id='${tid}';\ndelete from public.hub_entry_players where entry_id in (${entries.map(e=>`'${e}'`).join(',')});\ndelete from public.hub_entries where tournament_id='${tid}';\ndelete from public.hub_tournaments where id='${tid}';\ndelete from public.hub_teams where id in (${teams.map(e=>`'${e}'`).join(',')});\ndelete from public.hub_organizers where user_id='${owner.id}';\ncommit;\nselect 'QA fixture removed' as result;`;
+ const cleanup=`begin;\ndelete from public.hub_ops_audit where tournament_id='${tid}';\ndelete from public.hub_awards where batch_id in(select id from public.hub_award_batches where tournament_id='${tid}');\ndelete from public.hub_award_batches where tournament_id='${tid}';\ndelete from public.hub_entry_attestations where entry_id in (${entries.map(e=>`'${e}'`).join(',')});\ndelete from public.hub_eligibility_reviews where entry_id in (${entries.map(e=>`'${e}'`).join(',')});\ndelete from public.hub_participation_policies where tournament_id='${tid}';\ndelete from public.hub_engine_audit where tournament_id='${tid}';\ndelete from public.hub_engines where tournament_id='${tid}';\ndelete from public.hub_entry_players where entry_id in (${entries.map(e=>`'${e}'`).join(',')});\ndelete from public.hub_entries where tournament_id='${tid}';\ndelete from public.hub_tournaments where id='${tid}';\ndelete from public.hub_teams where id in (${teams.map(e=>`'${e}'`).join(',')});\ndelete from public.hub_organizers where user_id='${owner.id}';\ncommit;\nselect 'QA fixture removed' as result;`;
  writeFileSync(join(qaDir,'cleanup.sql'),cleanup);
  console.log(`QA accounts prepared in ${qaDir}. Apply setup.sql, run test, then cleanup.sql and cleanup-auth.`);
  process.exit(0);
