@@ -45,7 +45,7 @@ export default function Header() {
                         <div className="relative h-10 w-10 sm:h-14 sm:w-14 translate-x-1 sm:translate-x-3 transition-all duration-500 group-hover:scale-110">
                             {/* Header Logo - Transparent Shield */}
                             <Image
-                                src="/brand/header_logo.png"
+                                src="/branding/deafhub-dh-icon-512.png"
                                 alt="DEAF HUB"
                                 fill
                                 className="object-contain"
