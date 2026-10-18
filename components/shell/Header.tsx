@@ -38,17 +38,17 @@ export default function Header() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-none transition-all duration-300">
-            <div className="container mx-auto flex h-16 sm:h-20 items-center justify-between px-3 sm:px-4">
+            <div className="container mx-auto flex h-16 items-center justify-between px-3 sm:px-4">
                 {/* Left: Logo */}
                 <div className="flex items-center gap-4">
                     <Link href="/" className="flex items-center gap-2 sm:gap-4 group">
                         <Image
-                            src="/branding/deafhub-wordmark-approved.png"
+                            src="/branding/deafhub-wordmark-no-glints.png"
                             alt="DeafHub Esports"
-                            width={2048}
-                            height={682}
+                            width={2172}
+                            height={724}
                             priority
-                            className="h-auto w-[150px] sm:w-[210px]"
+                            className="h-auto w-[120px] sm:w-[180px]"
                         />
                     </Link>
                 </div>
