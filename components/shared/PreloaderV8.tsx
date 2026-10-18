@@ -115,10 +115,7 @@ export default function PreloaderV8() {
                             }}
                             transition={{ duration: 0.7, ease: 'circOut' }}
                             className="relative p-8 flex items-center justify-center overflow-visible bg-transparent"
-                            style={{ mixBlendMode: 'screen' }} // ВАЖНО: Удаляет любые черные артефакты клиппинга
                         >
-                            {/* Internal Flipping Backdrop УДАЛЕН - он создавал черный прямоугольник на фото */}
-
                             <div className="relative z-10 flex items-center gap-4 md:gap-8 bg-transparent">
                                 <motion.h1
                                     animate={{
@@ -168,17 +165,6 @@ export default function PreloaderV8() {
                                 </motion.h1>
                             </div>
 
-                            {/* Final Neon Flare (без blur) */}
-                            {!isFlipping && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="absolute inset-0 pointer-events-none"
-                                    style={{
-                                        boxShadow: '0 0 80px rgba(34,211,238,0.22)',
-                                    }}
-                                />
-                            )}
                         </motion.div>
 
                         {/* Bottom Slogan */}
