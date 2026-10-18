@@ -5,12 +5,13 @@ import Link from 'next/link';
 import {ArrowRight,UserRound,Trophy,Settings,MessageSquare,Bell,Hand} from 'lucide-react';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import styles from './BrandPreview.module.css';
+import LivingWaves from './LivingWaves';
 export default function BrandPreview(){
  const ru=useLanguageStore(s=>s.language==='ru');
  const root=useRef<HTMLDivElement>(null);
  useEffect(()=>{const device=navigator as Navigator&{deviceMemory?:number;connection?:{saveData?:boolean}};root.current?.classList.toggle(styles.quiet,Boolean(device.connection?.saveData||(device.deviceMemory&&device.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)));},[]);
  const text=(r:string,e:string)=>ru?r:e;
- return <div ref={root} className={styles.page}><div className={styles.waves}/><div className={styles.shade}/><div className={styles.content}>
+ return <div ref={root} className={styles.page}><div className={styles.waves}/><LivingWaves/><div className={styles.shade}/><div className={styles.content}>
  <section className={styles.hero}><div><p className="text-xs font-bold tracking-[.4em] text-[#22D3EE]">DEAFHUB · PREVIEW</p><h1 className="mt-3 text-[34px] font-extrabold leading-[1.06] sm:text-[48px]">{text('Киберспорт','Esports')}<br/><span className="text-[#22D3EE]">{text('без барьеров.','without barriers.')}</span></h1><p className="mt-4 max-w-xl text-sm leading-6 text-white/65">{text('Онлайн-платформа для глухих и слабослышащих игроков: турниры, команды и общение без обязательного голосового чата.','An online platform for Deaf and hard of hearing players: tournaments, teams and communication without mandatory voice chat.')}</p><div className="mt-5 flex flex-wrap gap-3"><Link href="/profile" className="flex items-center gap-3 rounded-2xl bg-[#22D3EE] px-5 py-2.5 text-sm font-bold text-[#031015]"><UserRound size={18}/>{text('Личный кабинет','My account')}<ArrowRight size={18}/></Link><Link href="/tournaments" className="flex items-center gap-3 rounded-2xl border border-[#22D3EE]/50 px-5 py-2.5 text-sm font-bold"><Trophy size={18}/>{text('Турниры','Tournaments')}<ArrowRight size={18}/></Link></div></div>
  <div className={styles.logo}><Image src="/branding/deafhub-dh-no-glints.png" alt="DH" width={512} height={512} priority className={styles.logoImage}/><svg viewBox="0 0 512 512" className={styles.starTrack} aria-hidden="true"><foreignObject width="512" height="512"><div className={styles.star}/></foreignObject></svg><p className={styles.brandName}>DEAF<span className="text-[#22D3EE]">HUB</span></p><p className={styles.tagline}>ESPORTS PLATFORM</p></div></section>
  <section aria-label={text('Игры','Games')} className={styles.games}>{['Dota 2','CS2','EA Sports FC'].map(game=><Link key={game} href="/tournaments" className={`${styles.card} ${styles.game}`}><span>{game}</span><ArrowRight size={20}/></Link>)}</section>
