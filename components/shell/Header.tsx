@@ -67,7 +67,7 @@ export default function Header() {
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <div role="group" aria-label="Language / Язык" className="relative grid grid-cols-2 rounded-full border border-white/10 bg-white/5 p-1">
+                    <div role="group" aria-label="Language / Язык" className="relative grid grid-cols-2 rounded-full border border-white/10 bg-white/5 p-1 scale-90 sm:scale-100">
                         <span
                             aria-hidden="true"
                             className="pointer-events-none absolute bottom-1 left-1 top-1 rounded-full border border-[#22D3EE]/30 bg-white/5 shadow-[0_0_20px_rgba(34,211,238,0.15)] transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
@@ -79,7 +79,7 @@ export default function Header() {
                             aria-pressed={language === 'ru'}
                             lang="ru"
                             onClick={() => setLanguage('ru')}
-                            className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
+                            className="relative z-10 flex items-center justify-center rounded-full px-4 py-1.5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
                         >
                             <span className={`transition-opacity duration-300 ${language === 'ru' ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
                                 {RU_FLAG}
@@ -91,7 +91,7 @@ export default function Header() {
                             aria-pressed={language === 'en'}
                             lang="en"
                             onClick={() => setLanguage('en')}
-                            className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
+                            className="relative z-10 flex items-center justify-center rounded-full px-4 py-1.5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
                         >
                             <span className={`transition-opacity duration-300 ${language === 'en' ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
                                 {GB_FLAG}
