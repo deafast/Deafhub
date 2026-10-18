@@ -50,9 +50,14 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/brand/tab_logo.jpg",
-    shortcut: "/brand/tab_logo.jpg",
-    apple: "/brand/tab_logo.jpg",
+    icon: [
+      { url: "/branding/deafhub-browser.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
+      { url: "/branding/deafhub-browser-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/branding/deafhub-browser-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/branding/deafhub-browser-48.png", sizes: "48x48", type: "image/png" },
+    ],
+    shortcut: "/branding/deafhub-browser.ico",
+    apple: { url: "/branding/deafhub-browser-180.png", sizes: "180x180", type: "image/png" },
   },
 };
 
