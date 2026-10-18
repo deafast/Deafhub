@@ -1,16 +1,16 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Локальные кадры: public/preloader/1.jpg ... 6.jpg
 const FLIP_IMAGES = [
-    'url("/preloader/1.jpg")',
-    'url("/preloader/2.jpg")',
-    'url("/preloader/3.jpg")',
-    'url("/preloader/4.jpg")',
-    'url("/preloader/5.jpg")',
-    'url("/preloader/6.jpg")',
+    'url("/preloader/1.webp")',
+    'url("/preloader/2.webp")',
+    'url("/preloader/3.webp")',
+    'url("/preloader/4.webp")',
+    'url("/preloader/5.webp")',
+    'url("/preloader/6.webp")',
 ];
 
 /**
@@ -23,7 +23,7 @@ export default function PreloaderV8() {
     const [isSkipped, setIsSkipped] = useState(false);
 
     const [isFlipping, setIsFlipping] = useState(true);
-    const [currentFrame, setCurrentFrame] = useState(0);
+    const introRef = useRef<HTMLDivElement>(null);
     const [bgReady, setBgReady] = useState(false);
 
     const exitDelayMs = 2750;     // общий выход
@@ -42,40 +42,66 @@ export default function PreloaderV8() {
     useEffect(() => {
         try {
             if (sessionStorage.getItem('dh_intro_seen')) {
-                setIsSkipped(true);
-                setIsLoading(false);
+                queueMicrotask(() => { setIsSkipped(true); setIsLoading(false); });
                 return;
             }
         } catch {
             // The intro also works with storage disabled.
         }
 
-        // Предзагрузка первого кадра для плавного входа (как просил юзер)
-        const img = new Image();
-        img.src = "/preloader/1.jpg";
-        img.onload = () => setBgReady(true);
-        img.onerror = () => setBgReady(true);
-
-        const interval = setInterval(() => {
-            setCurrentFrame((prev) => (prev + 1) % FLIP_IMAGES.length);
-        }, 40);
-
-        const stopTimer = setTimeout(() => {
-            clearInterval(interval);
-            setIsFlipping(false);
-        }, stopFlipMs);
-
-        const exitTimer = setTimeout(() => {
-            setIsLoading(false);
-            try { sessionStorage.setItem('dh_intro_seen', 'true'); } catch {}
-        }, exitDelayMs);
-
+        if (isSkipped) return;
+        let cancelled = false;
+        let animationFrame = 0;
+        let stopTimer: ReturnType<typeof setTimeout> | undefined;
+        let exitTimer: ReturnType<typeof setTimeout> | undefined;
+        let readinessTimer: ReturnType<typeof setTimeout> | undefined;
+        const ready = new Set<number>();
+        const decoded = FLIP_IMAGES.map((_, index) => {
+            const image = new Image();
+            image.src = `/preloader/${index + 1}.webp`;
+            return image.decode().then(() => { ready.add(index); }).catch(() => {});
+        });
+        // Never hold the page indefinitely if an image fails or the network is slow.
+        const deadline = new Promise<void>((resolve) => {
+            readinessTimer = setTimeout(resolve, 900);
+        });
+        void Promise.race([Promise.all(decoded), deadline]).then(() => {
+            if (cancelled) return;
+            clearTimeout(readinessTimer);
+            const frames = [...ready].sort((a, b) => a - b);
+            setBgReady(frames.length > 0);
+            if (frames.length === 0) setIsFlipping(false);
+            const started = performance.now();
+            let previous = -1;
+            const tick = (now: number) => {
+                if (cancelled) return;
+                const elapsed = now - started;
+                if (elapsed >= stopFlipMs || frames.length === 0) return;
+                const index = frames[Math.floor(elapsed / 40) % frames.length];
+                if (index !== previous) {
+                    introRef.current?.style.setProperty('--dh-intro-frame', FLIP_IMAGES[index]);
+                    previous = index;
+                }
+                animationFrame = requestAnimationFrame(tick);
+            };
+            animationFrame = requestAnimationFrame(tick);
+            stopTimer = setTimeout(() => {
+                cancelAnimationFrame(animationFrame);
+                setIsFlipping(false);
+            }, stopFlipMs);
+            exitTimer = setTimeout(() => {
+                setIsLoading(false);
+                try { sessionStorage.setItem('dh_intro_seen', 'true'); } catch {}
+            }, exitDelayMs);
+        });
         return () => {
-            clearInterval(interval);
+            cancelled = true;
+            cancelAnimationFrame(animationFrame);
+            clearTimeout(readinessTimer);
             clearTimeout(stopTimer);
             clearTimeout(exitTimer);
         };
-    }, []);
+    }, [isSkipped]);
 
     if (isSkipped) return null;
 
@@ -85,6 +111,7 @@ export default function PreloaderV8() {
                 <motion.div
                     key="dh-preloader"
                     id="dh-preloader-container"
+                    ref={introRef}
                     initial={{ opacity: 1 }}
                     exit={{
                         opacity: 0,
@@ -111,7 +138,7 @@ export default function PreloaderV8() {
                         transition={{ duration: 0.4 }}
                         className="absolute inset-0 pointer-events-none"
                         style={{
-                            backgroundImage: bgReady ? FLIP_IMAGES[currentFrame] : 'none',
+                            backgroundImage: bgReady ? 'var(--dh-intro-frame, url("/preloader/1.webp"))' : 'none',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                         }}
@@ -122,8 +149,8 @@ export default function PreloaderV8() {
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{
-                                scale: 1,
-                                opacity: 1,
+                                scale: bgReady || !isFlipping ? 1 : 0.9,
+                                opacity: bgReady || !isFlipping ? 1 : 0,
                             }}
                             transition={{ scale: { duration: 2, ease: [0.23, 1, 0.32, 1] }, opacity: { duration: 0.6 } }}
                             className="relative p-8 flex items-center justify-center overflow-visible bg-transparent"
@@ -137,7 +164,7 @@ export default function PreloaderV8() {
                                     style={{
                                         WebkitBackgroundClip: 'text',
                                         backgroundClip: 'text',
-                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
+                                        backgroundImage: isFlipping ? 'var(--dh-intro-frame, url("/preloader/1.webp"))' : 'none',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
@@ -167,7 +194,7 @@ export default function PreloaderV8() {
                                     style={{
                                         WebkitBackgroundClip: 'text',
                                         backgroundClip: 'text',
-                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
+                                        backgroundImage: isFlipping ? 'var(--dh-intro-frame, url("/preloader/1.webp"))' : 'none',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
