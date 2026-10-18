@@ -20,16 +20,17 @@ const FLIP_IMAGES = [
  */
 export default function PreloaderV8() {
     const [isLoading, setIsLoading] = useState(true);
-    const [isMounted, setIsMounted] = useState(false);
+    const [isSkipped, setIsSkipped] = useState(false);
 
     const [isFlipping, setIsFlipping] = useState(true);
     const [currentFrame, setCurrentFrame] = useState(0);
     const [bgReady, setBgReady] = useState(false);
 
-    const exitDelayMs = 2600;     // общий выход
-    const stopFlipMs = 2200;      // стоп-кадр
+    const exitDelayMs = 2750;     // общий выход
+    const stopFlipMs = 2000;      // стоп-кадр
 
     const skipIntro = () => {
+        setIsSkipped(true);
         setIsLoading(false);
         try {
             sessionStorage.setItem('dh_intro_seen', 'true');
@@ -39,13 +40,15 @@ export default function PreloaderV8() {
     };
 
     useEffect(() => {
-        setIsMounted(true);
-        if (sessionStorage.getItem('dh_intro_seen')) {
-            setIsLoading(false);
-            return;
+        try {
+            if (sessionStorage.getItem('dh_intro_seen')) {
+                setIsSkipped(true);
+                setIsLoading(false);
+                return;
+            }
+        } catch {
+            // The intro also works with storage disabled.
         }
-
-        if (!isLoading) return;
 
         // Предзагрузка первого кадра для плавного входа (как просил юзер)
         const img = new Image();
@@ -54,15 +57,17 @@ export default function PreloaderV8() {
         img.onerror = () => setBgReady(true);
 
         const interval = setInterval(() => {
-            if (!isFlipping) return;
             setCurrentFrame((prev) => (prev + 1) % FLIP_IMAGES.length);
         }, 40);
 
-        const stopTimer = setTimeout(() => setIsFlipping(false), stopFlipMs);
+        const stopTimer = setTimeout(() => {
+            clearInterval(interval);
+            setIsFlipping(false);
+        }, stopFlipMs);
 
         const exitTimer = setTimeout(() => {
             setIsLoading(false);
-            sessionStorage.setItem('dh_intro_seen', 'true');
+            try { sessionStorage.setItem('dh_intro_seen', 'true'); } catch {}
         }, exitDelayMs);
 
         return () => {
@@ -70,9 +75,9 @@ export default function PreloaderV8() {
             clearTimeout(stopTimer);
             clearTimeout(exitTimer);
         };
-    }, [isFlipping, isLoading]);
+    }, []);
 
-    if (!isLoading) return null;
+    if (isSkipped) return null;
 
     return (
         <AnimatePresence mode="wait">
@@ -83,9 +88,7 @@ export default function PreloaderV8() {
                     initial={{ opacity: 1 }}
                     exit={{
                         opacity: 0,
-                        scale: 1.05,
-                        filter: 'brightness(1.25)',
-                        transition: { duration: 0.55, ease: [0.76, 0, 0.24, 1] },
+                        transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] },
                     }}
                     className="fixed inset-0 z-[99999] flex items-center justify-center bg-black overflow-hidden"
                     style={{ width: '100vw', height: '100vh' }}
@@ -147,12 +150,12 @@ export default function PreloaderV8() {
                                 {/* THE CENTRAL BAR | */}
                                 <motion.div
                                     animate={{
-                                        height: isFlipping ? '60px' : '120px',
+                                        scaleY: isFlipping ? 0.5 : 1,
                                         backgroundColor: '#22D3EE',
                                         boxShadow: isFlipping ? '0 0 18px #22D3EE' : '0 0 44px rgba(34,211,238,0.9)',
                                     }}
-                                    transition={{ duration: 0.45, type: 'spring', stiffness: 120, damping: 18 }}
-                                    className="w-[4px] md:w-[8px] z-20 rounded-sm skew-x-[-20deg]"
+                                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                                    className="h-[120px] w-[4px] md:w-[8px] z-20 rounded-sm skew-x-[-20deg]"
                                 />
 
                                 <motion.h1
