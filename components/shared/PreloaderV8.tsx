@@ -118,7 +118,7 @@ export default function PreloaderV8() {
                         transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] },
                     }}
                     className="fixed inset-0 z-[99999] flex items-center justify-center bg-black overflow-hidden"
-                    style={{ width: '100vw', height: '100vh' }}
+                    style={{ width: '100%', height: '100svh' }}
                 >
                     {/* ФИКС F5: Скрипт защиты от мерцания */}
                     <script dangerouslySetInnerHTML={{
@@ -153,14 +153,14 @@ export default function PreloaderV8() {
                                 opacity: bgReady || !isFlipping ? 1 : 0,
                             }}
                             transition={{ scale: { duration: 2, ease: [0.23, 1, 0.32, 1] }, opacity: { duration: 0.6 } }}
-                            className="relative p-8 flex items-center justify-center overflow-visible bg-transparent"
+                            className="relative p-4 sm:p-6 md:p-8 flex items-center justify-center overflow-visible bg-transparent"
                         >
-                            <div className="relative z-10 flex items-center gap-4 md:gap-8 bg-transparent">
+                            <div className="relative z-10 flex items-center gap-3 md:gap-8 bg-transparent">
                                 <motion.h1
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#EAFBFF',
                                     }}
-                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
+                                    className="text-[clamp(2rem,10vw,3rem)] md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
                                         WebkitBackgroundClip: 'text',
                                         backgroundClip: 'text',
@@ -183,14 +183,14 @@ export default function PreloaderV8() {
                                         boxShadow: isFlipping ? '0 0 18px #22D3EE' : '0 0 44px rgba(34,211,238,0.9)',
                                     }}
                                     transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                                    className="h-[120px] w-[4px] md:w-[8px] z-20 rounded-sm skew-x-[-20deg]"
+                                    className="h-[64px] md:h-[120px] w-[4px] md:w-[8px] z-20 rounded-sm skew-x-[-20deg]"
                                 />
 
                                 <motion.h1
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#22D3EE',
                                     }}
-                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
+                                    className="text-[clamp(2rem,10vw,3rem)] md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
                                         WebkitBackgroundClip: 'text',
                                         backgroundClip: 'text',
@@ -208,7 +208,7 @@ export default function PreloaderV8() {
                         </motion.div>
 
                         {/* Bottom Slogan */}
-                        <div className="mt-8 text-center px-4 bg-transparent">
+                        <div className="mt-4 md:mt-8 text-center px-4 bg-transparent">
                             <div className="flex items-center justify-center gap-4 bg-transparent">
                                 <motion.div
                                     animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.25 : 0.7 }}
@@ -228,9 +228,10 @@ export default function PreloaderV8() {
                     <button
                         type="button"
                         onClick={skipIntro}
-                        className="absolute bottom-6 right-6 z-30 min-h-11 min-w-11 rounded-md border border-white/30 bg-black/60 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-cyan-300 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300 motion-reduce:transition-none"
+                        style={{ bottom: 'max(16px, env(safe-area-inset-bottom))', right: 'max(16px, env(safe-area-inset-right))' }}
+                        className="absolute z-30 min-h-11 min-w-11 rounded-md border border-white/30 bg-black/60 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-cyan-300 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300 motion-reduce:transition-none"
                     >
-                        Пропустить заставку
+                        Skip intro
                     </button>
                 </motion.div >
             )}
