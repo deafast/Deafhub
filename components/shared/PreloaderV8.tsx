@@ -29,6 +29,15 @@ export default function PreloaderV8() {
     const exitDelayMs = 2600;     // общий выход
     const stopFlipMs = 2200;      // стоп-кадр
 
+    const skipIntro = () => {
+        setIsLoading(false);
+        try {
+            sessionStorage.setItem('dh_intro_seen', 'true');
+        } catch {
+            // Closing the intro must also work when browser storage is unavailable.
+        }
+    };
+
     useEffect(() => {
         setIsMounted(true);
         if (sessionStorage.getItem('dh_intro_seen')) {
@@ -191,6 +200,13 @@ export default function PreloaderV8() {
                             <div key={i} className="h-px w-full bg-white/10 mb-4" />
                         ))}
                     </div>
+                    <button
+                        type="button"
+                        onClick={skipIntro}
+                        className="absolute bottom-6 right-6 z-30 min-h-11 min-w-11 rounded-md border border-white/30 bg-black/60 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-cyan-300 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300 motion-reduce:transition-none"
+                    >
+                        Пропустить заставку
+                    </button>
                 </motion.div >
             )}
         </AnimatePresence >
