@@ -53,12 +53,17 @@ export default function PreloaderV8() {
         // Предзагрузка первого кадра для плавного входа (как просил юзер)
         const img = new Image();
         img.src = "/preloader/1.jpg";
+        FLIP_IMAGES.forEach((_, index) => {
+            const frame = new Image();
+            frame.src = `/preloader/${index + 1}.jpg`;
+            frame.decode?.().catch(() => {});
+        });
         img.onload = () => setBgReady(true);
         img.onerror = () => setBgReady(true);
 
         const interval = setInterval(() => {
             setCurrentFrame((prev) => (prev + 1) % FLIP_IMAGES.length);
-        }, 40);
+        }, 180);
 
         const stopTimer = setTimeout(() => {
             clearInterval(interval);
@@ -133,11 +138,12 @@ export default function PreloaderV8() {
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#EAFBFF',
                                     }}
-                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
+                                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                                    className="relative text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
                                         WebkitBackgroundClip: 'text',
                                         backgroundClip: 'text',
-                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
+                                        backgroundImage: 'none',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
@@ -145,6 +151,17 @@ export default function PreloaderV8() {
                                     }}
                                 >
                                     DEAF
+                                    {FLIP_IMAGES.map((image, index) => (
+                                        <motion.span
+                                            key={image}
+                                            aria-hidden="true"
+                                            className="absolute inset-0 pointer-events-none"
+                                            initial={{ opacity: index === 0 ? 1 : 0 }}
+                                            animate={{ opacity: isFlipping && currentFrame === index ? 1 : 0 }}
+                                            transition={{ duration: 0.16, ease: 'linear' }}
+                                            style={{ color: 'transparent', backgroundImage: image, backgroundSize: 'cover', backgroundPosition: 'center', backgroundClip: 'text', WebkitBackgroundClip: 'text' }}
+                                        >DEAF</motion.span>
+                                    ))}
                                 </motion.h1>
 
                                 {/* THE CENTRAL BAR | */}
@@ -162,11 +179,12 @@ export default function PreloaderV8() {
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#22D3EE',
                                     }}
-                                    className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
+                                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                                    className="relative text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
                                         WebkitBackgroundClip: 'text',
                                         backgroundClip: 'text',
-                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
+                                        backgroundImage: 'none',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
@@ -174,6 +192,17 @@ export default function PreloaderV8() {
                                     }}
                                 >
                                     HUB
+                                    {FLIP_IMAGES.map((image, index) => (
+                                        <motion.span
+                                            key={image}
+                                            aria-hidden="true"
+                                            className="absolute inset-0 pointer-events-none"
+                                            initial={{ opacity: index === 0 ? 1 : 0 }}
+                                            animate={{ opacity: isFlipping && currentFrame === index ? 1 : 0 }}
+                                            transition={{ duration: 0.16, ease: 'linear' }}
+                                            style={{ color: 'transparent', backgroundImage: image, backgroundSize: 'cover', backgroundPosition: 'center', backgroundClip: 'text', WebkitBackgroundClip: 'text' }}
+                                        >HUB</motion.span>
+                                    ))}
                                 </motion.h1>
                             </div>
 
