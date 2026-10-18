@@ -2,7 +2,7 @@
 
 The existing Hub now has an organizer-controlled path from approved entries through
 round-robin groups, qualification and Single or Double Elimination. It uses the
-existing visual classes; Claude examples and global design assets are untouched.
+existing visual classes; design examples and global design assets are untouched.
 
 ## Rules
 

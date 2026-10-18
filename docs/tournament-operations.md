@@ -41,7 +41,7 @@ These are medals/placements, with no balance, entry fees or payout functions.
 Existing Hub cards contain criteria, entry counts, registered rosters, per-player
 confirmation progress, review forms, award controls and a timestamped activity log.
 Layouts stack on narrow screens; overflow tables stay scrollable. Existing colors,
-animations, global styles and Claude design examples are untouched.
+animations, global styles and design examples are untouched.
 
 Raw confirmations are visible only to that player and the tournament owner. Entry
 review reasons are visible to the organizer and that entry's registered roster. Audit
