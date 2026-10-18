@@ -194,12 +194,6 @@ export default function PreloaderV8() {
                         </div>
                     </div>
 
-                    {/* Cinematic Stripes */}
-                    <div className="absolute inset-0 opacity-10 pointer-events-none">
-                        {Array.from({ length: 30 }).map((_, i) => (
-                            <div key={i} className="h-px w-full bg-white/10 mb-4" />
-                        ))}
-                    </div>
                     <button
                         type="button"
                         onClick={skipIntro}
