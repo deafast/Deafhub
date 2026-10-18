@@ -15,9 +15,8 @@ const FLIP_IMAGES = [
 
 /**
  * PreloaderV8 - Sharp Edge / Marvel Edition.
- * КРАСНАЯ ЗОНА: Решена проблема черных прямоугольников из фото пользователя.
- * Исправлено: Удален "Internal Flipping Backdrop" (который создавал коробку) 
- * и применен режим экрана для букв.
+ * Background frames stay clipped to glyphs through the final color reveal.
+ * Swap backgroundImage directly, never animate it independently from clipping.
  */
 export default function PreloaderV8() {
     const [isLoading, setIsLoading] = useState(true);
@@ -124,12 +123,12 @@ export default function PreloaderV8() {
                                 <motion.h1
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#EAFBFF',
-                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
                                     }}
                                     className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
-                                        WebkitBackgroundClip: isFlipping ? 'text' : 'unset',
-                                        backgroundClip: isFlipping ? 'text' : 'unset',
+                                        WebkitBackgroundClip: 'text',
+                                        backgroundClip: 'text',
+                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
@@ -153,12 +152,12 @@ export default function PreloaderV8() {
                                 <motion.h1
                                     animate={{
                                         color: isFlipping ? 'transparent' : '#22D3EE',
-                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
                                     }}
                                     className="text-5xl md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
                                     style={{
-                                        WebkitBackgroundClip: isFlipping ? 'text' : 'unset',
-                                        backgroundClip: isFlipping ? 'text' : 'unset',
+                                        WebkitBackgroundClip: 'text',
+                                        backgroundClip: 'text',
+                                        backgroundImage: isFlipping ? FLIP_IMAGES[currentFrame] : 'none',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
