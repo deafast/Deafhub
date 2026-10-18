@@ -5,10 +5,9 @@ import Link from 'next/link';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import AccountButton from '@/components/auth/AccountButton';
 
-import { motion } from 'framer-motion';
 
 const GB_FLAG = (
-    <svg viewBox="0 0 640 480" className="w-4 h-3">
+    <svg viewBox="0 0 640 480" className="w-4 h-3" aria-hidden="true">
         <path fill="#012169" d="M0 0h640v480H0z" />
         <path fill="#FFF" d="m75 0 244 181L562 0h78v62L400 240l240 178v62h-78L320 300 78 480H0v-62l240-178L0 62V0h75z" />
         <path fill="#C8102E" d="m424 281 216 159v40L369 306l55-25zM640 0v3L445 149l56-25L640 0zM0 440l214-159-55 25L0 480v-40zM0 0v4l195 145-56 25L0 0z" />
@@ -18,7 +17,7 @@ const GB_FLAG = (
 );
 
 const RU_FLAG = (
-    <svg viewBox="0 0 640 480" className="w-4 h-3">
+    <svg viewBox="0 0 640 480" className="w-4 h-3" aria-hidden="true">
         <path fill="#fff" d="M0 0h640v160H0z" />
         <path fill="#0039a6" d="M0 160h640v160H0z" />
         <path fill="#d52b1e" d="M0 320h640v160H0z" />
@@ -68,28 +67,31 @@ export default function Header() {
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="relative flex items-center gap-0.5 sm:gap-1 rounded-full border border-white/10 bg-white/5 p-0.5 sm:p-1 backdrop-blur-sm overflow-hidden scale-90 sm:scale-100">
-                        {/* Smooth sliding background highlight */}
-                        <div className="absolute inset-0 flex p-1">
-                            <motion.div
-                                layoutId="lang-bg-stable"
-                                className="w-1/2 h-full bg-white/5 border border-[#22D3EE]/30 rounded-full shadow-[0_0_20px_rgba(34,211,238,0.15)] backdrop-blur-md"
-                                animate={{ x: language === 'ru' ? 0 : '100%' }}
-                                transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                            />
-                        </div>
-
+                    <div role="group" aria-label="Language / Язык" className="relative grid grid-cols-2 rounded-full border border-white/10 bg-white/5 p-1">
+                        <span
+                            aria-hidden="true"
+                            className="pointer-events-none absolute bottom-1 left-1 top-1 rounded-full border border-[#22D3EE]/30 bg-white/5 shadow-[0_0_20px_rgba(34,211,238,0.15)] transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+                            style={{ width: 'calc((100% - 8px) / 2)', transform: language === 'ru' ? 'translateX(0)' : 'translateX(100%)' }}
+                        />
                         <button
+                            type="button"
+                            aria-label="Русский"
+                            aria-pressed={language === 'ru'}
+                            lang="ru"
                             onClick={() => setLanguage('ru')}
-                            className="relative z-10 flex items-center justify-center rounded-full px-4 py-1.5 transition-colors group"
+                            className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
                         >
                             <span className={`transition-opacity duration-300 ${language === 'ru' ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
                                 {RU_FLAG}
                             </span>
                         </button>
                         <button
+                            type="button"
+                            aria-label="English"
+                            aria-pressed={language === 'en'}
+                            lang="en"
                             onClick={() => setLanguage('en')}
-                            className="relative z-10 flex items-center justify-center rounded-full px-4 py-1.5 transition-colors group"
+                            className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
                         >
                             <span className={`transition-opacity duration-300 ${language === 'en' ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
                                 {GB_FLAG}
