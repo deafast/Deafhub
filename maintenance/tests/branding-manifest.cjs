@@ -1,0 +1,13 @@
+const {readFileSync}=require('node:fs');const {resolve}=require('node:path');const vm=require('node:vm');const ts=require('typescript');const test=require('node:test');const assert=require('node:assert/strict');
+const root=resolve(__dirname,'../..');const scope={exports:{}};
+vm.runInNewContext(ts.transpileModule(readFileSync(resolve(root,'app/manifest.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,scope);
+const manifest=scope.exports.default();
+test('installation manifest uses existing square branded PNG 192 and 512 with exact dimensions',()=>{
+ assert.equal(manifest.icons.length,2);
+ for(const icon of manifest.icons){assert.match(icon.src,/^\/branding\//);assert.equal(icon.type,'image/png');assert.ok(!icon.purpose||icon.purpose==='any');const data=readFileSync(resolve(root,'public'+icon.src));assert.equal(data.subarray(1,4).toString(),'PNG');const width=data.readUInt32BE(16),height=data.readUInt32BE(20);assert.equal(width,height);assert.equal(icon.sizes,`${width}x${height}`);}
+ assert.equal(manifest.icons.map(i=>i.sizes).join(','),'192x192,512x512');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
+});
+test('browser PNG and ICO dimensions remain valid without replacing brand assets',()=>{
+ for(const size of [16,32,48,180]){const data=readFileSync(resolve(root,`public/branding/deafhub-browser-${size}.png`));assert.equal(data.readUInt32BE(16),size);assert.equal(data.readUInt32BE(20),size);}
+ const ico=readFileSync(resolve(root,'public/branding/deafhub-browser.ico'));assert.equal(ico.readUInt16LE(2),1);const sizes=Array.from({length:ico.readUInt16LE(4)},(_,i)=>ico[6+i*16]||256).sort((a,b)=>a-b);assert.equal(sizes.join(','),'16,32,48');
+});
