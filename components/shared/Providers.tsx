@@ -1,14 +1,19 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import GlobalCanvas from '@/components/r3f/GlobalCanvas';
 
 import SmoothScroll from './SmoothScroll';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const language = useLanguageStore(state => state.language);
+    useEffect(() => {
+        document.documentElement.lang = language;
+    }, [language]);
     const [queryClient] = useState(() => new QueryClient());
 
     return (
