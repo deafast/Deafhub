@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 const uuid=z.string().uuid();
 const schema=z.discriminatedUnion('action',[
- z.object({action:z.literal('set_policy'),tournament_id:uuid,body:z.string().trim().min(20).max(6000),require_acceptance:z.boolean(),bronze:z.enum(['none','shared_semifinal','lower_final'])}),
+ z.object({action:z.literal('set_policy'),tournament_id:uuid,body:z.string().trim().min(20).max(6000),require_acceptance:z.boolean(),bronze:z.enum(['none','shared_semifinal','lower_final','bronze_match'])}),
  z.object({action:z.literal('attest'),entry_id:uuid,policy_version:uuid,accepted:z.boolean()}),
  z.object({action:z.literal('review_eligibility'),entry_id:uuid,policy_version:uuid,approved:z.boolean(),reason:z.string().trim().min(3).max(500)}),
  z.object({action:z.literal('issue_awards'),tournament_id:uuid}),
