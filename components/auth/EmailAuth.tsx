@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import EmailConfirmationPending from './EmailConfirmationPending';
+import {confirmationCallback,CONFIRMATION_COOLDOWN_KEY,CONFIRMATION_COOLDOWN_MS} from '@/lib/auth/email-confirmation';
 
 type Mode = 'login' | 'signup' | 'forgot' | 'reset';
 
@@ -26,6 +28,8 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
     const [pending, setPending] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [awaitingEmail,setAwaitingEmail]=useState('');
+    const [confirmationDeadline,setConfirmationDeadline]=useState(0);
     const [canReset, setCanReset] = useState(false);
     const [resetDone, setResetDone] = useState(false);
     const locked = disabled || pending;
@@ -42,6 +46,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
 
     function changeMode(next: Mode) {
         setMode(next);
+        setAwaitingEmail('');
         setPassword('');
         setConfirmation('');
         setVisible(false);
@@ -72,12 +77,17 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
                 if (error) throw error;
                 setMessage(ru ? 'Если для этой почты доступно восстановление, вы получите письмо со ссылкой. Проверьте также папку «Спам».' : 'If password recovery is available for this email, you will receive a link. Please also check spam.');
             } else if (mode === 'signup') {
-                const { data, error } = await client.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: callback } });
+                const { data, error } = await client.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: confirmationCallback(window.location.origin), data:{locale:ru?'ru':'en'} } });
                 if (error) throw error;
                 setPassword('');
                 setConfirmation('');
                 if (data.session) finishSignIn();
-                else setMessage(ru ? 'Проверьте почту и подтвердите адрес по ссылке из письма. Если аккаунт уже существует, войдите или восстановите пароль.' : 'Check your email to confirm your address. If you already have an account, sign in or reset your password.');
+                else {
+                    const deadline=Date.now()+CONFIRMATION_COOLDOWN_MS;
+                    setConfirmationDeadline(deadline);
+                    try { sessionStorage.setItem(CONFIRMATION_COOLDOWN_KEY,String(deadline)); } catch {}
+                    setAwaitingEmail(email.trim());
+                }
             } else if (mode === 'reset') {
                 const { error } = await client.auth.updateUser({ password });
                 if (error) throw error;
@@ -110,6 +120,8 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
         router.replace('/profile');
         router.refresh();
     }
+
+    if(awaitingEmail)return <EmailConfirmationPending email={awaitingEmail} ru={ru} deadline={confirmationDeadline} disabled={disabled} onBack={()=>changeMode('login')}/>;
 
     const newPassword = mode === 'signup' || mode === 'reset';
     const label = mode === 'signup' ? (ru ? 'Создать аккаунт' : 'Create account') : mode === 'forgot' ? (ru ? 'Отправить ссылку' : 'Send reset link') : mode === 'reset' ? (ru ? 'Сохранить пароль' : 'Save password') : (ru ? 'Войти' : 'Sign in');
