@@ -16,7 +16,7 @@ function sample(double:boolean):State {
  return state;
 }
 export default function TournamentDemo(){
- const ru=useLanguageStore(s=>s.language==='ru');const [double,setDouble]=useState(false);
+ const ru=useLanguageStore(s=>s.language==='ru');const [double,setDouble]=useState(true);
  return <main className="mx-auto min-h-screen max-w-5xl px-5 pb-28 pt-32 text-white">
  <h1 className="text-3xl font-bold">{ru?'Демонстрация таблиц и сетки':'Tables and bracket preview'}</h1>
  <p className="my-5 rounded-xl border border-[#22D3EE]/30 p-4">{ru?'ДЕМО. Временные вымышленные команды и результаты только для просмотра. В базу, реальные награды и статистику не записываются.':'DEMO. Temporary fictional teams and scores for visual review only. Nothing is saved to the database, real awards or statistics.'}</p>
