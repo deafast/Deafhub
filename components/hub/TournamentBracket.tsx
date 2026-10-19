@@ -17,7 +17,7 @@ export default function TournamentBracket({state,ru,name}:{state:State;ru:boolea
   for(const c of columns){const col=items.filter(m=>depths.get(m.id)===c);col.forEach((m,i)=>positions.set(m.id,{x:c*300,y:height+((i+.5)*count/col.length-.5)*148}));}
   width=Math.max(width,columns.length*300);height+=count*148+24;
  }
- const destinations=(m:Match,outcome:'winner'|'loser')=>matches.filter(n=>n.sources.some(s=>'match'in s&&s.match===m.id&&s.outcome===outcome)).map(n=>n.id);
+ const destinations=(m:Match,outcome:'winner'|'loser')=>matches.filter(n=>n.status!=='skipped'&&n.sources.some(s=>'match'in s&&s.match===m.id&&s.outcome===outcome)).map(n=>n.id);
  const participant=(m:Match,index:0|1)=>{
   const id=index===0?m.a:m.b,s=m.sources[index];
   return id?name(id):'match'in s?`${s.outcome==='winner'?t('Победитель','Winner'):t('Проигравший','Loser')} ${s.match}`:t('Свободное место','BYE');
