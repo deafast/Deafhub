@@ -2,10 +2,10 @@
 import { useCallback, useState, type FormEvent } from 'react';
 import { readMatchResult } from '@/lib/tournament/result-form';
 import { standings, type Command, type Config, type State } from '@/lib/tournament/engine';
-type Props={id:string;game:string;owner:boolean;ru:boolean;approved:string[];name:(id:string)=>string;onSaved:()=>Promise<void>;initial:{revision:number;state:State}|null};
+type Props={demo?:boolean;id:string;game:string;owner:boolean;ru:boolean;approved:string[];name:(id:string)=>string;onSaved:()=>Promise<void>;initial:{revision:number;state:State}|null};
 const field='mt-2 block w-full rounded-xl border border-white/15 bg-[#0A0F14] p-3 text-white';
 const button='rounded-xl bg-[#22D3EE] px-4 py-3 font-bold text-[#0A0F14] disabled:opacity-40';
-export default function TournamentEngine({id,game,owner,ru,approved,name,onSaved,initial}:Props) {
+export default function TournamentEngine({demo=false,id,game,owner,ru,approved,name,onSaved,initial}:Props) {
  const [state,setState]=useState<State|null>(initial?.state||null),[revision,setRevision]=useState(initial?.revision||0),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const text=(r:string,e:string)=>ru?r:e;
  const load=useCallback(async()=>{
@@ -35,7 +35,7 @@ export default function TournamentEngine({id,game,owner,ru,approved,name,onSaved
   }
   void save({type:'qualify',ties});
  }
- return <details className="border-t border-white/10 pt-4"><summary className="cursor-pointer text-[#22D3EE]">{text('Этапы и турнирная сетка','Stages and bracket')}</summary>
+ return <details open={demo||undefined} className="border-t border-white/10 pt-4"><summary className="cursor-pointer text-[#22D3EE]">{text('Этапы и турнирная сетка','Stages and bracket')}</summary>
  {error?<p role="alert" className="mt-3 text-red-300">{ru?({
  'Bronze match requires Single Elimination with at least four playoff entries':'Матч за третье место доступен только в Single при минимум четырёх участниках плей-офф.',
  'Third-place rule does not match the format':'Настройки сетки не совпадают с опубликованным правилом третьего места.',
@@ -50,7 +50,7 @@ export default function TournamentEngine({id,game,owner,ru,approved,name,onSaved
  'Revoke awards before correcting results':'Сначала отзовите действующие награды с указанием причины.',
  'Revision conflict; reload tournament':'Данные изменились. Обновите турнир перед сохранением.',
  }[error]||error):error}</p>:null}
- <button disabled={busy} type="button" className="mt-3 text-sm text-[#22D3EE]" onClick={()=>void load().catch(e=>setError(e.message))}>{text('Обновить этапы','Refresh stages')}</button>
+ {!demo?<button disabled={busy} type="button" className="mt-3 text-sm text-[#22D3EE]" onClick={()=>void load().catch(e=>setError(e.message))}>{text('Обновить этапы','Refresh stages')}</button>:null}
  {!state?(owner?<form onSubmit={launch} className="mt-4 grid gap-4 sm:grid-cols-2">
   <p className="text-sm text-white/60 sm:col-span-2">{text('Запуск закрывает регистрацию и фиксирует допущенные команды. Сначала рассмотрите все заявки. Группы распределяются по очереди из списка команд по названию. Очки и порядок тай-брейков должны соответствовать опубликованному регламенту: очки → победы → разница → забито; оставшееся равенство решает организатор.','Launching closes registration and locks approved entries. Review every entry first. Groups alternate through entries sorted by name. Publish matching rules: points → wins → difference → scored; the organizer resolves remaining ties.')}</p>
   <label>{text('Плей-офф','Playoffs')}<select name="format" className={field}><option value="single">Single Elimination</option><option value="double">Double Elimination</option></select></label>
