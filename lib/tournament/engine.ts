@@ -6,6 +6,7 @@ export type Config = {
   bestOf: 1 | 3 | 5;
   // Missing on legacy persisted states: do not reinterpret their recorded BO scores.
   fcScore?: 'goals';
+  bronzeMatch?: boolean;
   groups: { id: string; entries: string[] }[];
   qualify: number;
   points: { win: number; draw: number; loss: number };
@@ -49,7 +50,10 @@ function playoffMatches(seeds: string[], config: Config): Match[] {
       r===1?entry(seeds[order[2*i]-1]??null):winner(`U${r-1}.${2*i}`),
       r===1?entry(seeds[order[2*i+1]-1]??null):winner(`U${r-1}.${2*i+1}`));
   }
-  if(config.format==='single') return matches;
+  if(config.format==='single') {
+    if(config.bronzeMatch) add(matches,'BR1','bronze',loser(`U${rounds-1}.0`),loser(`U${rounds-1}.1`));
+    return matches;
+  }
   if(size>2) {
     for(let i=0;i<size/4;i++) add(matches,`L1.${i}`,'lower',loser(`U1.${2*i}`),loser(`U1.${2*i+1}`));
     for(let r=2;r<=rounds;r++) {
@@ -118,8 +122,9 @@ function evaluate(state: State, previous: Match[] = [], invalidate=false) {
   }
   state.champion=null;
   if(state.phase!=='groups') {
-    const final=state.matches.at(-1)!;
-    if(['finished','skipped'].includes(final.status) && final.winner) { state.champion=final.winner; state.phase='finished'; }
+    const final=state.matches.findLast(m=>m.stage!=='bronze')!;
+    const bronze=state.matches.find(m=>m.id==='BR1');
+    if(['finished','skipped'].includes(final.status) && final.winner && (!bronze||bronze.status==='finished')) { state.champion=final.winner; state.phase='finished'; }
     else state.phase='playoffs';
   }
 }
@@ -128,6 +133,7 @@ export function createTournament(game: Game, entries: string[], config: Config):
   if(!['single','double'].includes(config.format)||!['reset','single'].includes(config.grandFinal)||![1,3,5].includes(config.bestOf)) fail('Invalid tournament rules');
   if(game==='fc' && config.bestOf!==1) fail('FC uses football goals in a single match; multi-match FC series are not supported');
   if(game!=='fc' && config.fcScore) fail('Football scoring is only available for FC');
+  if(config.bronzeMatch && (config.format!=='single' || (config.groups.length?config.qualify*config.groups.length:entries.length)<4)) fail('Bronze match requires Single Elimination with at least four playoff entries');
   if(!Object.values(config.points).every(n=>Number.isSafeInteger(n)&&n>=0&&n<=100)) fail('Invalid points');
   const state: State={schema:1,game,entries:[...entries],config:structuredClone(config),phase:config.groups.length?'groups':'playoffs',matches:[],seeds:config.groups.length?[]:[...entries],champion:null};
   if(game==='fc') state.config.fcScore='goals';
