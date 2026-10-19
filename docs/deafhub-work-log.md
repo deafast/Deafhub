@@ -1,0 +1,26 @@
+# Рабочий журнал DeafHub
+
+## Границы работы
+Репозиторий deafast/Deafhub, только preview/deafhub-setup. Не изменять main, production, дизайнерские образцы и финансовый модуль. Изучать сначала git status и git diff; сравнивать с актуальной удалённой Preview, а не старой локальной базой. Не сбрасывать рабочее дерево: часть уже опубликованного кода остаётся локально незакоммиченной.
+
+## Изученные пути
+- lib/tournament/engine.ts — подтверждённое состояние групп, Single/Double, BYE, Forfeit и переходы.
+- components/hub/TournamentBracket.tsx — верхняя/нижняя сетки, финалы и связи матчей; TournamentEngine.tsx — группы/квалификация и формы результатов.
+- app/tournaments/demo/TournamentDemo.tsx — вычисляемый read-only образец, Double по умолчанию; фиктивные команды не записываются в базу.
+- components/auth/EmailAuth.tsx, EmailConfirmationPending.tsx — регистрация и ожидание подтверждения, провайдеры почты, повторная отправка с паузой.
+- lib/auth/email-confirmation.ts — разрешённые домены почты, callback и cooldown.
+- app/auth/callback/route.ts — PKCE, recovery, Steam и переход после email; app/auth/email-confirmed/page.tsx — серверная проверка подтверждения.
+- supabase/templates/confirm-signup.html — RU/EN, настоящий логотип, неизменённая ConfirmationURL, inline CSS и необязательные адаптивные media queries.
+- app/auth/email-preview/route.ts — только Preview/development, безопасная демонстрационная ссылка.
+- docs/email-confirmation.md — настройки, доказательства и ограничения; docs/deafhub-status.md — основной реестр; docs/deafhub-development-plan.md — согласованный план.
+
+## Проверенные результаты на 19 октября 2026
+До последних текстовых правок: 106 тестов, TypeScript, ESLint и Next webpack build прошли. После редактуры текста письма: 24 email-теста прошли. Изменения a48957e / 239faa9 / 6d31355 побайтово сверены с GitHub.
+Resend: preview-mail.deafhub.cc подтверждён; в Porkbun добавлены три записи только тестового поддомена, исходные A и www CNAME сохранены. Образец 01a1537c-60c5-720f-a7ea-3792bc2083b1 получил Delivered после редактуры текста. Полное подтверждение регистрации этим не проверялось.
+SMTP Supabase выключен; ключ Resend не создан, реальные шаблоны Supabase не изменены. Vercel NEXT_PUBLIC_SUPABASE_URL hvxvwgnnmazpptuenidv задан для Preview; Site URL и два callback также Preview.
+
+## Текущая доработка
+Адаптивное письмо: основной текст 16 px, вспомогательный 14 px; до 600 px поля 20 px, логотип 190 px и заголовок 26/34; до 380 px заголовок 24/32. Без поддержки media queries остаётся гибкая таблица max-width 600 px и inline CSS. Не считать суженный браузерный образец реальным тестом Gmail/Mail.ru на телефоне.
+
+## Следующий сеанс
+Проверить status/diff и удалённый SHA. Открывать только изменённые участки и связанные зависимости; обязательные проверки прав, токенов и логики не пропускать. SMTP, настоящие ссылки регистрации, Mail.ru/Outlook и мобильные клиенты остаются незавершёнными; FC 100 игроков и solo-регистрация — также. Подробный реестр в deafhub-status.md.
