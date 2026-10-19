@@ -2,7 +2,7 @@ export const translations = {
   en: {
     nav: {
       home: "Home",
-      live: "Live",
+      live: "Matches",
       tournaments: "Tournaments",
       team: "Teams",
       profile: "Profile",
@@ -238,7 +238,7 @@ export const translations = {
   ru: {
     nav: {
       home: "Главная",
-      live: "Live",
+      live: "Матчи",
       tournaments: "Турниры",
       team: "Команды",
       profile: "Профиль",
