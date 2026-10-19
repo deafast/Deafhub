@@ -4,12 +4,14 @@ export type Config = {
   format: 'single' | 'double';
   grandFinal: 'reset' | 'single';
   bestOf: 1 | 3 | 5;
+  // Missing on legacy persisted states: do not reinterpret their recorded BO scores.
+  fcScore?: 'goals';
   groups: { id: string; entries: string[] }[];
   qualify: number;
   points: { win: number; draw: number; loss: number };
 };
 type Source = { entry: string | null } | { match: string; outcome: 'winner' | 'loser' };
-export type Result = { kind: 'played'; a: number; b: number } | { kind: 'forfeit'; loser: string };
+export type Result = { kind: 'played'; a: number; b: number; penalties?: { a: number; b: number } } | { kind: 'forfeit'; loser: string };
 export type Match = {
   id: string; stage: string; sources: [Source, Source];
   a: string | null; b: string | null;
@@ -95,13 +97,20 @@ function evaluate(state: State, previous: Match[] = [], invalidate=false) {
       } else {
         const group=m.stage.startsWith('group:');
         if(![result.a,result.b].every(n=>Number.isSafeInteger(n)&&n>=0&&n<=1000)) fail('Invalid score');
-        if(result.a===result.b && !(group&&state.game==='fc')) fail('Draw not allowed');
-        if(!group || state.game!=='fc') {
+        const football=state.game==='fc' && (group || state.config.fcScore==='goals');
+        if(result.penalties) {
+          if(!football || group || result.a!==result.b) fail('Penalties require a tied FC playoff match');
+          if(![result.penalties.a,result.penalties.b].every(n=>Number.isSafeInteger(n)&&n>=0&&n<=1000)
+            || result.penalties.a===result.penalties.b) fail('Invalid penalty shootout');
+        }
+        if(result.a===result.b && !(group&&state.game==='fc') && !result.penalties) fail(football?'Draw not allowed; record the deciding penalty shootout for FC':'Draw not allowed');
+        if(!football) {
           const target=(state.config.bestOf+1)/2;
           if(Math.max(result.a,result.b)!==target || Math.min(result.a,result.b)>=target) fail('Score does not match best-of');
         }
-        m.winner=result.a===result.b?null:result.a>result.b?a:b;
-        m.loser=result.a===result.b?null:result.a>result.b?b:a;
+        const deciding=result.penalties??result;
+        m.winner=deciding.a===deciding.b?null:deciding.a>deciding.b?a:b;
+        m.loser=deciding.a===deciding.b?null:deciding.a>deciding.b?b:a;
       }
       m.status='finished';
     } else m.status='ready';
@@ -117,8 +126,11 @@ function evaluate(state: State, previous: Match[] = [], invalidate=false) {
 export function createTournament(game: Game, entries: string[], config: Config): State {
   if(!['dota2','cs2','fc'].includes(game) || entries.length<2 || entries.length>64 || !unique(entries)) fail('Choose 2–64 unique approved entries');
   if(!['single','double'].includes(config.format)||!['reset','single'].includes(config.grandFinal)||![1,3,5].includes(config.bestOf)) fail('Invalid tournament rules');
+  if(game==='fc' && config.bestOf!==1) fail('FC uses football goals in a single match; multi-match FC series are not supported');
+  if(game!=='fc' && config.fcScore) fail('Football scoring is only available for FC');
   if(!Object.values(config.points).every(n=>Number.isSafeInteger(n)&&n>=0&&n<=100)) fail('Invalid points');
   const state: State={schema:1,game,entries:[...entries],config:structuredClone(config),phase:config.groups.length?'groups':'playoffs',matches:[],seeds:config.groups.length?[]:[...entries],champion:null};
+  if(game==='fc') state.config.fcScore='goals';
   if(config.groups.length) {
     if(!unique(config.groups.map(g=>g.id)) || !unique(config.groups.flatMap(g=>g.entries)) || config.groups.flatMap(g=>g.entries).sort().join()!==[...entries].sort().join()) fail('Each entry must belong to exactly one group');
     for(const group of config.groups) {
