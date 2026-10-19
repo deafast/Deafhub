@@ -6,6 +6,7 @@ import { createTournament, transition, type State } from '@/lib/tournament/engin
 const uuid=z.string().uuid();
 const config=z.object({
  format:z.enum(['single','double']),grandFinal:z.enum(['reset','single']),bestOf:z.union([z.literal(1),z.literal(3),z.literal(5)]),
+ fcScore:z.literal('goals').optional(),
  groups:z.array(z.object({id:z.string().regex(/^[A-Z0-9_-]{1,12}$/),entries:z.array(uuid).min(2).max(64)})).max(32),
  qualify:z.number().int().min(1).max(32),
  points:z.object({win:z.number().int().min(0).max(100),draw:z.number().int().min(0).max(100),loss:z.number().int().min(0).max(100)}),
@@ -14,7 +15,7 @@ const command=z.discriminatedUnion('type',[
  z.object({type:z.literal('launch'),config,entries:z.array(uuid).min(2).max(64)}),
  z.object({type:z.literal('qualify'),ties:z.record(z.string(),z.array(uuid).max(64))}),
  z.object({type:z.literal('result'),match:z.string().max(64),result:z.discriminatedUnion('kind',[
-  z.object({kind:z.literal('played'),a:z.number().int().min(0).max(1000),b:z.number().int().min(0).max(1000)}),
+  z.object({kind:z.literal('played'),a:z.number().int().min(0).max(1000),b:z.number().int().min(0).max(1000),penalties:z.object({a:z.number().int().min(0).max(1000),b:z.number().int().min(0).max(1000)}).optional()}),
   z.object({kind:z.literal('forfeit'),loser:uuid}),
  ]),invalidate:z.boolean(),reason:z.string().trim().min(3).max(500)}),
 ]);
