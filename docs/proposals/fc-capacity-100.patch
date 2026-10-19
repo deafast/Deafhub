@@ -1,0 +1,161 @@
+diff --git a/app/api/tournament-engine/route.ts b/app/api/tournament-engine/route.ts
+index e135e94..372d833 100644
+--- a/app/api/tournament-engine/route.ts
++++ b/app/api/tournament-engine/route.ts
+@@ -8,13 +8,13 @@ const config=z.object({
+  format:z.enum(['single','double']),grandFinal:z.enum(['reset','single']),bestOf:z.union([z.literal(1),z.literal(3),z.literal(5)]),
+  fcScore:z.literal('goals').optional(),
+  bronzeMatch:z.boolean().optional(),
+- groups:z.array(z.object({id:z.string().regex(/^[A-Z0-9_-]{1,12}$/),entries:z.array(uuid).min(2).max(64)})).max(32),
++ groups:z.array(z.object({id:z.string().regex(/^[A-Z0-9_-]{1,12}$/),entries:z.array(uuid).min(2).max(100)})).max(32),
+  qualify:z.number().int().min(1).max(32),
+  points:z.object({win:z.number().int().min(0).max(100),draw:z.number().int().min(0).max(100),loss:z.number().int().min(0).max(100)}),
+ });
+ const command=z.discriminatedUnion('type',[
+- z.object({type:z.literal('launch'),config,entries:z.array(uuid).min(2).max(64)}),
+- z.object({type:z.literal('qualify'),ties:z.record(z.string(),z.array(uuid).max(64))}),
++ z.object({type:z.literal('launch'),config,entries:z.array(uuid).min(2).max(100)}),
++ z.object({type:z.literal('qualify'),ties:z.record(z.string(),z.array(uuid).max(100))}),
+  z.object({type:z.literal('result'),match:z.string().max(64),result:z.discriminatedUnion('kind',[
+   z.object({kind:z.literal('played'),a:z.number().int().min(0).max(1000),b:z.number().int().min(0).max(1000),penalties:z.object({a:z.number().int().min(0).max(1000),b:z.number().int().min(0).max(1000)}).optional()}),
+   z.object({kind:z.literal('forfeit'),loser:uuid}),
+diff --git a/components/hub/TournamentEngine.tsx b/components/hub/TournamentEngine.tsx
+index 3fb7ff5..a811252 100644
+--- a/components/hub/TournamentEngine.tsx
++++ b/components/hub/TournamentEngine.tsx
+@@ -58,7 +58,7 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
+   <label>{text('Гранд-финал Double','Double grand final')}<select name="grandFinal" className={field}><option value="reset">{text('Повторный финал при победе нижней сетки','Reset if lower bracket wins')}</option><option value="single">{text('Один финал','One final')}</option></select></label>
+   <label>{text('Формат серии','Series format')}<select name="bestOf" className={field} disabled={game==='fc'}>{[1,3,5].map(n=><option key={n} value={n}>BO{n}</option>)}</select></label>
+   <label className="flex items-start gap-3 text-sm sm:col-span-2"><input type="checkbox" name="bronzeMatch"/>{text('Отдельный матч за третье место: только Single, минимум 4 участника плей-офф. Должен совпадать с опубликованным правилом наград.','Separate bronze match: Single only, at least 4 playoff entries. Must match the published award rule.')}</label>
+-  <label>{text('Групповой этап','Group stage')}<select name="groups" className={field}><option value="0">{text('Без групп','No groups')}</option>{[2,4,8].map(n=><option key={n} value={n}>{n} {text('группы','groups')}</option>)}</select></label>
++  <label>{text('Групповой этап','Group stage')}<select name="groups" className={field} defaultValue={game==='fc'&&approved.length>64?20:0}><option value="0">{text('Без групп','No groups')}</option>{[2,4,8,16,20,25].filter(n=>n<=Math.floor(approved.length/2)).map(n=><option key={n} value={n}>{n} {text('группы','groups')}</option>)}</select></label>
+   <label>{text('Выходят из каждой группы','Qualifiers per group')}<input name="qualify" type="number" min="1" max="32" defaultValue="2" className={field} required/></label>
+   {[['win',text('Очки за победу','Win points'),3],['draw',text('Очки за ничью FC','FC draw points'),1],['loss',text('Очки за поражение','Loss points'),0]].map(([key,label,value])=><label key={key}>{label}<input name={String(key)} type="number" min="0" max="100" defaultValue={value} className={field} required/></label>)}
+   <p className="text-sm text-white/60 sm:col-span-2">{game==='fc'?text('FC: счёт в голах; один матч, с дополнительным временем и пенальти по регламенту. ','FC: goals in a single match, with extra time and penalties as specified in the rules. '):''}{text('Посев:','Seeding:')} {approved.length? [...approved].sort((a,b)=>name(a).localeCompare(name(b))||a.localeCompare(b)).map(name).join(' → '):text('Нет допущенных команд','No approved entries')}. {text('Без отмеченной опции отдельный матч за третье место не создаётся.','No separate bronze match is created unless enabled.')}</p>
+diff --git a/db/tournament-engine.sql b/db/tournament-engine.sql
+index c5e843f..9b20e1f 100644
+--- a/db/tournament-engine.sql
++++ b/db/tournament-engine.sql
+@@ -42,7 +42,7 @@ begin
+  if e.tournament_id is null then
+   if command->>'type'<>'launch' or t.status='finished' or exists(select 1 from public.hub_matches where tournament_id=tid) or exists(select 1 from public.hub_entries where tournament_id=tid and status='pending') then raise exception 'Review entries and remove manual scheduling before launch';end if;
+   select jsonb_agg(id::text order by id::text),count(*) into ids,n from public.hub_entries where tournament_id=tid and status='approved';
+-  if n<2 or n>64 or ids is distinct from (select jsonb_agg(value order by value) from jsonb_array_elements_text(next_state->'entries')) then raise exception 'Approved entries changed';end if;
++  if n<2 or n>(case when t.game='fc' then 100 else 64 end) or ids is distinct from (select jsonb_agg(value order by value) from jsonb_array_elements_text(next_state->'entries')) then raise exception 'Approved entries changed';end if;
+  else
+   if next_state->'entries'<>e.state->'entries' or next_state->'config'<>e.state->'config' then raise exception 'Tournament rules are locked';end if;
+  end if;
+diff --git a/lib/tournament/engine.test.mjs b/lib/tournament/engine.test.mjs
+index d17fb73..7633169 100644
+--- a/lib/tournament/engine.test.mjs
++++ b/lib/tournament/engine.test.mjs
+@@ -133,8 +133,8 @@ for(const count of [8,12,32]) test(`Single ${count}: exact match count and no fi
+  assert.equal(s.matches.filter(m=>m.status==='finished').length,count-1);
+  assert.ok(s.matches.every(m=>m.stage==='upper'));
+ });
+-test('100-entry launch remains explicitly unsupported until database capacity migration',()=>{
+- assert.throws(()=>createTournament('fc',Array.from({length:100},(_,i)=>`f${i}`),rules()),/2–64/);
++test('101-entry launch remains rejected above FC capacity',()=>{
++ assert.throws(()=>createTournament('fc',Array.from({length:101},(_,i)=>`f${i}`),rules()),/2–100/);
+ });
+ 
+ for(const count of [4,5,8,12,32]) test(`optional Single bronze ${count}: real semifinal losers and complete placements`,()=>{
+@@ -184,3 +184,27 @@ test('bronze is generated after qualification, not in round-robin groups',()=>{
+  while(s.phase!=='finished')s=result(s,s.matches.find(m=>m.status==='ready').id);
+  assert.ok(s.champion);assert.equal(s.matches.find(m=>m.id==='BR1').status,'finished');
+ });
++
++for(const format of ['single','double'])for(const side of [0,1])test(`FC capacity 100 ${format} winner side ${side}`,()=>{
++ let s=createTournament('fc',Array.from({length:100},(_,i)=>`p${i}`),rules({format}));let played=0;
++ assert.ok(Buffer.byteLength(JSON.stringify(s))<2000000);
++ while(!s.champion){const m=s.matches.find(m=>m.status==='ready');assert.ok(m);s=result(s,m.id,side?0:2,side?2:0);assert.ok(++played<=199);}
++ assert.equal(played,format==='single'?99:side?199:198);
++ const losses=new Map(s.entries.map(e=>[e,0]));for(const m of s.matches)if(m.status==='finished'&&m.loser)losses.set(m.loser,losses.get(m.loser)+1);
++ for(const [id,n]of losses)assert.equal(n,id===s.champion?(format==='double'&&side?1:0):format==='double'?2:1);
++});
++test('FC 100 balanced groups qualify into real double bracket without rematches',()=>{
++ const entries=Array.from({length:100},(_,i)=>`p${i}`);const groups=Array.from({length:20},(_,i)=>({id:String.fromCharCode(65+i),entries:entries.filter((_,n)=>n%20===i)}));
++ let s=createTournament('fc',entries,rules({groups}));assert.equal(s.matches.length,200);
++ for(const m of [...s.matches])s=result(s,m.id,2,0);
++ s=transition(s,{type:'qualify',ties:{}});assert.equal(s.seeds.length,40);
++ assert.ok(s.matches.filter(m=>m.stage==='upper'&&m.id.startsWith('U1.')&&m.a&&m.b).every(m=>!groups.some(g=>g.entries.includes(m.a)&&g.entries.includes(m.b))));
++ while(!s.champion)s=result(s,s.matches.find(m=>m.status==='ready').id,1,0);
++ assert.equal(s.phase,'finished');assert.ok(Buffer.byteLength(JSON.stringify(s))<2000000);
++});
++test('capacity rejects 101 FC, 65 team entries and overloaded new FC groups',()=>{
++ const entries=n=>Array.from({length:n},(_,i)=>`p${i}`);
++ assert.throws(()=>createTournament('fc',entries(101),rules()),/2–100/);
++ for(const game of ['dota2','cs2'])assert.throws(()=>createTournament(game,entries(65),rules()),/2–64/);
++ assert.throws(()=>createTournament('fc',entries(100),rules({groups:[{id:'A',entries:entries(100)}]})),/at most 16/);
++});
+diff --git a/lib/tournament/engine.ts b/lib/tournament/engine.ts
+index b0e2807..175d2cb 100644
+--- a/lib/tournament/engine.ts
++++ b/lib/tournament/engine.ts
+@@ -1,5 +1,6 @@
+ /** Deterministic tournament state. Only the authenticated server may persist transitions. */
+ export type Game = 'dota2' | 'cs2' | 'fc';
++export const tournamentCapacity = (game: Game) => game === 'fc' ? 100 : 64;
+ export type Config = {
+   format: 'single' | 'double';
+   grandFinal: 'reset' | 'single';
+@@ -129,7 +130,7 @@ function evaluate(state: State, previous: Match[] = [], invalidate=false) {
+   }
+ }
+ export function createTournament(game: Game, entries: string[], config: Config): State {
+-  if(!['dota2','cs2','fc'].includes(game) || entries.length<2 || entries.length>64 || !unique(entries)) fail('Choose 2–64 unique approved entries');
++  if(!['dota2','cs2','fc'].includes(game) || entries.length<2 || entries.length>tournamentCapacity(game) || !unique(entries)) fail(`Choose 2–${tournamentCapacity(game)} unique approved entries`);
+   if(!['single','double'].includes(config.format)||!['reset','single'].includes(config.grandFinal)||![1,3,5].includes(config.bestOf)) fail('Invalid tournament rules');
+   if(game==='fc' && config.bestOf!==1) fail('FC uses football goals in a single match; multi-match FC series are not supported');
+   if(game!=='fc' && config.fcScore) fail('Football scoring is only available for FC');
+@@ -140,6 +141,7 @@ export function createTournament(game: Game, entries: string[], config: Config):
+   if(config.groups.length) {
+     if(!unique(config.groups.map(g=>g.id)) || !unique(config.groups.flatMap(g=>g.entries)) || config.groups.flatMap(g=>g.entries).sort().join()!==[...entries].sort().join()) fail('Each entry must belong to exactly one group');
+     for(const group of config.groups) {
++      if(game==='fc' && entries.length>64 && group.entries.length>16) fail('FC tournaments above 64 entries require groups of at most 16 players');
+       if(group.entries.length<2 || !Number.isInteger(config.qualify) || config.qualify<1 || config.qualify>group.entries.length) fail('Invalid qualification count');
+       for(let a=0;a<group.entries.length;a++) for(let b=a+1;b<group.entries.length;b++) add(state.matches,`G${group.id}.${a}.${b}`,`group:${group.id}`,entry(group.entries[a]),entry(group.entries[b]));
+     }
+diff --git a/scripts/fc-capacity-sql-check.mjs b/scripts/fc-capacity-sql-check.mjs
+new file mode 100644
+index 0000000..dd44073
+--- /dev/null
++++ b/scripts/fc-capacity-sql-check.mjs
+@@ -0,0 +1,20 @@
++// Generates rollback-only legacy schema fixtures; never creates actual FC registrations.
++import {createTournament} from '../lib/tournament/engine.ts';
++const uid=n=>`10000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
++const actor=uid(1),json=v=>`'${JSON.stringify(v).replaceAll("'","''")}'::jsonb`;
++let sql=`begin;\ninsert into auth.users(id,email,aud,role) values('${actor}','fc-capacity-rollback@deafhub-test.invalid','authenticated','authenticated');\ninsert into public.profiles(id,nickname,region) values('${actor}','Capacity rollback QA','europe');\ninsert into public.hub_organizers values('${actor}');\n`;
++for(let i=0;i<101;i++)sql+=`insert into public.hub_teams(id,name,game,captain_id) values('${uid(1000+i)}','Rollback capacity ${i}','fc','${actor}');\n`;
++for(const [index,count,game,success]of [[0,100,'fc',true],[1,101,'fc',false],[2,65,'cs2',false],[3,64,'cs2',true]]){
++ const tid=uid(2000+index),entries=Array.from({length:count},(_,i)=>uid(3000+index*200+i));
++ sql+=`insert into public.hub_tournaments(id,title,game,organizer_id,starts_at,rules,roster_size) values('${tid}','Rollback capacity ${count} ${game}','${game}','${actor}',now()+interval '1 day','Rollback-only capacity validation, not a real tournament',${game==='fc'?1:5});\n`;
++ for(let i=0;i<count;i++)sql+=`insert into public.hub_entries(id,tournament_id,team_id,status,rules_version) select '${entries[i]}',id,'${uid(1000+i)}','approved',rules_version from public.hub_tournaments where id='${tid}';\n`;
++ const config={format:'double',grandFinal:'reset',bestOf:1,groups:[],qualify:2,points:{win:3,draw:1,loss:0}};
++ let state=createTournament(game==='cs2'&&count>64?'fc':game,entries.slice(0,100),config);state.game=game;state.entries=entries;state.matches=[]; // Only SQL entrant ceiling is under test; engine graphs are tested separately.
++ const command=json({type:'launch'}),value=json(state),request=uid(5000+index);
++ sql+=`do $$declare r jsonb;begin\nperform set_config('request.jwt.claim.sub','${actor}',true);\nperform public.hub_ops_action('set_policy',jsonb_build_object('tournament_id','${tid}','body','Rollback-only capacity policy, no real participants','require_acceptance',false,'bronze','none'));\n`;
++ const call=`public.hub_engine_commit('${tid}','${actor}',0,'${request}',${command},${value})`;
++ if(success){sql+=`r:=${call};if r->>'revision'<>'1' then raise exception 'FAIL capacity revision';end if;\nr:=${call};if r->>'revision'<>'1' then raise exception 'FAIL duplicate revision';end if;\nbegin perform public.hub_engine_commit('${tid}','${actor}',999,gen_random_uuid(),'{"type":"result"}',${value});raise exception 'FAIL stale revision accepted';exception when raise_exception then if SQLERRM<>'Revision conflict' then raise;end if;end;\n`;}else{sql+=`begin perform ${call};raise exception 'FAIL capacity accepted';exception when raise_exception then if SQLERRM<>'Approved entries changed' then raise;end if;end;\n`;}
++ sql+='end $$;\n';
++}
++sql+=`do $$begin if has_function_privilege('anon','public.hub_engine_commit(uuid,uuid,integer,uuid,jsonb,jsonb)','execute') or has_function_privilege('authenticated','public.hub_engine_commit(uuid,uuid,integer,uuid,jsonb,jsonb)','execute') or not has_function_privilege('service_role','public.hub_engine_commit(uuid,uuid,integer,uuid,jsonb,jsonb)','execute') then raise exception 'FAIL RPC permissions';end if;end $$;\nrollback;\nselect 'FC100 pass; FC101 reject; CS65 reject; CS64 pass; replay/CAS/ACL pass; fixtures rolled back' as capacity_qa;`;
++console.log(sql);
+diff --git a/supabase/migrations/20261019130440_fc_capacity_100.sql b/supabase/migrations/20261019130440_fc_capacity_100.sql
+new file mode 100644
+index 0000000..76b98c3
+--- /dev/null
++++ b/supabase/migrations/20261019130440_fc_capacity_100.sql
+@@ -0,0 +1,11 @@
++-- Only the participant ceiling changes. Preserve the current RPC body, ownership,
++-- locking, audit, idempotency, grants and participation/award triggers.
++do $migration$
++declare definition text; old_guard text:='n<2 or n>64 or ids'; new_guard text:='n<2 or n>(case when t.game=''fc'' then 100 else 64 end) or ids';
++begin
++ definition:=pg_get_functiondef('public.hub_engine_commit(uuid,uuid,integer,uuid,jsonb,jsonb)'::regprocedure);
++ if position(new_guard in definition)>0 then return;end if;
++ if (length(definition)-length(replace(definition,old_guard,'')))/length(old_guard)<>1 then raise exception 'Unexpected hub_engine_commit capacity guard; review migration';end if;
++ execute replace(definition,old_guard,new_guard);
++end $migration$;
++notify pgrst,'reload schema';
