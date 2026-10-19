@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { validState, verifySteam } from '@/lib/steam/openid';
+import { claimSteamAccount } from '@/lib/steam/link';
 export const runtime='nodejs';
 export async function GET(request:NextRequest) {
  let target='/sign-in?error=steam';
@@ -23,8 +24,10 @@ export async function GET(request:NextRequest) {
   if (lookupError) throw lookupError;
   if (current) {
    if (linked && linked.user_id!==current.id) throw new Error('Already linked');
-   const {error}=await admin.from('steam_accounts').upsert({steam_id:steamId,user_id:current.id},{onConflict:'steam_id'});
-   if (error) throw error;
+   await claimSteamAccount(steamId,current.id,{
+    insert:async(id,userId)=>{const {error}=await admin.from('steam_accounts').insert({steam_id:id,user_id:userId});return {error};},
+    owner:async(id)=>{const {data,error}=await admin.from('steam_accounts').select('user_id').eq('steam_id',id).maybeSingle();return {userId:data?.user_id||null,error};},
+   });
   } else {
    let userId=linked?.user_id as string | undefined;
    const email=`${steamId}@steam.deafhub.invalid`;
@@ -47,6 +50,7 @@ export async function GET(request:NextRequest) {
  const response=NextResponse.redirect(new URL(target,request.url));
  for (const name of ['dh-steam-state','dh-steam-user']) response.cookies.set(name,'',{maxAge:0,path:'/auth/steam'});
  response.headers.set('Cache-Control','private, no-store');
+ response.headers.set('Referrer-Policy','no-referrer');
  return response;
 }
 
