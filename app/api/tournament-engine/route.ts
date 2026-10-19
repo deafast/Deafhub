@@ -7,6 +7,7 @@ const uuid=z.string().uuid();
 const config=z.object({
  format:z.enum(['single','double']),grandFinal:z.enum(['reset','single']),bestOf:z.union([z.literal(1),z.literal(3),z.literal(5)]),
  fcScore:z.literal('goals').optional(),
+ bronzeMatch:z.boolean().optional(),
  groups:z.array(z.object({id:z.string().regex(/^[A-Z0-9_-]{1,12}$/),entries:z.array(uuid).min(2).max(64)})).max(32),
  qualify:z.number().int().min(1).max(32),
  points:z.object({win:z.number().int().min(0).max(100),draw:z.number().int().min(0).max(100),loss:z.number().int().min(0).max(100)}),
