@@ -21,6 +21,6 @@ export default function TournamentDemo(){
  <h1 className="text-3xl font-bold">{ru?'Демонстрация таблиц и сетки':'Tables and bracket preview'}</h1>
  <p className="my-5 rounded-xl border border-[#22D3EE]/30 p-4">{ru?'ДЕМО. Временные вымышленные команды и результаты только для просмотра. В базу, реальные награды и статистику не записываются.':'DEMO. Temporary fictional teams and scores for visual review only. Nothing is saved to the database, real awards or statistics.'}</p>
  <div className="mb-6 flex flex-wrap gap-3">{[false,true].map(value=><button key={String(value)} aria-pressed={double===value} onClick={()=>setDouble(value)} className={`min-h-11 rounded-xl border px-4 py-3 ${double===value?'border-[#22D3EE] text-[#22D3EE]':'border-white/20'}`}>{value?'Double Elimination':'Single + Bronze'}</button>)}</div>
- <TournamentEngine key={String(double)} id="demo-read-only" game="dota2" owner={false} ru={ru} approved={entries} name={name} onSaved={async()=>{}} initial={{revision:1,state:sample(double)}}/>
+ <TournamentEngine demo key={String(double)} id="demo-read-only" game="dota2" owner={false} ru={ru} approved={entries} name={name} onSaved={async()=>{}} initial={{revision:1,state:sample(double)}}/>
  </main>;
 }
