@@ -14,8 +14,13 @@ existing visual classes; design examples and global design assets are untouched.
   require an explicit organizer decision; an ID is never a qualification tie-break.
 - Two groups / two qualifiers use A1–B2 and B1–A2. Configurations producing a
   same-group opening playoff match are rejected rather than silently reseeded.
-- BO1/3/5 scores are series wins for elimination matches and Dota/CS2 groups.
-  FC group scores are goals and may draw. A tied elimination series is rejected.
+- Dota/CS2 use BO1/3/5 series wins. New FC tournaments use a single football match
+  (`config.fcScore="goals"`, `bestOf=1`): goals in groups and playoffs; draws are
+  allowed in groups. A tied playoff requires a separate, non-tied penalty shootout.
+  The submitted match score includes extra time when the published rules require it;
+  penalties never inflate goal totals. FC multi-match series are not implemented.
+- Legacy persisted FC configs without `fcScore` retain their existing playoff BO
+  semantics and are labelled in the interface. No historical score is reinterpreted.
 - BYE is automatic, has no fictional score and does not count as a played match.
   Forfeit records the real losing entry and awards victory/points without fake goals.
 - Double Elimination includes upper/lower brackets. The organizer explicitly chooses
@@ -48,7 +53,7 @@ manual `hub_action` cannot change an engine's entrants/results or bypass complet
 
 ## Verification
 
-- Node 24: `node --test lib/tournament/engine.test.mjs` (33 tests).
+- Node 24: `node --test lib/tournament/engine.test.mjs` (44 tests on 19 October).
 - `npx tsc --noEmit` and ESLint on changed TS/TSX files.
 - `db/competition-check.sql` and `db/tournament-engine-check.sql` run transactionally
   and roll back all fixtures. The latter verifies ownership, CAS, idempotency, audit,
@@ -79,3 +84,18 @@ The default QA directory is the OS temporary directory / `deafhub-qa`; override 
 Never upload its private fixture or `.env.local`. Cleanup targets only IDs created by
 that run. To test a deployed Preview, set `QA_ORIGIN` to the verified Preview URL and
 run `tournament-e2e.mjs` directly after preparing a fresh database fixture.
+
+
+## Capacity and current verification limits (19 October 2026)
+
+The engine, request validation and `hub_engine_commit` SQL still limit entries to 64.
+A 100-player FC tournament is **not supported**. Raising just the frontend limit
+would not upgrade the database. The project MCP denied read access and the dashboard
+required sign-in; no migration or live RLS verification was performed in this session.
+Individual FC registration also remains unimplemented in the team-based schema.
+The UI does not ask an individual FC player to create a five-person team.
+
+Tournament filtering uses persisted server records through `filterTournaments`;
+`?game=dota2|cs2|fc` stores the selection. Search, own entries and game filters combine.
+Invalid games show all games. A loaded empty list differs from a login/error state;
+no sample results or season ratings are inserted.
