@@ -1,0 +1,24 @@
+// Prints a rollback-only fixture; no credentials, network calls or real entries.
+import {createTournament,transition} from '../lib/tournament/engine.ts';
+const entries=Array.from({length:4},(_,i)=>`00000000-0000-4000-8000-00000000099${i}`);
+const tid='00000000-0000-4000-8000-000000000924',actor='00000000-0000-4000-8000-000000000901';
+const config={format:'single',grandFinal:'reset',bestOf:1,bronzeMatch:true,groups:[],qualify:2,points:{win:3,draw:1,loss:0}};
+let state=createTournament('fc',entries,config);
+const json=value=>`'${JSON.stringify(value).replaceAll("'","''")}'::jsonb`;
+const commit=(s,revision)=>`perform public.hub_engine_commit('${tid}','${actor}',${revision},gen_random_uuid(),${json({type:revision?'result':'launch'})},${json(s)});`;
+let sql=`insert into public.hub_tournaments(id,title,game,organizer_id,starts_at,rules,roster_size) values('${tid}','Bronze QA rollback only','fc','${actor}',now()+interval '1 day','Rollback-only QA rules, not a real tournament',1);\n`;
+for(let i=0;i<4;i++)sql+=`insert into public.hub_entries(id,tournament_id,team_id,status,rules_version) select '${entries[i]}',id,'00000000-0000-4000-8000-00000000091${i+1}','pending',rules_version from public.hub_tournaments where id='${tid}';\ninsert into public.hub_entry_players values('${entries[i]}','00000000-0000-4000-8000-00000000090${i+1}','QA bronze player ${i}');\n`;
+sql+=`do $$declare result jsonb;begin\nperform set_config('request.jwt.claim.sub','${actor}',true);\nperform public.hub_ops_action('set_policy',jsonb_build_object('tournament_id','${tid}','body','Single bronze match; rollback-only test regulations','require_acceptance',false,'bronze','bronze_match'));\n`;
+for(const e of entries)sql+=`perform public.hub_action('review_entry',jsonb_build_object('entry_id','${e}','status','approved'));\n`;
+const wrong=structuredClone(state);delete wrong.config.bronzeMatch;wrong.matches=wrong.matches.filter(m=>m.id!=='BR1');
+sql+=`begin ${commit(wrong,0)} raise exception 'FAIL bronze mismatch accepted';exception when raise_exception then if SQLERRM<>'Third-place rule does not match the format' then raise;end if;end;\n`;
+sql+=commit(state,0)+'\n';
+for(const id of ['U1.0','U1.1','U2.0'])state=transition(state,{type:'result',match:id,result:{kind:'played',a:2,b:1},invalidate:false,reason:'Verified rollback QA result'});
+sql+=commit(state,1)+'\n';
+sql+=`begin perform public.hub_ops_action('issue_awards',jsonb_build_object('tournament_id','${tid}'));raise exception 'FAIL awards before bronze';exception when raise_exception then if SQLERRM<>'Finish the tournament first' then raise;end if;end;\n`;
+state=transition(state,{type:'result',match:'BR1',result:{kind:'played',a:1,b:1,penalties:{a:3,b:4}},invalidate:false,reason:'Verified bronze penalties'});
+sql+=commit(state,2)+'\n';
+sql+=`perform public.hub_ops_action('issue_awards',jsonb_build_object('tournament_id','${tid}'));\nperform public.hub_ops_action('issue_awards',jsonb_build_object('tournament_id','${tid}'));\nif (select count(*) from public.hub_awards a join public.hub_award_batches b on b.id=a.batch_id where b.tournament_id='${tid}')<>3 then raise exception 'FAIL bronze awards count';end if;\n`;
+for(const [place,entry] of [[1,state.champion],[2,state.matches.find(m=>m.id==='U2.0').loser],[3,state.matches.find(m=>m.id==='BR1').winner]])sql+=`if not exists(select 1 from public.hub_awards a join public.hub_award_batches b on b.id=a.batch_id where b.tournament_id='${tid}' and a.place=${place} and a.entry_id='${entry}') then raise exception 'FAIL place ${place}';end if;\n`;
+sql+=`begin ${commit(state,3)} raise exception 'FAIL correcting issued bronze';exception when raise_exception then if SQLERRM<>'Revoke awards before correcting results' then raise;end if;end;\nend $$;\n`;
+console.log(sql);
