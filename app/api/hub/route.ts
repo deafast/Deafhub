@@ -20,22 +20,33 @@ const actionSchema=z.discriminatedUnion('action',[
  z.object({action:z.literal('close_tournament'),tournament_id:uuid}),
 ]).refine(value=>value.action!=='create_tournament'||value.game!=='fc'||value.roster_size===1,{message:'FC requires an individual 1v1 roster'});
 const headers={'Cache-Control':'private, no-store'};
-export async function GET() {
+export async function GET(request:NextRequest) {
  const client=await createClient();
  if(!client) return NextResponse.json({error:'Unavailable'},{status:503,headers});
  const {data:{user},error}=await client.auth.getUser();
  if(error||!user) return NextResponse.json({error:'Sign in required'},{status:401,headers});
+ const selected=request?.nextUrl.searchParams.get('tournament')||null;
+ if(selected&&!uuid.safeParse(selected).success)return NextResponse.json({error:'Invalid tournament'},{status:400,headers});
+ // A history link loads its exact tournament instead of relying on the first 500 events.
+ const selectedEntries=selected?await client.from('hub_entries').select('*').eq('tournament_id',selected).limit(5000):null;
+ if(selectedEntries?.error)return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
+ const selectedTeams=[...new Set((selectedEntries?.data||[]).map(e=>e.team_id).filter((id):id is string=>Boolean(id)))];
+ const teamsQuery=client.from('hub_teams').select('*').order('created_at',{ascending:false});
+ const membersQuery=client.from('hub_members').select('*');
+ const tournamentQuery=client.from('hub_tournaments').select('*').order('starts_at');
+ const matchesQuery=client.from('hub_matches').select('*').order('starts_at',{ascending:false});
+ const enginesQuery=client.from('hub_engines').select('tournament_id,revision,state');
  const results=await Promise.all([
-  client.from('hub_teams').select('*').order('created_at',{ascending:false}).limit(500),
-  client.from('hub_members').select('*').limit(5000),
-  client.from('hub_tournaments').select('*').order('starts_at').limit(500),
-  client.from('hub_entries').select('*').limit(5000),
-  client.from('hub_matches').select('*').order('starts_at',{ascending:false}).limit(500),
+  selected?(selectedTeams.length?teamsQuery.in('id',selectedTeams).limit(500):Promise.resolve({data:[],error:null})):teamsQuery.limit(500),
+  selected?(selectedTeams.length?membersQuery.in('team_id',selectedTeams).limit(5000):Promise.resolve({data:[],error:null})):membersQuery.limit(5000),
+  (selected?tournamentQuery.eq('id',selected):tournamentQuery).limit(500),
+  selectedEntries||client.from('hub_entries').select('*').limit(5000),
+  (selected?matchesQuery.eq('tournament_id',selected):matchesQuery).limit(500),
   client.from('hub_invites').select('*'),
   client.from('hub_entry_players').select('entry_id').eq('user_id',user.id),
   client.from('hub_organizers').select('user_id').eq('user_id',user.id).maybeSingle(),
   client.from('steam_accounts').select('steam_id').eq('user_id',user.id).maybeSingle(),
-  client.from('hub_engines').select('tournament_id,revision,state').limit(500),
+  (selected?enginesQuery.eq('tournament_id',selected):enginesQuery).limit(500),
   client.from('hub_all_player_stats').select('matches,wins,draws').eq('user_id',user.id).maybeSingle(),
  ]);
  if(results.some(r=>r.error)) return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
