@@ -8,6 +8,7 @@ const date=z.string().datetime({offset:true});
 const actionSchema=z.discriminatedUnion('action',[
  z.object({action:z.literal('create_team'),name:z.string().trim().min(2).max(40),game}),
  z.object({action:z.literal('join_team'),code:uuid}),
+ z.object({action:z.literal('register_fc'),tournament_id:uuid,rules_version:uuid,skill_level:z.enum(['strong','intermediate','amateur']),accepted:z.literal(true)}),
  z.object({action:z.literal('register'),team_id:uuid,tournament_id:uuid,rules_version:uuid,accepted:z.literal(true)}),
  z.object({action:z.literal('create_tournament'),title:z.string().trim().min(3).max(100),game,starts_at:date,rules:z.string().min(20).max(12000),roster_size:z.number().int().min(1).max(10)}),
  z.object({action:z.literal('review_entry'),entry_id:uuid,status:z.enum(['approved','rejected'])}),
@@ -51,9 +52,11 @@ export async function POST(request:NextRequest) {
  const parsed=actionSchema.safeParse(await request.json().catch(()=>null));
  if(!parsed.success) return NextResponse.json({error:'Check all fields'},{status:400,headers});
  const {action,...p}=parsed.data;
- const {data,error:rpcError}=await client.rpc('hub_action',{action,p});
+ const {data,error:rpcError}=parsed.data.action==='register_fc'
+  ?await client.rpc('hub_register_fc',{tid:parsed.data.tournament_id,accepted_rules:parsed.data.rules_version,level:parsed.data.skill_level})
+  :await client.rpc('hub_action',{action,p});
  if(rpcError) {
-  const allowed=['Complete player confirmations and organizer review first','Use tournament engine','Finish all matches first','Captain cannot leave the team','Membership not found','Captain required','Sign in required','Save your player nickname first','Invitation not found','Roster locked during tournament participation','Roster full','Captain and matching game required','Registration closed','Read and accept current rules','Roster size does not match tournament','A player is already registered','Organizer access required','Choose a future date','Organizer required','Entry is already in a match','Two approved entries required','Result already confirmed','Cannot close tournament'];
+  const allowed=['FC individual tournament required','Choose your playing level','Complete player confirmations and organizer review first','Use tournament engine','Finish all matches first','Captain cannot leave the team','Membership not found','Captain required','Sign in required','Save your player nickname first','Invitation not found','Roster locked during tournament participation','Roster full','Captain and matching game required','Registration closed','Read and accept current rules','Roster size does not match tournament','A player is already registered','Organizer access required','Choose a future date','Organizer required','Entry is already in a match','Two approved entries required','Result already confirmed','Cannot close tournament'];
   const message=allowed.find(text=>rpcError.message===text);
   return NextResponse.json({error:message || (rpcError.code==='23505'?'This team, membership or entry already exists':'Could not save. Check fields and permissions.')},{status:400,headers});
  }
