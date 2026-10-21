@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createTournament, transition, type State } from '@/lib/tournament/engine';
+import {drawFcGroups} from '@/lib/tournament/fc-groups';
+import type {FcLevel} from '@/lib/tournament/fc-levels';
 const uuid=z.string().uuid();
 const config=z.object({
  format:z.enum(['single','double']),grandFinal:z.enum(['reset','single']),bestOf:z.union([z.literal(1),z.literal(3),z.literal(5)]),
@@ -56,7 +58,15 @@ export async function POST(req:NextRequest) {
   if(p.command.type==='launch') {
    if(stored.data)return reply({error:'Tournament already launched'},409);
    if(!['dota2','cs2','fc'].includes(t.data!.game))return reply({error:'Invalid game'},400);
-   next=createTournament(t.data!.game as State['game'],p.command.entries,p.command.config);
+   let rules=p.command.config;
+   if(t.data!.game==='fc'&&rules.groups.length){
+    const {data:approved,error:entryError}=await client.from('hub_entries').select('id,skill_level').eq('tournament_id',p.tournament_id).eq('status','approved');
+    if(entryError)return reply({error:'FC registration setup is not complete'},503);
+    const ids=approved?.map(e=>e.id)||[];
+    if(ids.length!==p.command.entries.length||new Set(p.command.entries).size!==ids.length||p.command.entries.some(id=>!ids.includes(id)))return reply({error:'Approved entries changed'},409);
+    rules={...rules,groups:drawFcGroups((approved||[]).map(e=>({id:e.id,level:e.skill_level as FcLevel|null})),rules.groups.map(g=>g.id))};
+   }
+   next=createTournament(t.data!.game as State['game'],p.command.entries,rules);
   } else {
    if(!stored.data)return reply({error:'Launch tournament first'},400);
    next=transition(stored.data.state as State,p.command);
