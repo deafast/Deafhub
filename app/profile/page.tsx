@@ -17,6 +17,6 @@ export default async function ProfilePage() {
     const parsed = profileSchema.safeParse(data);
     const initial = parsed.success ? parsed.data : { nickname: '', region: 'europe' as const, telegram: '', vk: '' };
     const { data: steam } = await client.from('steam_accounts').select('steam_id').eq('user_id', user.id).maybeSingle();
-    return <PlayerDashboard steamId={steam?.steam_id || null} profile={initial} googleConnected={Boolean(user.identities?.some((identity) => identity.provider === 'google'))} />;
+    return <PlayerDashboard key={user.id} steamId={steam?.steam_id || null} profile={initial} googleConnected={Boolean(user.identities?.some((identity) => identity.provider === 'google'))} />;
 }
 
