@@ -44,3 +44,8 @@ Preview a2e839d Ready; /tournaments/demo теперь также показыв�
 Официальный Next/eslint16.4.2, совместимый audit fix без force; prod audit0, общий5high dev-цепочка braces. Код ecd0c9c0764a379b8019536def55c5d9102281c8, 16 файлов побайтово сверены. Старые рабочие деревья/node_modules не изменены, новое дерево имеет отдельную установку. main/production/дизайн/финансы и отложенные функции не изменялись.
 
 Preview ecd0c9c: Vercel Ready; браузер API истории гостю Sign in required, турнирный demo открывается. Полный авторизованный E2E не выполнен.
+
+## 21 октября: малая доработка истории, база e816245
+Исправлен только components/hub/MatchHistory.tsx: ответ401 очищает page/nextCursor; Retry использует сохранённый cursor сбойного запроса, уже загруженные страницы не сбрасываются. Добавлен maintenance/tests/match-history-interactions.cjs: RU/EN expiry, next-page503→retry→dedup и unmount/abort. Реальные React hooks проверяются react-test-renderer19.2.3 (пин dev-only; пакет помечен deprecated, это не браузерный E2E). Общий набор158PASS, ESLint компонента, webpack build, tsc и diff check PASS. Регрессия на исходном компоненте:3FAIL/1PASS; исправленный:4PASS. Код70338c9, тесты2d2dc70, dev dependency451d70a; четыре файла побайтово сверены. Схема/данные/auth-настройки/design/main/production не менялись. Большой пункт реальной авторизованной приёмки остаётся открытым.
+
+Preview малой доработки `2d2dc704cbfb5c4049be6f86abe44ad1e675b889`: Vercel Ready. Авторизованный браузерный E2E не заявлен.
