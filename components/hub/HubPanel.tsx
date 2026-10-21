@@ -23,10 +23,12 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
  const [busy,setBusy]=useState(false); const [loading,setLoading]=useState(true); const [unauth,setUnauth]=useState(false);
  const [creationGame,setCreationGame]=useState('dota2');
  const [query,setQuery]=useState(''); const [game,setGame]=useGameFilter();
- const load=useCallback(async(signal?:AbortSignal)=>{
-  try { const selected=new URLSearchParams(window.location.search).get('tournament');const response=await fetch('/api/hub'+(selected?'?tournament='+encodeURIComponent(selected):''),{cache:'no-store',signal}); if(!response.ok) { setUnauth(response.status===401); throw new Error(response.status===401?'Sign in required':'Competition service unavailable'); } setData(await response.json()); setError(''); }
-  catch(e) { if(!signal?.aborted) setError(e instanceof Error?e.message:'Unavailable'); }
-  finally { if(!signal?.aborted) setLoading(false); }
+ const load=useCallback((signal?:AbortSignal)=>{
+  const selected=new URLSearchParams(window.location.search).get('tournament');
+  return fetch('/api/hub'+(selected?'?tournament='+encodeURIComponent(selected):''),{cache:'no-store',signal})
+   .then(async response=>{if(signal?.aborted)return;setUnauth(response.status===401);if(!response.ok)throw new Error(response.status===401?'Sign in required':'Competition service unavailable');const value=await response.json();if(!signal?.aborted){setData(value);setError('');}})
+   .catch(e=>{if(!signal?.aborted)setError(e instanceof Error?e.message:'Unavailable');})
+   .finally(()=>{if(!signal?.aborted)setLoading(false);});
  },[]);
  useEffect(()=>{const controller=new AbortController(); void load(controller.signal); return ()=>controller.abort();},[load]);
  async function mutate(payload:Record<string,unknown>) {
