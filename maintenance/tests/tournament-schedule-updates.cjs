@@ -1,5 +1,5 @@
 const {readFileSync}=require('node:fs');const {resolve}=require('node:path');const vm=require('node:vm');const ts=require('typescript');const test=require('node:test');const assert=require('node:assert/strict');
-function load(file,imports={}){const code=ts.transpileModule(readFileSync(resolve(__dirname,'../..',file),'utf8'),{fileName:file,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;const scope={exports:{},URL,Headers,Response,structuredClone,crypto,setTimeout,clearTimeout,setInterval,clearInterval,require:name=>imports[name]||require(name)};vm.runInNewContext(code,scope);return scope.exports;}
+function load(file,imports={}){const code=ts.transpileModule(readFileSync(resolve(__dirname,'../..',file),'utf8'),{fileName:file,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;const scope={exports:{},URL,Headers,Response,AbortController,document:{visibilityState:'visible',addEventListener(){},removeEventListener(){}},fetch:(...args)=>global.fetch(...args),structuredClone,crypto,setTimeout,clearTimeout,setInterval,clearInterval,require:name=>imports[name]||require(name)};vm.runInNewContext(code,scope);return scope.exports;}
 function fixture(){const handlers=[];let connection,removed=0;const channel={on(type,filter,callback){handlers.push({type,filter,callback});return channel;},subscribe(callback){connection=callback;return channel;}};return {handlers,connect:value=>connection(value),client:{channel:()=>channel,removeChannel:async()=>{removed++;}},removed:()=>removed};}
 test('realtime is scoped to tournament; bursts coalesce and cleanup rejects later events',async t=>{t.mock.timers.enable({apis:['setTimeout','setInterval']});const f=fixture();let refresh=0;const status=[];const {startTournamentUpdates}=load('lib/tournament/updates.ts');const watcher=startTournamentUpdates(f.client,'own-event',async()=>{refresh++;},s=>status.push(s),()=>true);assert.ok(f.handlers.every(h=>h.filter.filter==='tournament_id=eq.own-event'&&h.filter.table==='hub_engines'));f.connect('SUBSCRIBED');f.handlers.forEach(h=>h.callback());t.mock.timers.tick(200);assert.equal(refresh,1);assert.equal(status.at(-1),'live');watcher.stop();f.handlers[0].callback();f.connect('CHANNEL_ERROR');t.mock.timers.tick(60000);assert.equal(refresh,1);assert.equal(f.removed(),1);});
 test('realtime fallback checks every 30 seconds, pauses hidden pages and stops polling on reconnect',async t=>{t.mock.timers.enable({apis:['setTimeout','setInterval']});const f=fixture();let refresh=0,visible=false;const {startTournamentUpdates}=load('lib/tournament/updates.ts');const watcher=startTournamentUpdates(f.client,'own-event',async()=>{refresh++;},()=>{},()=>visible);f.connect('TIMED_OUT');t.mock.timers.tick(30200);assert.equal(refresh,0);visible=true;t.mock.timers.tick(30000);t.mock.timers.tick(200);assert.equal(refresh,1);f.connect('SUBSCRIBED');t.mock.timers.tick(200);assert.equal(refresh,2);t.mock.timers.tick(60000);assert.equal(refresh,2);watcher.stop();});
@@ -31,3 +31,32 @@ for(const ru of [true,false])test(`match list labels use scheduled time without 
  assert.match(historyLabels.matchDateLabel({...match,scheduled_at:null},ru),ru?/^Начало турнира:/:/^Tournament start:/);
  assert.equal(historyLabels.matchDateLabel({...match,scheduled_at:'invalid'},ru),ru?'Дата не указана':'Date unavailable');
 });
+const Renderer=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
+async function mountEngine(t,ru,onSaved){
+ const original=global.fetch;let update,view;let response={revision:1,state:stored.state},expired=false;
+ global.fetch=async()=>expired?Response.json({error:'Sign in required'},{status:401}):Response.json(response);
+ const component=load('components/hub/TournamentEngine.tsx',{
+  './TournamentBracket':()=>null,'./MatchSchedule':Schedule,'@/lib/supabase/client':{createClient:()=>({})},
+  '@/lib/tournament/updates':{startTournamentUpdates:(_client,_id,refresh)=>{update=refresh;return {stop(){},refresh};}},
+  '@/lib/tournament/engine':engine,'@/lib/tournament/result-form':load('lib/tournament/result-form.ts'),
+ }).default;
+ t.after(async()=>{if(view)await Renderer.act(async()=>view.unmount());global.fetch=original;});
+ await Renderer.act(async()=>{view=Renderer.create(React.createElement(component,{id:uuid(4),game:'cs2',owner:true,ru,approved:entries,name:id=>'PRIVATE ENTRY '+id,onSaved,initial:{revision:1,state:stored.state}}));});
+ return {view,setResponse:value=>{response=value;},expire:()=>{expired=true;},refresh:async()=>{await Renderer.act(async()=>update());}};
+}
+for(const ru of [true,false])test(`engine updates refresh the parent catalog once per new revision RU=${ru}`,async t=>{
+ let refreshes=0;const f=await mountEngine(t,ru,async()=>{refreshes++;});
+ const newer={revision:2,state:engine.transition(stored.state,{type:'schedule',match:'U1.0',scheduledAt:payload.command.scheduledAt,reason:'Rescheduled match'})};
+ f.setResponse(newer);await f.refresh();assert.equal(refreshes,1,'Parent catalog did not reload its match list');assert.match(JSON.stringify(f.view.toJSON()),/UTC/);
+ await f.refresh();assert.equal(refreshes,1,'Unchanged revision should not fetch the full catalog again');
+ f.setResponse({revision:1,state:stored.state});await f.refresh();assert.equal(refreshes,1);assert.match(JSON.stringify(f.view.toJSON()),/UTC/);
+});
+for(const ru of [true,false])test(`engine sign-out refreshes the parent to remove stale private catalog RU=${ru}`,async t=>{
+ let refreshes=0;const f=await mountEngine(t,ru,async()=>{refreshes++;});assert.match(JSON.stringify(f.view.toJSON()),/PRIVATE ENTRY/);
+ f.expire();await f.refresh();assert.equal(refreshes,1,'Parent must recheck the expired session');assert.equal(f.view.root.findAllByType('form').length,0);assert.doesNotMatch(JSON.stringify(f.view.toJSON()),/PRIVATE ENTRY/);
+});
+test('engine parent refresh retries a failed callback without a newer server revision',async t=>{
+ let refreshes=0;const f=await mountEngine(t,true,async()=>{refreshes++;if(refreshes===1)throw Error('Temporary parent load failure');});
+ f.setResponse({revision:2,state:stored.state});await f.refresh();assert.equal(refreshes,1);await f.refresh();assert.equal(refreshes,2);await f.refresh();assert.equal(refreshes,2);
+});
+test('engine unchanged initial revision does not reload the full catalog',async t=>{let refreshes=0;const f=await mountEngine(t,false,async()=>{refreshes++;});await f.refresh();assert.equal(refreshes,0);});
