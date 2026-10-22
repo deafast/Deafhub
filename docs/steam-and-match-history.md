@@ -1,5 +1,26 @@
 # Steam и история матчей DEAF|HUB
 
+## Продолжение Steam — 22 октября 2026
+
+Код и тесты: `5e2e90ed19cfe27c26386c1c5d36e6bc34249332`. База `b94c979`; прежняя авторизация и привязка не переписывались. Дизайн и история матчей в этом этапе не менялись.
+
+Точные адреса из `app/auth/steam/route.ts` и `callback/route.ts`:
+
+- Начало: `<origin>/auth/steam`.
+- Callback: `<тот же origin>/auth/steam/callback` с созданным сервером параметром `state`.
+- Постоянный Preview callback: `https://deafhub-git-preview-deafhub-setup-ionas-projects-019510f8.vercel.app/auth/steam/callback`.
+- Код определяет origin из запроса. Не направлять Preview в production и не менять общие Auth-настройки Supabase.
+
+GetPlayerSummaries/v2 уже был подключён. Теперь запрос находится в `lib/steam/profile.server.ts` с `server-only`; общие типы и безопасная ссылка остаются в `profile.ts`. Секрет читает только серверный `/api/steam-profile` из `STEAM_WEB_API_KEY` и передаёт официальному API заголовком `x-webapi-key`, без `key` в URL. Поддержан `avatars.fastly.steamstatic.com`, используемый [публичными страницами Steam](https://steamcommunity.com/id/robinwalker/). HTTPS/точное совпадение разрешённого хоста/отсутствие credentials и нестандартного порта сохраняются. Отсутствующий, пустой или состоящий из пробелов ключ возвращает `unconfigured`; OpenID-вход и сохранённая привязка от него не зависят.
+
+Безопасность OpenID проверена тестами реальных обработчиков с подставленными ответами внешних систем: подписанный SteamID и return URL, state/cookie, проверка у фиксированного Steam endpoint, срок и однократность nonce, привязка к начавшей вход сессии, отказ чужому владельцу, идемпотентность той же пары, отказ при UNIQUE-конфликте. Hosted-схема двух Steam-таблиц дополнительно сверена read-only: PK SteamID, UNIQUE user_id, PK nonce_hash, RLS и собственный SELECT присутствуют. Hosted-данные/схема/настройки не менялись.
+
+Проверки: 54 Steam-теста PASS; общий существующий локальный набор 253 PASS/0 FAIL, `tsc --noEmit`, ESLint изменённых TS/CJS и webpack build PASS. React RU/EN охватывает ник/аватар, закрытый профиль, отсутствие ключа, отказ API и повторный запрос при загрузке страницы. До исправления новый тест секрета выявил передачу ключа в URL. Это локальная проверка с тестовыми ответами, не реальный ответ Steam API и не вход владельца.
+
+**Внешние шаги открыты:** старый ключ объявлен скомпрометированным, использовать его запрещено. Отзыв и выпуск нового пока не подтверждены. В браузере Vercel поиск `STEAM_WEB_API_KEY` дал No Results Found; плагин получил 403 scope команды, UI доступен. Владелец вносит новый ключ прямо в [Environment Variables проекта](https://vercel.com/ionas-projects-019510f8/deafhub/settings/environment-variables) как Secret, только Preview, ветка `preview/deafhub-setup`. Не присылать ключ в чат. Production Environment Variables не изменяются. После добавления нужен новый Preview deployment; затем фактический Steam-login/link, профиль, RU/EN и reload. До входа E2E не отмечать успешным.
+
+Правила передачи ключа: [официальная документация Steam](https://partner.steamgames.com/doc/webapi_overview/auth). Код не пишет ключ, callback assertions, исходные ошибки провайдера и токены сессии в логи или ответы. Для диагностик не включать дампы заголовков/переменных окружения.
+
 Проверка: 19 октября 2026. Только `preview/deafhub-setup`.
 
 ## Что уже было и что изменено
