@@ -70,3 +70,12 @@ npx next build --webpack
 ```
 
 PGlite dependency is isolated at /tmp/deafhub-sql-qa; it is not an app dependency.
+
+## Publication verified
+
+- Runtime commit: `989c7ea6a89ce28f34644debf666fd4868300566`; Vercel Preview Ready.
+- Tests/docs through `e4cca3bd2231e095bc1905d25a0373041c9adcde`: all 19 files byte-identical to GitHub.
+- Browser: https://deafhub-kl5okvyoi-ionas-projects-019510f8.vercel.app/tournaments opens the signed-out state; both new GET APIs return Sign in required. This verifies the guest boundary, not authorized form interaction.
+- GitHub deafast browser session and Supabase nagato connector both work. The website itself is signed out.
+- Six new tables contain zero rows in hosted Supabase; no fake results/roles/check-ins were inserted.
+- main remains `f68ee6d1c70d115be90e6931434c24acbd3f9fd2`.
