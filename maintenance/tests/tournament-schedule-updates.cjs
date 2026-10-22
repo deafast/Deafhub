@@ -13,3 +13,21 @@ test('schedule rejects guest, non-organizer, foreign origin and stale revision b
 test('schedule rejects invalid date or short reason without a database write',async()=>{saved=[];for(const command of [{...payload.command,scheduledAt:'not-time'},{...payload.command,reason:'x'},{...payload.command,match:'foreign-match'}])assert.equal((await route.POST(request({...payload,command}))).status,400);assert.equal(saved.length,0);});
 const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');const Schedule=load('components/hub/MatchSchedule.tsx').default;
 for(const ru of [true,false])test(`schedule screen is UTC, owner-only, and read-only after finish RU=${ru}`,()=>{const match={id:'U1.0',status:'ready',scheduledAt:payload.command.scheduledAt};const render=(owner,status)=>renderToStaticMarkup(React.createElement(Schedule,{match:{...match,status},owner,busy:false,ru,onSave:async()=>{}}));const html=render(true,'ready');assert.match(html,/UTC/);assert.match(html,/type="datetime-local"/);assert.match(html,/<input(?=[^>]*name="reason")(?=[^>]*required)[^>]*>/);assert.ok(!render(false,'ready').includes('<form'));assert.ok(!render(true,'finished').includes('<form'));});
+test('hub API forwards confirmed engine schedule and its cancellation to the match list',async()=>{
+ const at='2026-11-01T18:30:00.000Z';let scheduledAt=at;
+ const hubClient={auth:{getUser:async()=>({data:{user:{id:uuid(3)}},error:null})},from:table=>{
+  const data=()=>table==='hub_tournaments'?[{id:uuid(4),starts_at:'2026-10-22T10:00:00.000Z'}]:table==='hub_engines'?[{tournament_id:uuid(4),revision:2,state:{matches:[{id:'U1.0',a:entries[0],b:entries[1],status:'ready',scheduledAt}]}}]:[];
+  const q={select(){return q},order(){return q},eq(){return q},limit(){return q},maybeSingle:async()=>({data:null,error:null}),then:resolve=>Promise.resolve({data:data(),error:null}).then(resolve)};return q;
+ }};
+ const hub=load('app/api/hub/route.ts',{'next/server':{NextResponse:{json:(v,init)=>Response.json(v,init)}},'@/lib/supabase/server':{createClient:async()=>hubClient}});
+ const req={nextUrl:new URL('https://preview.example/api/hub')};
+ let response=await hub.GET(req);assert.equal(response.status,200);assert.equal((await response.json()).matches[0].scheduled_at,at);
+ scheduledAt=undefined;response=await hub.GET(req);const match=(await response.json()).matches[0];assert.equal(match.scheduled_at,null);assert.equal(match.starts_at,'2026-10-22T10:00:00.000Z');
+});
+const historyLabels=load('lib/hub-history.ts');
+for(const ru of [true,false])test(`match list labels use scheduled time without claiming completion RU=${ru}`,()=>{
+ const match={engine_match:'U1.0',starts_at:'2026-10-22T10:00:00Z',scheduled_at:payload.command.scheduledAt};
+ const label=historyLabels.matchDateLabel(match,ru);assert.match(label,ru?/^Запланированное время:/:/^Scheduled time:/);assert.ok(label.endsWith(new Date(match.scheduled_at).toLocaleString(ru?'ru-RU':'en-GB')));
+ assert.match(historyLabels.matchDateLabel({...match,scheduled_at:null},ru),ru?/^Начало турнира:/:/^Tournament start:/);
+ assert.equal(historyLabels.matchDateLabel({...match,scheduled_at:'invalid'},ru),ru?'Дата не указана':'Date unavailable');
+});
