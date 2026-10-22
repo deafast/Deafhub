@@ -15,6 +15,7 @@ const config=z.object({
  points:z.object({win:z.number().int().min(0).max(100),draw:z.number().int().min(0).max(100),loss:z.number().int().min(0).max(100)}),
 });
 const command=z.discriminatedUnion('type',[
+ z.object({type:z.literal('schedule'),match:z.string().min(1).max(64),scheduledAt:z.string().datetime().nullable(),reason:z.string().trim().min(3).max(500)}),
  z.object({type:z.literal('launch'),config,entries:z.array(uuid).min(2).max(64)}),
  z.object({type:z.literal('qualify'),ties:z.record(z.string(),z.array(uuid).max(64))}),
  z.object({type:z.literal('result'),match:z.string().max(64),result:z.discriminatedUnion('kind',[
