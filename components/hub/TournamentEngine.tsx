@@ -70,6 +70,8 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
  'Invalid score':'Проверьте счёт матча.',
  'Score does not match best-of':'Счёт не соответствует формату серии BO.',
  'Dependent results exist; explicitly invalidate them':'Есть зависимые сыгранные матчи. Для исправления требуется явное разрешение на их сброс.',
+ 'Both captains must confirm the current result or a referee must decide':'Оба капитана должны подтвердить актуальный результат либо требуется решение судьи.',
+ 'Complete personal check-in before launch':'Сначала каждый допущенный игрок должен подтвердить готовность к турниру.',
  'Revoke awards before correcting results':'Сначала отзовите действующие награды с указанием причины.',
  'Revision conflict; reload tournament':'Данные изменились. Обновите турнир перед сохранением.',
  }[error]||error):error}</p>:null}
