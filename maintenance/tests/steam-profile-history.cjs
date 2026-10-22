@@ -10,7 +10,8 @@ function load(file,imports={},env={}){
  const scope={exports:{},URL,AbortSignal,fetch,Response,process:{env},require:name=>imports[name]||require(name)};
  vm.runInNewContext(compiled,scope);return scope.exports;
 }
-const profile=load('lib/steam/profile.ts');
+const sharedProfile=load('lib/steam/profile.ts');
+const profile={...sharedProfile,...load('lib/steam/profile.server.ts',{'server-only':{},'./profile':sharedProfile})};
 const id='76561198000000001';
 const player={steamid:id,communityvisibilitystate:3,personaname:' Player ',avatarfull:'https://avatars.steamstatic.com/example_full.jpg',realname:'PRIVATE',loccountrycode:'XX'};
 const response=p=>async()=>Response.json({response:{players:p}});
@@ -25,6 +26,31 @@ test('official endpoint, exact requested SteamID and minimal public fields',asyn
  });
  assert.equal(data.status,'available');assert.equal(data.profile.name,'Player');assert.equal(data.profile.url,'https://steamcommunity.com/profiles/'+id);
  assert.ok(!JSON.stringify(data).includes('PRIVATE'));assert.ok(!JSON.stringify(data).includes('secret'));assert.ok(!JSON.stringify(data).includes('loccountrycode'));assert.ok(Number.isFinite(Date.parse(data.checkedAt)));
+});
+
+test('Web API credential is sent only in a header, never in the request URL',async()=>{
+ const credential='test-only-api-credential';
+ let request;
+ const data=await profile.getSteamPublicProfile(id,credential,async(url,options)=>{
+  request={url,options};
+  return response([player])();
+ });
+ assert.equal(data.status,'available');
+ assert.equal(request.url.searchParams.has('key'),false);
+ assert.ok(!request.url.href.includes(credential));
+ assert.equal(new Headers(request.options.headers).get('x-webapi-key'),credential);
+});
+
+test('current Steam Fastly avatar host is supported while lookalike hosts remain blocked',async()=>{
+ const avatarfull='https://avatars.fastly.steamstatic.com/test_full.jpg';
+ const data=await profile.getSteamPublicProfile(id,'test-only-api-credential',response([{...player,avatarfull}]));
+ assert.equal(data.status,'available');assert.equal(data.profile.avatar,avatarfull);
+ const other=await profile.getSteamPublicProfile(id,'test-only-api-credential',response([{...player,avatarfull:'https://avatars.fastly.steamstatic.com.attacker.invalid/test.jpg'}]));
+ assert.equal(other.profile.avatar,null);
+});
+
+test('empty or whitespace-only credential is unconfigured without any external request',async()=>{
+ for(const key of ['', '  \n'])assert.equal((await profile.getSteamPublicProfile(id,key,async()=>{throw Error('must not fetch');})).status,'unconfigured');
 });
 test('private profile does not expose name avatar or other fields',async()=>{
  const data=await profile.getSteamPublicProfile(id,'secret',response([{...player,communityvisibilitystate:1}]));assert.equal(JSON.stringify(data),'{"status":"private"}');
@@ -58,7 +84,7 @@ test('engine tournament start is not represented as match completion; invalid da
  for(const ru of [true,false]){assert.match(history.matchDateLabel({...match('m','a'),engine_match:true},ru),ru?/Начало турнира:/:/Tournament start:/);assert.match(history.matchDateLabel(match('m','a','finished','invalid'),ru),ru?/Дата не указана/:/Date unavailable/);}
 });
 let user=null,link=null,dbError=null,calls=0;
-const route=load('app/api/steam-profile/route.ts',{'next/server':{NextResponse:{json:(body,init)=>Response.json(body,init)}},'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user},error:null})},from:table=>{assert.equal(table,'steam_accounts');return {select:()=>({eq:(field,value)=>{assert.equal(field,'user_id');assert.equal(value,user.id);return {maybeSingle:async()=>({data:link,error:dbError})}}})}}})},'@/lib/steam/profile':{...profile,getSteamPublicProfile:async steamId=>{calls++;assert.equal(steamId,id);return {status:'unconfigured'}}}});
+const route=load('app/api/steam-profile/route.ts',{'next/server':{NextResponse:{json:(body,init)=>Response.json(body,init)}},'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user},error:null})},from:table=>{assert.equal(table,'steam_accounts');return {select:()=>({eq:(field,value)=>{assert.equal(field,'user_id');assert.equal(value,user.id);return {maybeSingle:async()=>({data:link,error:dbError})}}})}}})},'@/lib/steam/profile':sharedProfile,'@/lib/steam/profile.server':{getSteamPublicProfile:async steamId=>{calls++;assert.equal(steamId,id);return {status:'unconfigured'}}}});
 test('profile API requires auth, queries own link and never accepts arbitrary SteamID',async()=>{
  let result=await route.GET(new Request('https://preview.example/api/steam-profile?steamId=foreign'));assert.equal(result.status,401);assert.equal(calls,0);
  user={id:'current-user'};result=await route.GET();assert.equal((await result.json()).linked,false);assert.equal(calls,0);

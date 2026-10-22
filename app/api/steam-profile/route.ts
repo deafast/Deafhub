@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@/lib/supabase/server';
-import {getSteamPublicProfile,steamProfileUrl} from '@/lib/steam/profile';
+import {steamProfileUrl} from '@/lib/steam/profile';
+import {getSteamPublicProfile} from '@/lib/steam/profile.server';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store','Referrer-Policy':'no-referrer'};
 export async function GET(){
