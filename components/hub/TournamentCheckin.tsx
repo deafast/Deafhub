@@ -32,7 +32,7 @@ export default function TournamentCheckin({id,owner,ru,locked,userId,players,ent
  {error?<p role="alert" className="text-red-300">{readable(error)}</p>:null}{notice?<p role="status">{notice}</p>:null}
  {!data&&!error?<p role="status">{text('Загрузка…','Loading…')}</p>:null}
  {data?<p>{w?.enabled?`${dates(w.opens_at)} — ${dates(w.closes_at)}`:text('Обязательный check-in не включён.','Required check-in is not enabled.')}</p>:null}
- <button type="button" disabled={busy} className="min-h-11 text-[#22D3EE]" onClick={()=>{setError('');void load().catch(e=>{setError(e.message);if(e.message==='Sign in required')setData(null);});}}>{text('Обновить готовность','Refresh check-in')}</button>
+ <button type="button" disabled={busy} className="min-h-11 text-[#22D3EE]" onClick={()=>{setError('');setNotice('');void load().catch(e=>{setError(e.message);if(e.message==='Sign in required')setData(null);});}}>{text('Обновить готовность','Refresh check-in')}</button>
  {owner&&!locked&&data?<form key={w?.version||'new'} className="space-y-3" onSubmit={configure}>
  <label className="flex min-h-11 items-center gap-3"><input type="checkbox" name="enabled" defaultChecked={w?.enabled??false}/>{text('Требовать check-in перед запуском','Require check-in before launch')}</label>
  <div className="grid gap-3 sm:grid-cols-2"><label>{text('Начало · UTC','Opens · UTC')}<input type="datetime-local" name="opens_at" className={field} defaultValue={w?.opens_at?.slice(0,16)||''}/></label><label>{text('Окончание · UTC','Closes · UTC')}<input type="datetime-local" name="closes_at" className={field} defaultValue={w?.closes_at?.slice(0,16)||''}/></label></div>
