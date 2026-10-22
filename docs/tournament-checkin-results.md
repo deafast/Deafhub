@@ -54,8 +54,9 @@ been executed. Local fixtures test real SQL with simulated identities, not Supab
 Auth itself. Optional automatic admission has since been implemented and checked; see
 [tournament-auto-admission.md](tournament-auto-admission.md). It is off by default and
 never replaces a positive human eligibility review. Mandatory captain confirmation
-covers engine matches; legacy manual result reporting remains the existing organizer
-flow. Disputes and reasoned referee decisions are implemented. A separate appeals
+covers engine matches. The legacy manual write path is now blocked whenever mandatory
+confirmation is enabled; this prevents bypassing captain reports. Optional manual
+events retain the organizer flow. Disputes and reasoned referee decisions are implemented. A separate appeals
 system and file uploads are not part of the approved completion criteria.
 See the main status registry; do not interpret this document as full tournament QA.
 
@@ -82,3 +83,14 @@ to its installation directory when the default temporary runtime is unavailable.
 - GitHub deafast browser session and Supabase nagato connector both work. The website itself is signed out.
 - Six new tables contain zero rows in hosted Supabase; no fake results/roles/check-ins were inserted.
 - main remains `f68ee6d1c70d115be90e6931434c24acbd3f9fd2`.
+
+
+## Subsequent completion: admission and legacy boundary
+
+Optional automatic admission is implemented and verified separately. The legacy manual
+result bypass is fixed by migration20261022105700: mandatory confirmation now requires
+the engine/report flow. Current checks:217 automated tests,24 admission SQL checks,
+15 legacy boundary SQL checks and17 report SQL checks; TypeScript/ESLint/build PASS.
+324 schema records match Preview. See tournament-auto-admission.md and
+legacy-result-confirmation-boundary.md. Complete authenticated browser acceptance
+remains open.
