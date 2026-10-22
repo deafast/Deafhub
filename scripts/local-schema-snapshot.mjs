@@ -1,0 +1,2 @@
+import {readFile,writeFile} from 'node:fs/promises';import {createTestDatabase} from './lib/local-postgres.mjs';
+const db=await createTestDatabase();try{await db.exec(await readFile('supabase/migrations/20261021111817_player_match_history.sql','utf8'));const {rows}=await db.query(await readFile('db/hub-schema-snapshot.sql','utf8'));await writeFile(process.argv[2]||'/tmp/deafhub-local-schema.json',JSON.stringify(rows,null,2));console.log('Local hub structural rows:',rows.length);}finally{await db.close();}
