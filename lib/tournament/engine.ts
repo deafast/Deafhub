@@ -18,6 +18,7 @@ export type Match = {
   a: string | null; b: string | null;
   status: 'waiting' | 'ready' | 'finished' | 'bye' | 'skipped';
   result?: Result; winner?: string | null; loser?: string | null;
+  scheduledAt?: string;
 };
 export type Row = { entry: string; played: number; wins: number; draws: number; losses: number; scored: number; conceded: number; points: number };
 export type State = {
@@ -26,6 +27,7 @@ export type State = {
   matches: Match[]; seeds: string[]; champion: string | null;
 };
 export type Command =
+  | { type: 'schedule'; match: string; scheduledAt: string | null; reason: string }
   | { type: 'result'; match: string; result: Result; invalidate: boolean; reason: string }
   | { type: 'qualify'; ties: Record<string, string[]> };
 function fail(message: string): never { throw new Error(message); }
@@ -163,6 +165,18 @@ export function standings(state: State, groupId: string): Row[] {
 const rankKey=(r:Row)=>[r.points,r.wins,r.scored-r.conceded,r.scored].join(':');
 export function transition(current: State, command: Command): State {
   const state=structuredClone(current);
+  if(command.type==='schedule') {
+    if(command.reason.trim().length<3) fail('Schedule reason required');
+    const match=state.matches.find(m=>m.id===command.match)??fail('Match not found');
+    if(state.phase==='finished'||!['waiting','ready'].includes(match.status)) fail('Only upcoming matches can be scheduled');
+    if(command.scheduledAt===null) delete match.scheduledAt;
+    else {
+      const date=new Date(command.scheduledAt);
+      if(!Number.isFinite(date.getTime())||date.toISOString()!==command.scheduledAt) fail('Use a valid UTC schedule');
+      match.scheduledAt=command.scheduledAt;
+    }
+    return state;
+  }
   if(command.type==='qualify') {
     if(state.phase!=='groups'||state.matches.some(m=>m.status!=='finished')) fail('Finish all group matches first');
     const ranked=state.config.groups.map(g=>{
