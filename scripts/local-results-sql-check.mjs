@@ -1,7 +1,7 @@
 import {readFile} from 'node:fs/promises';import assert from 'node:assert/strict';import {randomUUID} from 'node:crypto';import {createTestDatabase} from './lib/local-postgres.mjs';import {createTournament,transition} from '../lib/tournament/engine.ts';
 const db=await createTestDatabase();let n=0;
 try{
- for(const path of ['20261022062526_tournament_checkin','20261022062542_match_confirmations'])await db.exec(await readFile(`supabase/migrations/${path}.sql`,'utf8'));
+ for(const path of ['20261022062526_tournament_checkin','20261022062542_match_confirmations','20261022105700_require_engine_for_confirmed_results'])await db.exec(await readFile(`supabase/migrations/${path}.sql`,'utf8'));
  await db.exec((await readFile('db/player-match-history-check.sql','utf8')).split('-- MIGRATE_HISTORY')[0]);const {rows:[f]}=await db.query('select * from history_fixture');
  const actor=uid=>db.query("select set_config('request.jwt.claim.sub',$1,true)",[uid]);
  const action=(type,p={})=>db.query('select public.hub_result_action($1,$2::jsonb) result',[type,JSON.stringify({tournament_id:f.engine_tid,...p})]);
