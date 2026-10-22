@@ -26,14 +26,14 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
  const load=useCallback((signal?:AbortSignal)=>{
   const selected=new URLSearchParams(window.location.search).get('tournament');
   return fetch('/api/hub'+(selected?'?tournament='+encodeURIComponent(selected):''),{cache:'no-store',signal})
-   .then(async response=>{if(signal?.aborted)return;setUnauth(response.status===401);if(!response.ok)throw new Error(response.status===401?'Sign in required':'Competition service unavailable');const value=await response.json();if(!signal?.aborted){setData(value);setError('');}})
+   .then(async response=>{if(signal?.aborted)return;setUnauth(response.status===401);if(response.status===401){setData(null);setNotice('');}if(!response.ok)throw new Error(response.status===401?'Sign in required':'Competition service unavailable');const value=await response.json();if(!signal?.aborted){setData(value);setError('');}})
    .catch(e=>{if(!signal?.aborted)setError(e instanceof Error?e.message:'Unavailable');})
    .finally(()=>{if(!signal?.aborted)setLoading(false);});
  },[]);
  useEffect(()=>{const controller=new AbortController(); void load(controller.signal); return ()=>controller.abort();},[load]);
  async function mutate(payload:Record<string,unknown>) {
   setBusy(true); setError(''); setNotice('');
-  try {const response=await fetch('/api/hub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); const result=await response.json(); if(!response.ok) throw new Error(result.error); await load(); setNotice(ru?'Сохранено.':'Saved.');}
+  try {const response=await fetch('/api/hub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); const result=await response.json(); if(response.status===401){setData(null);setNotice('');setUnauth(true);}if(!response.ok) throw new Error(result.error); await load(); setNotice(ru?'Сохранено.':'Saved.');}
   catch(e) {setError(e instanceof Error?e.message:'Could not save');} finally {setBusy(false);}
  }
  async function submit(event:FormEvent<HTMLFormElement>) {
