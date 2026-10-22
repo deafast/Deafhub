@@ -87,3 +87,14 @@ Preview малой доработки `2d2dc704cbfb5c4049be6f86abe44ad1e675b889`
 - result-form-scores.cjs:12 RU/EN сценариев, до исправления8FAIL/4PASS, после12PASS; общий набор210PASS, tsc/ESLint API+компонент/webpack build/diff PASS. Реестр43/14/6/6.
 
 Сохранены: сервер586603ba018245525c207d18d1490411782b353f, формаfa43806636647398df84c88aefd8396f68c2498f, тестыdd029d5ce696acb6c56fc622eadc169b91870d9a. Четыре исходника/теста побайтово совпали с GitHub.
+
+
+## 22 октября — автоматический допуск
+- Worktree deafhub-auto-admit от b6923c201eaa6d94f024b6fbd3040022b5489123; прежние деревья сохранены. Новый API tournament-admission, TournamentAutoAdmission внутри прежнего Operations, RU/EN названия аудита. Миграция 20261022104233 уже применена к hvxvwgnnmazpptuenidv.
+- hub_admission_rules выключено по умолчанию; opt-in owner RPC, reason/audit, prelaunch lock. helper требует текущие rules/policy, точный snapshot-состав, положительный review от текущего organizer и обязательные личные acceptance. Триггеры после review/attest; повтор безопасен, rejected не открывает, awards/results не трогает. Auth.uid, RLS, empty search_path, internal helper ACL закрыт.
+- 215 unit/route/component тестов, 24 изолированных SQL assertions, tsc/ESLint/webpack build/diff PASS. Hosted/local schema 322 записи совпали; snapshot docs/checks/2026-10-22-auto-admission-schema.json, compare script обновлён. Hosted rules0rows, anon_read=false, user_write=false; фикстур/ролей/фальшивых результатов не создавали. Старые advisor warnings сохранены; новый узкий authenticated definer RPC проверен.
+- QA logs: ../qa-auto-admit/{tests,sql,types,lint,build}.log. Изолированный PGlite: ../sql-qa-runtime/node_modules/@electric-sql/pglite (DEAFHUB_PGLITE_PATH); /tmp ранее очищался. Не повторять неизменённые SQL-тесты без новой причины.
+- Подзадача автодопуска завершена по коду/SQL; полный пункт14 требует настоящего авторизованного браузерного E2E. Отдельная апелляционная система не согласована владельцем и не добавляется как обязательный объём. Реестр44/14/6/6. Публикация/Preview фиксируются после подтверждения.
+
+
+Публикация автодопуска подтверждена: миграция `4b6169cfe40a3ec355fe276bee4c56ad90b22587`, API `e9cd6501e10b3d1ebf75c46eacab65cb2b987e89`, интерфейс `fa8fab4d5d854ac9bf2907e4c5e52187346adbfb`, тесты/SQL/schema до `ac3f570d43fdb13deff05a2a62fd0e126f3a5255`. Девять исходников/тестов/schema побайтово совпали с GitHub. Vercel runtime `fa8fab4` — Ready; браузер `/tournaments` открывается, новый API гостю отвечает Sign in required. Preview: https://deafhub-h3hzp45dt-ionas-projects-019510f8.vercel.app/tournaments . Это гостевая проверка, не авторизованный E2E. Реестр44/14/6/6.

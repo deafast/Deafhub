@@ -51,10 +51,12 @@
 
 A complete authenticated browser player/captain/organizer/referee scenario has not yet
 been executed. Local fixtures test real SQL with simulated identities, not Supabase
-Auth itself. Auto-admission is not enabled: eligibility review and approval remain
-organizer decisions. Mandatory captain confirmation covers engine matches; legacy
-manual result reporting remains the existing organizer flow. Standalone protest case
-management, uploaded evidence storage and appeals are not implemented by this change.
+Auth itself. Optional automatic admission has since been implemented and checked; see
+[tournament-auto-admission.md](tournament-auto-admission.md). It is off by default and
+never replaces a positive human eligibility review. Mandatory captain confirmation
+covers engine matches; legacy manual result reporting remains the existing organizer
+flow. Disputes and reasoned referee decisions are implemented. A separate appeals
+system and file uploads are not part of the approved completion criteria.
 See the main status registry; do not interpret this document as full tournament QA.
 
 Reproduce:
@@ -69,7 +71,8 @@ npx tsc --noEmit
 npx next build --webpack
 ```
 
-PGlite dependency is isolated at /tmp/deafhub-sql-qa; it is not an app dependency.
+PGlite is an isolated QA dependency, not an app dependency. Set DEAFHUB_PGLITE_PATH
+to its installation directory when the default temporary runtime is unavailable.
 
 ## Publication verified
 
