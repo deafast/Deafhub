@@ -1,0 +1,1826 @@
+[
+  {
+    "kind": "column",
+    "name": "hub_all_player_stats.draws",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_all_player_stats.matches",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_all_player_stats.user_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_all_player_stats.wins",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.engine_revision",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.id",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.issued_by",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.revoke_reason",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.revoked_at",
+    "value": {
+      "type": "timestamptz",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.status",
+    "value": {
+      "type": "text",
+      "default": "'issued'::text",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_award_batches.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.avatar_url",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.batch_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.entry_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.game",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.id",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.nickname",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.place",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.recipient_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.team_name",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_awards.tournament_title",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_eligibility_reviews.actor_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_eligibility_reviews.approved",
+    "value": {
+      "type": "bool",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_eligibility_reviews.entry_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_eligibility_reviews.policy_version",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_eligibility_reviews.reason",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_eligibility_reviews.updated_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engine_audit.actor_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engine_audit.command",
+    "value": {
+      "type": "jsonb",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engine_audit.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engine_audit.request_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engine_audit.revision",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engine_audit.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engines.revision",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engines.state",
+    "value": {
+      "type": "jsonb",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engines.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_engines.updated_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.id",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.player_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.player_nickname",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.rules_version",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.skill_level",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.status",
+    "value": {
+      "type": "text",
+      "default": "'pending'::text",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.team_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entries.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_attestations.accepted",
+    "value": {
+      "type": "bool",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_attestations.entry_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_attestations.policy_version",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_attestations.updated_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_attestations.user_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_players.entry_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_players.nickname",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_entry_players.user_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_invites.code",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_invites.team_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.confirmed_at",
+    "value": {
+      "type": "timestamptz",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.entry_a",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.entry_b",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.id",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.score_a",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.score_b",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.starts_at",
+    "value": {
+      "type": "timestamptz",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.status",
+    "value": {
+      "type": "text",
+      "default": "'scheduled'::text",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_matches.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_members.game",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_members.nickname",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_members.team_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_members.user_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_ops_audit.action",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_ops_audit.actor_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_ops_audit.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_ops_audit.entry_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_ops_audit.id",
+    "value": {
+      "type": "int8",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_ops_audit.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_organizers.user_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_participation_policies.body",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_participation_policies.bronze",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_participation_policies.require_acceptance",
+    "value": {
+      "type": "bool",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_participation_policies.tournament_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_participation_policies.updated_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_participation_policies.version",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_player_stats.matches",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_player_stats.user_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_player_stats.wins",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "YES"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_teams.captain_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_teams.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_teams.game",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_teams.id",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_teams.name",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.created_at",
+    "value": {
+      "type": "timestamptz",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.game",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.id",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.organizer_id",
+    "value": {
+      "type": "uuid",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.roster_size",
+    "value": {
+      "type": "int4",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.rules",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.rules_version",
+    "value": {
+      "type": "uuid",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.starts_at",
+    "value": {
+      "type": "timestamptz",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.status",
+    "value": {
+      "type": "text",
+      "default": "'open'::text",
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "column",
+    "name": "hub_tournaments.title",
+    "value": {
+      "type": "text",
+      "default": null,
+      "nullable": "NO"
+    }
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_award_batches.hub_award_batches_issued_by_fkey",
+    "value": "FOREIGN KEY (issued_by) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_award_batches.hub_award_batches_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_award_batches.hub_award_batches_status_check",
+    "value": "CHECK ((status = ANY (ARRAY['issued'::text, 'revoked'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_award_batches.hub_award_batches_tournament_id_engine_revisi",
+    "value": "UNIQUE (tournament_id, engine_revision)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_award_batches.hub_award_batches_tournament_id_fkey",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_tournaments(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_awards.hub_awards_batch_id_entry_id_recipient_id_key",
+    "value": "UNIQUE (batch_id, entry_id, recipient_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_awards.hub_awards_batch_id_fkey",
+    "value": "FOREIGN KEY (batch_id) REFERENCES hub_award_batches(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_awards.hub_awards_entry_id_fkey",
+    "value": "FOREIGN KEY (entry_id) REFERENCES hub_entries(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_awards.hub_awards_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_awards.hub_awards_place_check",
+    "value": "CHECK (((place >= 1) AND (place <= 3)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_awards.hub_awards_recipient_id_fkey",
+    "value": "FOREIGN KEY (recipient_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_eligibility_reviews.hub_eligibility_reviews_actor_id_fkey",
+    "value": "FOREIGN KEY (actor_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_eligibility_reviews.hub_eligibility_reviews_entry_id_fkey",
+    "value": "FOREIGN KEY (entry_id) REFERENCES hub_entries(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_eligibility_reviews.hub_eligibility_reviews_pkey",
+    "value": "PRIMARY KEY (entry_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_eligibility_reviews.hub_eligibility_reviews_reason_check",
+    "value": "CHECK (((char_length(reason) >= 3) AND (char_length(reason) <= 500)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engine_audit.hub_engine_audit_actor_id_fkey",
+    "value": "FOREIGN KEY (actor_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engine_audit.hub_engine_audit_pkey",
+    "value": "PRIMARY KEY (tournament_id, request_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engine_audit.hub_engine_audit_tournament_id_fkey",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_engines(tournament_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engine_audit.hub_engine_audit_tournament_id_revision_key",
+    "value": "UNIQUE (tournament_id, revision)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engines.hub_engines_pkey",
+    "value": "PRIMARY KEY (tournament_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engines.hub_engines_revision_check",
+    "value": "CHECK ((revision > 0))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engines.hub_engines_state_check",
+    "value": "CHECK (((state ->> 'schema'::text) = '1'::text))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_engines.hub_engines_tournament_id_fkey",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_tournaments(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_participant_kind",
+    "value": "CHECK ((((team_id IS NOT NULL) AND (player_id IS NULL) AND (player_nickname IS NULL) AND (skill_level IS NULL)) OR ((team_id IS NULL) AND (player_id IS NOT NULL) AND (NULLIF(btrim(player_nickname), ''::text) IS NOT NULL) AND (skill_level = ANY (ARRAY['strong'::text, 'intermediate'::text, 'amateur'::text])) AND (skill_level IS NOT NULL))))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_player_id_fkey",
+    "value": "FOREIGN KEY (player_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_status_check",
+    "value": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_team_id_fkey",
+    "value": "FOREIGN KEY (team_id) REFERENCES hub_teams(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_tournament_id_fkey",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_tournaments(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entries.hub_entries_tournament_id_team_id_key",
+    "value": "UNIQUE (tournament_id, team_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entry_attestations.hub_entry_attestations_entry_id_user_id_",
+    "value": "FOREIGN KEY (entry_id, user_id) REFERENCES hub_entry_players(entry_id, user_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entry_attestations.hub_entry_attestations_pkey",
+    "value": "PRIMARY KEY (entry_id, user_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entry_players.hub_entry_players_entry_id_fkey",
+    "value": "FOREIGN KEY (entry_id) REFERENCES hub_entries(id) ON DELETE CASCADE"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entry_players.hub_entry_players_pkey",
+    "value": "PRIMARY KEY (entry_id, user_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_entry_players.hub_entry_players_user_id_fkey",
+    "value": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_invites.hub_invites_code_key",
+    "value": "UNIQUE (code)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_invites.hub_invites_pkey",
+    "value": "PRIMARY KEY (team_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_invites.hub_invites_team_id_fkey",
+    "value": "FOREIGN KEY (team_id) REFERENCES hub_teams(id) ON DELETE CASCADE"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_check",
+    "value": "CHECK ((entry_a <> entry_b))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_check1",
+    "value": "CHECK ((((status = 'scheduled'::text) AND (score_a IS NULL) AND (score_b IS NULL)) OR ((status = 'finished'::text) AND (score_a IS NOT NULL) AND (score_b IS NOT NULL) AND (score_a <> score_b))))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_entry_a_fkey",
+    "value": "FOREIGN KEY (entry_a) REFERENCES hub_entries(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_entry_b_fkey",
+    "value": "FOREIGN KEY (entry_b) REFERENCES hub_entries(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_score_a_check",
+    "value": "CHECK (((score_a >= 0) AND (score_a <= 1000)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_score_b_check",
+    "value": "CHECK (((score_b >= 0) AND (score_b <= 1000)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_status_check",
+    "value": "CHECK ((status = ANY (ARRAY['scheduled'::text, 'finished'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_matches.hub_matches_tournament_id_fkey",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_tournaments(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_members.hub_members_pkey",
+    "value": "PRIMARY KEY (team_id, user_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_members.hub_members_team_id_fkey",
+    "value": "FOREIGN KEY (team_id) REFERENCES hub_teams(id) ON DELETE CASCADE"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_members.hub_members_user_id_fkey",
+    "value": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_members.hub_members_user_id_game_key",
+    "value": "UNIQUE (user_id, game)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_ops_audit.hub_ops_audit_actor_id_fkey",
+    "value": "FOREIGN KEY (actor_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_ops_audit.hub_ops_audit_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_ops_audit.hub_ops_audit_tournament_id_fkey",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_tournaments(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_organizers.hub_organizers_pkey",
+    "value": "PRIMARY KEY (user_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_organizers.hub_organizers_user_id_fkey",
+    "value": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_participation_policies.hub_participation_policies_body_chec",
+    "value": "CHECK (((char_length(body) >= 20) AND (char_length(body) <= 6000)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_participation_policies.hub_participation_policies_bronze_ch",
+    "value": "CHECK ((bronze = ANY (ARRAY['none'::text, 'shared_semifinal'::text, 'lower_final'::text, 'bronze_match'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_participation_policies.hub_participation_policies_pkey",
+    "value": "PRIMARY KEY (tournament_id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_participation_policies.hub_participation_policies_tournamen",
+    "value": "FOREIGN KEY (tournament_id) REFERENCES hub_tournaments(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_teams.hub_teams_captain_id_fkey",
+    "value": "FOREIGN KEY (captain_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_teams.hub_teams_game_check",
+    "value": "CHECK ((game = ANY (ARRAY['dota2'::text, 'cs2'::text, 'fc'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_teams.hub_teams_name_check",
+    "value": "CHECK (((char_length(name) >= 2) AND (char_length(name) <= 40)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_teams.hub_teams_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_game_check",
+    "value": "CHECK ((game = ANY (ARRAY['dota2'::text, 'cs2'::text, 'fc'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_organizer_id_fkey",
+    "value": "FOREIGN KEY (organizer_id) REFERENCES auth.users(id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_pkey",
+    "value": "PRIMARY KEY (id)"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_roster_size_check",
+    "value": "CHECK (((roster_size >= 1) AND (roster_size <= 10)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_rules_check",
+    "value": "CHECK (((char_length(rules) >= 20) AND (char_length(rules) <= 12000)))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_status_check",
+    "value": "CHECK ((status = ANY (ARRAY['open'::text, 'closed'::text, 'finished'::text])))"
+  },
+  {
+    "kind": "constraint",
+    "name": "hub_tournaments.hub_tournaments_title_check",
+    "value": "CHECK (((char_length(title) >= 3) AND (char_length(title) <= 100)))"
+  },
+  {
+    "kind": "function",
+    "name": "hub_action(action text, p jsonb)",
+    "value": {
+      "body": "0620bfc184c02be307669210bf7bda3f",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": true
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_engine_commit(tid uuid, actor uuid, expected integer, reque",
+    "value": {
+      "body": "839861925f1cbf5f62cb2ef4b39c3bec",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": true,
+      "authenticated_execute": false
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_engine_guard()",
+    "value": {
+      "body": "3208680ffb3007e92bc868a3b8989bc7",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": false
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_manual_confirmation_time()",
+    "value": {
+      "body": "fdea2f0be7caac45a521a79e06f8be71",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": false,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": false
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_ops_action(action text, p jsonb)",
+    "value": {
+      "body": "a49238bde0e2706a01ab5bbf6c7ccc65",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": true
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_participation_guard()",
+    "value": {
+      "body": "45c3672c6f5b3a39a5b830701bc30e44",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": false
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_player_match_history(before_at timestamp with time zone, be",
+    "value": {
+      "body": "9018767d3a9168ada5b5b1382d9af404",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": true
+    }
+  },
+  {
+    "kind": "function",
+    "name": "hub_register_fc(tid uuid, accepted_rules uuid, level text)",
+    "value": {
+      "body": "4c50657b8642f97b5dfa16e1d458bc10",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "anon_execute": false,
+      "service_execute": false,
+      "authenticated_execute": true
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_award_batches.award_batches_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_awards.awards_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_eligibility_reviews.reviews_private",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "(EXISTS ( SELECT 1\n   FROM (hub_entries e\n     JOIN hub_tournaments t ON ((t.id = e.tournament_id)))\n  WHERE ((e.id = hub_eligibility_reviews.entry_id) AND ((t.organizer_id = ( SELECT auth.uid() AS uid)) OR (EXISTS ( SELECT 1\n           FROM hub_entry_players ep\n          WHERE ((ep.entry_id = e.id) AND (ep.user_id = ( SELECT auth.uid() AS uid)))))))))",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_engine_audit.engine_audit_owner",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "(EXISTS ( SELECT 1\n   FROM hub_tournaments t\n  WHERE ((t.id = hub_engine_audit.tournament_id) AND (t.organizer_id = ( SELECT auth.uid() AS uid)))))",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_engines.engine_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_entries.entries_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_entry_attestations.attestations_private",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "((user_id = ( SELECT auth.uid() AS uid)) OR (EXISTS ( SELECT 1\n   FROM (hub_entries e\n     JOIN hub_tournaments t ON ((t.id = e.tournament_id)))\n  WHERE ((e.id = hub_entry_attestations.entry_id) AND (t.organizer_id = ( SELECT auth.uid() AS uid))))))",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_entry_players.entry_players_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_invites.invites_captain",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "(EXISTS ( SELECT 1\n   FROM hub_teams t\n  WHERE ((t.id = hub_invites.team_id) AND (t.captain_id = ( SELECT auth.uid() AS uid)))))",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_matches.matches_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_members.members_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_ops_audit.ops_audit_owner",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "(EXISTS ( SELECT 1\n   FROM hub_tournaments t\n  WHERE ((t.id = hub_ops_audit.tournament_id) AND (t.organizer_id = ( SELECT auth.uid() AS uid)))))",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_organizers.organizer_self",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_participation_policies.participation_policy_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_teams.teams_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "policy",
+    "name": "hub_tournaments.tournaments_read",
+    "value": {
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "command": "SELECT"
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_award_batches",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_awards",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_eligibility_reviews",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_engine_audit",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_engines",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_entries",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_entry_attestations",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_entry_players",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_invites",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_matches",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_members",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_ops_audit",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_organizers",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_participation_policies",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_teams",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "table",
+    "name": "hub_tournaments",
+    "value": {
+      "rls": true,
+      "anon_read": false,
+      "force_rls": false,
+      "authenticated_read": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_update": false
+    }
+  },
+  {
+    "kind": "trigger",
+    "name": "hub_engines.participation_engine_guard",
+    "value": "CREATE TRIGGER participation_engine_guard BEFORE INSERT OR UPDATE ON public.hub_engines FOR EACH ROW EXECUTE FUNCTION hub_participation_guard()"
+  },
+  {
+    "kind": "trigger",
+    "name": "hub_entries.engine_entries_guard",
+    "value": "CREATE TRIGGER engine_entries_guard BEFORE INSERT OR DELETE OR UPDATE ON public.hub_entries FOR EACH ROW EXECUTE FUNCTION hub_engine_guard()"
+  },
+  {
+    "kind": "trigger",
+    "name": "hub_entries.participation_entry_guard",
+    "value": "CREATE TRIGGER participation_entry_guard BEFORE UPDATE OF status ON public.hub_entries FOR EACH ROW EXECUTE FUNCTION hub_participation_guard()"
+  },
+  {
+    "kind": "trigger",
+    "name": "hub_matches.engine_matches_guard",
+    "value": "CREATE TRIGGER engine_matches_guard BEFORE INSERT OR DELETE OR UPDATE ON public.hub_matches FOR EACH ROW EXECUTE FUNCTION hub_engine_guard()"
+  },
+  {
+    "kind": "trigger",
+    "name": "hub_matches.manual_confirmation_time",
+    "value": "CREATE TRIGGER manual_confirmation_time BEFORE INSERT OR UPDATE ON public.hub_matches FOR EACH ROW EXECUTE FUNCTION hub_manual_confirmation_time()"
+  },
+  {
+    "kind": "trigger",
+    "name": "hub_tournaments.engine_tournament_guard",
+    "value": "CREATE TRIGGER engine_tournament_guard BEFORE UPDATE ON public.hub_tournaments FOR EACH ROW EXECUTE FUNCTION hub_engine_guard()"
+  }
+]
