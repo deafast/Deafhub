@@ -14,16 +14,16 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
  const text=(r:string,e:string)=>ru?r:e;
  const [updates,setUpdates]=useState<UpdateStatus>('connecting'),[signedOut,setSignedOut]=useState(false);
  const canManage=owner&&!signedOut;
- const latestRevision=useRef(initial?.revision||0),request=useRef<AbortController|null>(null);
+ const latestRevision=useRef(initial?.revision||0),catalogRevision=useRef(initial?.revision||0),request=useRef<AbortController|null>(null);
  const accept=useCallback((data:{state:State|null;revision:number})=>{if(data.revision<latestRevision.current)return;latestRevision.current=data.revision;setState(data.state);setRevision(data.revision);},[]);
  const load=useCallback(async()=>{
   request.current?.abort();const controller=new AbortController();request.current=controller;
   const response=await fetch(`/api/tournament-engine?id=${id}`,{cache:'no-store',signal:controller.signal});
   if(controller.signal.aborted)return;
-  if(response.status===401){setSignedOut(true);setState(null);setRevision(0);latestRevision.current=0;throw new Error('Sign in required');}
+  if(response.status===401){setSignedOut(true);setState(null);setRevision(0);latestRevision.current=0;catalogRevision.current=0;await onSaved().catch(()=>{});throw new Error('Sign in required');}
   if(!response.ok)throw new Error('Tournament engine unavailable');
-  const data=await response.json();if(!controller.signal.aborted){accept(data);setSignedOut(false);setError('');}
- },[id,accept]);
+  const data=await response.json();if(!controller.signal.aborted){accept(data);setSignedOut(false);setError('');if(data.revision>catalogRevision.current){await onSaved();catalogRevision.current=Math.max(catalogRevision.current,data.revision);}}
+ },[id,accept,onSaved]);
  useEffect(()=>{
   if(demo)return;const client=createClient();if(!client)return;
   const updates=startTournamentUpdates(client,id,()=>load().catch(e=>{if(e.name!=='AbortError')setError('Tournament engine unavailable');}),setUpdates);
