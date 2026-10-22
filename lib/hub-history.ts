@@ -8,8 +8,8 @@ export function ownMatchHistory(matches:HubMatch[],entryIds:string[]){
  });
 }
 export function matchDateLabel(match:HubMatch,ru:boolean){
- const value=Date.parse(match.starts_at);
+ const value=Date.parse(match.engine_match&&match.scheduled_at?match.scheduled_at:match.starts_at);
  if(!Number.isFinite(value))return ru?'Дата не указана':'Date unavailable';
  const label=new Date(value).toLocaleString(ru?'ru-RU':'en-GB');
- return (match.engine_match?(ru?'Начало турнира: ':'Tournament start: '):(ru?'Запланированное время: ':'Scheduled time: '))+label;
+ return (match.engine_match&&!match.scheduled_at?(ru?'Начало турнира: ':'Tournament start: '):(ru?'Запланированное время: ':'Scheduled time: '))+label;
 }
