@@ -62,3 +62,11 @@ Preview малой доработки `2d2dc704cbfb5c4049be6f86abe44ad1e675b889`
 - 179 автоматических тестов; 23 check-in и 17 result SQL assertions PASS; TypeScript/ESLint/webpack build PASS. 311 записей metadata hosted/local совпали; новый snapshot checks/2026-10-22-workflow-schema.json.
 - Не закрывать полный пункт14: нужны авторизованный браузерный E2E, автоматический допуск и полноценное отдельное дело протеста/апелляции; manual results пока старый organizer flow.
 - Публикация подтверждена: runtime `989c7ea6a89ce28f34644debf666fd4868300566` Vercel Ready; код/тесты/доки до `e4cca3bd2231e095bc1905d25a0373041c9adcde`, 19 файлов совпали. Browser guest `/tournaments` и оба новых GET API закрыты авторизацией. Сам сайт не авторизован; GitHub/Supabase доступны. Preview `https://deafhub-kl5okvyoi-ionas-projects-019510f8.vercel.app/tournaments`. main прежний f68ee6d.
+
+## 22 октября — сначала короткая доработка
+- Worktree `/workspace/scratch/cc7f06ba3151/deafhub-quick-session` от 7588200; прежние рабочие деревья сохранены.
+- Исправлены только catch ручного refresh в TournamentCheckin.tsx / TournamentResults.tsx: 401 очищает данные/формы, в результатах также state. Схема/сервер/дизайн не менялись.
+- maintenance/tests/workflow-expired-session.cjs: 4 FAIL на прежнем коде, 4 PASS после исправления; общий набор 183 PASS. tsc/ESLint двух компонентов/webpack build/diff PASS. Предыдущие неизменённые SQL-проверки повторно не запускались.
+- На постоянном branch Preview браузер пока гость; полный Auth E2E не заявлять. Реестр 40 выполнено / 14 не завершено / 6 запланировано / 6 отложено: новая малая ошибка закрыта, исходные 14 комплексных пунктов сохраняются.
+
+Код малой правки `1b65061496d11971adae1e634adacbb124256f73`; тесты `2250730069ff67cd241386105f05447248685e0d`, 3 файла побайтово сверены с GitHub.
