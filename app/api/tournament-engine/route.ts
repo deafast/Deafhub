@@ -75,7 +75,7 @@ export async function POST(req:NextRequest) {
  } catch(e) {return reply({error:e instanceof Error?e.message:'Invalid transition'},400);}
  const {data,error:saveError}=await admin.rpc('hub_engine_commit',{tid:p.tournament_id,actor:user.id,expected:p.revision,request_id:p.request_id,command:p.command,next_state:next});
  if(saveError) {
-  const allowed=['Organizer required','Revision conflict','Idempotency key reused','Review entries and remove manual scheduling before launch','Approved entries changed','Tournament rules are locked','Publish participation and award rules before launch','Third-place rule does not match the format','Complete player confirmations and organizer review first','Revoke awards before correcting results'];
+  const allowed=['Organizer required','Revision conflict','Idempotency key reused','Review entries and remove manual scheduling before launch','Approved entries changed','Tournament rules are locked','Publish participation and award rules before launch','Third-place rule does not match the format','Complete player confirmations and organizer review first','Revoke awards before correcting results','Complete personal check-in before launch','Both captains must confirm the current result or a referee must decide'];
   return reply({error:allowed.includes(saveError.message)?saveError.message:'Could not save tournament'},saveError.message==='Revision conflict'?409:400);
  }
  return reply(data);
