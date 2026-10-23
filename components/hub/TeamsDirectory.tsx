@@ -42,7 +42,7 @@ export default function TeamsDirectory({ data, ru, own, busy, onSubmit, onAction
 
     return <div className="space-y-6 text-[#EAFBFF]">
         <p className="text-base leading-7 text-slate-300">{text('Найдите команду или создайте свою. Для вступления нужен код приглашения от капитана.', 'Find a team or create your own. A captain’s invitation code is required to join.')}</p>
-        <p className="text-sm leading-6 text-slate-300">{text('EA Sports FC: индивидуальный формат 1 на 1. Индивидуальная регистрация ещё не подключена; создавать команду для неё не требуется.', 'EA Sports FC uses an individual 1v1 format. Individual registration is not connected yet; it must not require creating a team.')}</p>
+        <p className="text-sm leading-6 text-slate-300">{text('EA Sports FC: индивидуальный формат 1 на 1. Подайте заявку на странице турнира; создавать команду не требуется.', 'EA Sports FC uses an individual 1v1 format. Enter on the tournament page; no team is required.')} <Link href="/tournaments?game=fc" className="inline-flex min-h-11 items-center text-[#22D3EE] underline underline-offset-4">{text('Турниры EA Sports FC', 'EA Sports FC tournaments')}</Link></p>
         <div className="grid gap-5 lg:grid-cols-2">
             <form className={card + ' space-y-4'} onSubmit={onSubmit}>
                 <h3 className="text-lg font-bold">{text('Создать команду', 'Create team')}</h3>
