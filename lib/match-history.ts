@@ -5,7 +5,7 @@ export function historyDate(match:HistoryMatch,ru:boolean){
  const time=Date.parse(value);
  if(!Number.isFinite(time))return ru?'Дата не указана':'Date unavailable';
  const label=match.confirmed_at?(ru?'Результат подтверждён: ':'Result confirmed: '):match.scheduled_at?(ru?'Запланированное время: ':'Scheduled time: '):(ru?'Начало турнира: ':'Tournament start: ');
- return label+new Date(time).toLocaleString(ru?'ru-RU':'en-GB');
+ return label+new Date(time).toLocaleString(ru?'ru-RU':'en-GB',{timeZone:'UTC'})+' UTC';
 }
 export function historyScore(match:HistoryMatch,ru:boolean){
  if(match.result_kind==='forfeit')return ru?'Технический результат':'Forfeit result';
