@@ -1,16 +1,21 @@
 'use client';
-import {useEffect,useRef,useState,type FormEvent} from 'react';
+import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react';
 const field='mt-2 block w-full rounded-xl border border-white/15 bg-[#0A0F14] p-3 text-white';
 export default function TournamentAutoAdmission({id,owner,ru,locked,onSaved}:{id:string;owner:boolean;ru:boolean;locked:boolean;onSaved:()=>Promise<void>}){
  const [enabled,setEnabled]=useState<boolean|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const initialRequest=useRef<AbortController|null>(null);
+ const request=useRef<AbortController|null>(null);
  const text=(r:string,e:string)=>ru?r:e;
- function requireSession(response:Response){if(response.status===401){setEnabled(null);setNotice('');throw new Error('Sign in required');}}
- useEffect(()=>{const abort=new AbortController();initialRequest.current=abort;void fetch(`/api/tournament-admission?id=${id}`,{cache:'no-store',signal:abort.signal}).then(async r=>{if(abort.signal.aborted)return;requireSession(r);const d=await r.json();if(!r.ok)throw new Error(d.error);if(!abort.signal.aborted)setEnabled(d.enabled);}).catch(e=>{if(!abort.signal.aborted)setError(e.message);});return()=>abort.abort();},[id]);
- async function refresh(){initialRequest.current?.abort();setBusy(true);setError('');setNotice('');try{const r=await fetch(`/api/tournament-admission?id=${id}`,{cache:'no-store'});requireSession(r);const d=await r.json();if(!r.ok)throw new Error(d.error);setEnabled(d.enabled);}catch(e){const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required')setEnabled(null);}finally{setBusy(false);}}
- async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();initialRequest.current?.abort();const f=new FormData(e.currentTarget);setBusy(true);setError('');setNotice('');try{
-  const wanted=f.get('enabled')==='on';const r=await fetch('/api/tournament-admission',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,enabled:wanted,reason:f.get('reason')})});requireSession(r);const d=await r.json();if(!r.ok)throw new Error(d.error);setEnabled(wanted);await onSaved();setNotice(text(`Сохранено. Допущено проверенных заявок: ${d.admitted}.`,`Saved. Reviewed entries admitted: ${d.admitted}.`));
- }catch(e){const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required')setEnabled(null);}finally{setBusy(false);}}
+ const fail=useCallback((e:unknown)=>{const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required'){setEnabled(null);setNotice('');}},[]);
+ const refresh=useCallback(async()=>{
+  request.current?.abort();const abort=new AbortController();request.current=abort;
+  setBusy(true);setError('');setNotice('');
+  try{const r=await fetch(`/api/tournament-admission?id=${id}`,{cache:'no-store',signal:abort.signal});if(abort.signal.aborted)return;if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(abort.signal.aborted)return;if(!r.ok)throw new Error(d.error);setEnabled(d.enabled);}
+  catch(e){if(!abort.signal.aborted)fail(e);}finally{if(!abort.signal.aborted)setBusy(false);}
+ },[id,fail]);
+ useEffect(()=>{let active=true;void Promise.resolve().then(()=>{if(active){setEnabled(null);return refresh();}});return()=>{active=false;request.current?.abort();};},[refresh]);
+ async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();request.current?.abort();const abort=new AbortController();request.current=abort;const f=new FormData(e.currentTarget);setBusy(true);setError('');setNotice('');try{
+  const wanted=f.get('enabled')==='on';const r=await fetch('/api/tournament-admission',{method:'POST',signal:abort.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,enabled:wanted,reason:f.get('reason')})});if(abort.signal.aborted)return;if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(abort.signal.aborted)return;if(!r.ok)throw new Error(d.error);setEnabled(wanted);await onSaved();if(!abort.signal.aborted)setNotice(text(`Сохранено. Допущено проверенных заявок: ${d.admitted}.`,`Saved. Reviewed entries admitted: ${d.admitted}.`));
+ }catch(e){if(!abort.signal.aborted)fail(e);}finally{if(!abort.signal.aborted)setBusy(false);}}
  return <section aria-busy={busy} className="space-y-3 rounded-2xl border border-white/10 p-4"><h4 className="font-bold">{text('Автоматический допуск','Automatic admission')}</h4>
  <p className="text-sm text-white/70">{text('После положительной проверки организатором заявка допускается автоматически, когда состав полный и получены все личные подтверждения, обязательные по актуальным правилам. Неполные, отклонённые и устаревшие заявки автоматически не допускаются.','After a positive organizer review, an entry is automatically admitted once its roster is complete and all personal confirmations required by the current rules are recorded. Incomplete, rejected or outdated entries are not admitted automatically.')}</p>
  {error?<p role="alert" className="text-red-300">{error==='Sign in required'?text('Войдите в аккаунт.','Sign in to continue.'):error==='Admission rules are locked after launch'?text('После запуска настройка допуска зафиксирована.','Admission rules are locked after launch.'):text('Не удалось загрузить или сохранить настройку допуска.','Could not load or save admission settings.')}</p>:null}

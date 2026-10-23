@@ -40,6 +40,7 @@ export default function PreloaderV8() {
     };
 
     useEffect(() => {
+        if (!isLoading) return;
         try {
             if (sessionStorage.getItem('dh_intro_seen')) {
                 queueMicrotask(() => { setIsSkipped(true); setIsLoading(false); });
@@ -114,7 +115,7 @@ export default function PreloaderV8() {
             clearTimeout(stopTimer);
             clearTimeout(exitTimer);
         };
-    }, [isSkipped]);
+    }, [isSkipped, isLoading]);
 
     if (isSkipped) return null;
 

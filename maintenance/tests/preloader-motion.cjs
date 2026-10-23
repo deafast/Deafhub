@@ -20,3 +20,12 @@ test('enabling reduced motion during the intro closes it and cleans pending work
  await act(async()=>f.change(false));assert.equal(tree.toJSON(),null);
  await act(async()=>tree.unmount());
 });
+test('natural intro completion releases media listeners and timers without unmounting the page',async()=>{
+ const f=fixture(false);let tree;await act(async()=>{tree=create(React.createElement(f.Component));});
+ await act(async()=>{for(const timer of [...f.timers])timer();});
+ await act(async()=>{for(const timer of [...f.timers])timer();});
+ assert.equal(tree.root.findAllByType('button').length,0);
+ assert.equal(f.listeners.size,0);
+ assert.equal(f.timers.size,0);
+ await act(async()=>tree.unmount());
+});

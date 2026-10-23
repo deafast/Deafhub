@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { profileSchema, type PlayerProfile } from '@/lib/profile';
@@ -12,9 +12,11 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
     const [failed, setFailed] = useState(false);
+    const saving = useRef(false);
 
     async function save(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        if (saving.current) return;
         const form = new FormData(event.currentTarget);
         const parsed = profileSchema.safeParse(Object.fromEntries(form));
         setMessage('');
@@ -24,6 +26,7 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
             setMessage(ru ? 'Проверьте ник и контакты. Telegram — имя без ссылки, VK — короткий адрес страницы.' : 'Check your nickname and contacts. Enter Telegram and VK usernames, without links.');
             return;
         }
+        saving.current = true;
         setBusy(true);
         try {
             const result = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(parsed.data) });
@@ -33,7 +36,7 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
         } catch {
             setFailed(true);
             setMessage(ru ? 'Не удалось сохранить профиль. Попробуйте ещё раз.' : 'Could not save your profile. Please try again.');
-        } finally { setBusy(false); }
+        } finally { saving.current = false; setBusy(false); }
     }
 
     const field = 'mt-2 block h-12 w-full rounded-2xl border border-white/15 bg-white/5 px-4 text-white outline-none focus:border-[#22D3EE]';
