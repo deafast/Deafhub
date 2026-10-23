@@ -50,3 +50,30 @@ for(const ru of [true,false])for(const json of [true,false])test(`operations POS
  assert.doesNotMatch(JSON.stringify(view.toJSON()),/PRIVATE PARTICIPATION RULES|PRIVATE PLAYER/);assert.equal(view.root.findAllByType('form').length,0);
  await Renderer.act(async()=>view.unmount());
 });
+
+for(const ru of [true,false])for(const kind of ['checkin','results'])for(const late of ['initial','refresh','json','failure'])test(`${kind}: obsolete ${late} cannot restore data after current401 RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let calls=0,finish;
+ const snapshot=kind==='checkin'?{window:{version:uid,enabled:true,opens_at:'2026-10-01T10:00:00Z',closes_at:'2027-01-01T10:00:00Z'},checkins:[],rulesVersion:uid}:{rules:{require_confirmation:true},referees:[],reports:[{id:uid,match_id:'U1.0',is_current:true,result:{kind:'played',a:1,b:0},evidence:'PRIVATE LATE EVIDENCE',decided_by:null}],confirmations:[],captainEntries:[entry],userId:uid};
+ global.fetch=async url=>{if(url.includes('tournament-engine'))return Response.json({state:{game:'cs2',matches:[{id:'U1.0',a:entry,b:uid,status:'ready'}]}});calls++;if(late==='initial'&&calls===1)return new Promise(resolve=>{finish=resolve;});if(late!=='initial'&&calls===1)return Response.json(snapshot);if(calls===2&&late==='json')return {ok:true,status:200,json:()=>new Promise(resolve=>{finish=resolve;})};if(calls===2&&late!=='initial')return new Promise(resolve=>{finish=resolve;});return new Response('Session expired',{status:401});};
+ const Component=load(kind==='checkin'?'components/hub/TournamentCheckin.tsx':'components/hub/TournamentResults.tsx');let view;
+ await Renderer.act(async()=>{view=Renderer.create(React.createElement(Component,{id:uid,owner:kind==='checkin',ru,locked:false,userId:uid,players:[{entry_id:entry,user_id:uid,nickname:'PRIVATE PLAYER'}],entries:[{id:entry,status:'approved'}],policyVersion:null,name:()=> 'PRIVATE ENTRY'}));});
+ const refresh=()=>view.root.findAllByType('button').find(b=>b.children.join('')===(kind==='checkin'?(ru?'Обновить готовность':'Refresh check-in'):(ru?'Обновить протоколы':'Refresh reports'))).props.onClick();
+ if(late!=='initial')await Renderer.act(async()=>{refresh();});
+ await Renderer.act(async()=>{refresh();});
+ await Renderer.act(async()=>{finish(late==='json'?snapshot:late==='failure'?new Response('Old error',{status:503}):Response.json(snapshot));});
+ assert.equal(view.root.findAllByType('form').length,0);const output=JSON.stringify(view.toJSON());assert.doesNotMatch(output,/PRIVATE ENTRY|PRIVATE PLAYER|PRIVATE LATE EVIDENCE/);assert.match(output,ru?/Войдите в аккаунт/:/Sign in to continue/);
+ await Renderer.act(async()=>view.unmount());
+});
+
+for(const ru of [true,false])test(`operations save reloads fresh state despite an older pending refresh RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let gets=0,finish,updated=false;
+ global.fetch=async(url,init={})=>{if(init.method==='POST'){updated=true;return Response.json({saved:true});}if(++gets===2)return new Promise(resolve=>{finish=resolve;});return Response.json(updated?{...operationData,policy:{...operationData.policy,body:'FRESH PARTICIPATION RULES'}}:operationData);};
+ const Component=load('components/hub/TournamentOperations.tsx',operationImports);let view;
+ await Renderer.act(async()=>{view=Renderer.create(React.createElement(Component,{...operationProps(ru),status:'finished',locked:true}));});
+ await click(view,ru?'Обновить':'Refresh');await click(view,ru?'Обновить':'Refresh');
+ await click(view,ru?'Выдать награды по результатам':'Issue result-based awards');
+ assert.match(JSON.stringify(view.toJSON()),/FRESH PARTICIPATION RULES/);assert.equal(gets,3);
+ await Renderer.act(async()=>{finish(Response.json(operationData));});
+ assert.match(JSON.stringify(view.toJSON()),/FRESH PARTICIPATION RULES/);assert.doesNotMatch(JSON.stringify(view.toJSON()),/PRIVATE PARTICIPATION RULES/);
+ await Renderer.act(async()=>view.unmount());
+});
