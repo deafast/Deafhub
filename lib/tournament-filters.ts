@@ -21,9 +21,15 @@ export function gameFilterUrl(current: string, game: GameFilter) {
 export function filterTournaments(data: Pick<HubData, 'tournaments' | 'entries' | 'ownEntryIds' | 'userId'>,
     game: GameFilter, query: string, own: boolean): HubTournament[] {
     const search = query.trim().toLocaleLowerCase();
-    const ownEntries = new Set(data.ownEntryIds);
+    const ownTournaments = new Set<string>();
+    if (own) {
+        const ownEntries = new Set(data.ownEntryIds);
+        for (const entry of data.entries) {
+            if (ownEntries.has(entry.id)) ownTournaments.add(entry.tournament_id);
+        }
+    }
     return data.tournaments.filter(tournament => (game === 'all' || tournament.game === game)
         && tournament.title.toLocaleLowerCase().includes(search)
         && (!own || tournament.organizer_id === data.userId
-            || data.entries.some(entry => entry.tournament_id === tournament.id && ownEntries.has(entry.id))));
+            || ownTournaments.has(tournament.id)));
 }
