@@ -55,8 +55,8 @@ const componentCode = ts.transpileModule(componentSource, { compilerOptions: { m
 const componentScope = { exports: {}, require: name => name === '@/lib/team-directory' ? scope.exports : require(name) };
 vm.runInNewContext(componentCode, componentScope);
 const TeamsDirectory = componentScope.exports.default;
-const renderDirectory = data => renderToStaticMarkup(React.createElement(TeamsDirectory, {
- data, ru: true, own: false, busy: false, onSubmit: async () => {}, onAction: async () => {},
+const renderDirectory = (data, ru = true) => renderToStaticMarkup(React.createElement(TeamsDirectory, {
+ data, ru, own: false, busy: false, onSubmit: async () => {}, onAction: async () => {},
 }));
 test('real directory shows clear counts and invitation action, without fabricated ratings', () => {
  const data = { ...fixtures(4), userId: 'viewer', teams: [{ id: 'team', game: 'dota2', captain_id: 'captain', name: 'Test team' }], invites: [] };
@@ -72,4 +72,12 @@ test('non-captain never sees invitation secret even if supplied in data', () => 
  assert.doesNotMatch(renderDirectory(data), /private-test-invite/);
  data.userId = 'captain';
  assert.match(renderDirectory(data), /private-test-invite/);
+});
+for(const ru of [true,false])test(`individual FC entry is reachable from teams without creating a team RU=${ru}`,()=>{
+ const data={...fixtures(0),userId:'viewer',teams:[],invites:[]};
+ const html=renderDirectory(data,ru);
+ assert.match(html,/<a(?=[^>]*href="\/tournaments\?game=fc")(?=[^>]*class="[^"]*min-h-11[^"]*")[^>]*>/);
+ assert.match(html,ru?/Турниры EA Sports FC/:/EA Sports FC tournaments/);
+ assert.doesNotMatch(html,/Индивидуальная регистрация ещё не подключена|Individual registration is not connected yet/);
+ assert.doesNotMatch(html.match(/<form[\s\S]*?<\/form>/)[0],/<option value="fc">/);
 });
