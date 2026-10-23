@@ -50,6 +50,18 @@ export default function PreloaderV8() {
         }
 
         if (isSkipped) return;
+        const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const skipForReducedMotion = () => {
+            if (motionPreference.matches) {
+                setIsSkipped(true);
+                setIsLoading(false);
+            }
+        };
+        if (motionPreference.matches) {
+            queueMicrotask(skipForReducedMotion);
+            return;
+        }
+        motionPreference.addEventListener('change', skipForReducedMotion);
         let cancelled = false;
         let animationFrame = 0;
         let stopTimer: ReturnType<typeof setTimeout> | undefined;
@@ -96,6 +108,7 @@ export default function PreloaderV8() {
         });
         return () => {
             cancelled = true;
+            motionPreference.removeEventListener('change', skipForReducedMotion);
             cancelAnimationFrame(animationFrame);
             clearTimeout(readinessTimer);
             clearTimeout(stopTimer);
