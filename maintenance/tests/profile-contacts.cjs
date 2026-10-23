@@ -1,0 +1,6 @@
+const {readFileSync}=require('node:fs'),vm=require('node:vm'),ts=require('typescript'),test=require('node:test'),assert=require('node:assert/strict');
+const scope={exports:{},require};vm.runInNewContext(ts.transpileModule(readFileSync('lib/profile.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,scope);
+const schema=scope.exports.profileSchema,base={nickname:'Player',region:'europe',telegram:'',vk:''};
+test('Telegram contact accepts a 32-character username with optional @ and fits existing database limit',()=>{const name='a'.repeat(32);for(const value of [name,'@'+name,'  @'+name+'  ']){const parsed=schema.parse({...base,telegram:value});assert.equal(parsed.telegram,name);assert.ok(parsed.telegram.length<=32);}});
+test('Telegram contact still rejects incomplete names, URLs and values longer than 32 username characters',()=>{for(const value of ['@','abcd','https://t.me/valid_name','@@valid_name','@'+'a'.repeat(33),'a'.repeat(33)])assert.equal(schema.safeParse({...base,telegram:value}).success,false,value);});
+test('empty Telegram contacts remain optional and browser accepts the optional prefix',()=>{assert.equal(schema.parse(base).telegram,'');const source=readFileSync('components/auth/ProfileForm.tsx','utf8');assert.match(source,/name="telegram"[^\n]*maxLength=\{33\}/);});
