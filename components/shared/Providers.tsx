@@ -3,10 +3,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import GlobalCanvas from '@/components/r3f/GlobalCanvas';
+import dynamic from 'next/dynamic';
 
 import SmoothScroll from './SmoothScroll';
 import { useLanguageStore } from '@/store/useLanguageStore';
+
+const GlobalCanvas = dynamic(() => import('@/components/r3f/GlobalCanvas'), { ssr: false });
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -21,7 +23,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <SmoothScroll>
                 <div id="main-root" className="relative h-full w-full">
                     {children}
-                    {pathname === '/' ? null : <GlobalCanvas />}
+                    {pathname === '/profile' ? <GlobalCanvas /> : null}
                 </div>
             </SmoothScroll>
         </QueryClientProvider>
