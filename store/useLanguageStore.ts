@@ -18,11 +18,11 @@ export const useLanguageStore = create<LanguageState>()(
         {
             name: "language-storage",
             partialize: (state) => ({ language: state.language }),
-            onRehydrateStorage: () => (state) => {
-                if (state) {
-                    state.t = translations[state.language || 'en'];
-                }
-            }
+            merge: (persisted, current) => {
+                const saved = (persisted ?? {}) as { language?: unknown };
+                const language: Language = saved.language === 'ru' ? 'ru' : 'en';
+                return { ...current, language, t: translations[language] };
+            },
         }
     )
 );
