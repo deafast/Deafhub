@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState,type FormEvent} from 'react';
+import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react';
 type Window={version:string;enabled:boolean;opens_at:string|null;closes_at:string|null};
 type Checkin={entry_id:string;user_id:string;ready:boolean;window_version:string;rules_version:string;policy_version:string|null};
 type Props={id:string;owner:boolean;ru:boolean;locked:boolean;userId:string;players:{entry_id:string;user_id:string;nickname:string}[];entries:{id:string;status:string}[];policyVersion:string|null;name:(id:string)=>string};
@@ -18,11 +18,15 @@ const errors:Record<string,[string,string]>={
 };
 export default function TournamentCheckin({id,owner,ru,locked,userId,players,entries,policyVersion,name}:Props){
  const [data,setData]=useState<{window:Window|null;checkins:Checkin[];rulesVersion:string}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const request=useRef<AbortController|null>(null);
+ const fail=useCallback((e:unknown)=>{const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required'){request.current?.abort();setData(null);setNotice('');}},[]);
  const text=(r:string,e:string)=>ru?r:e;
  const readable=(message:string)=>errors[message]?.[ru?0:1]||text('Не удалось выполнить действие. Обновите данные и повторите попытку.','Could not complete the action. Refresh and try again.');
- async function load(signal?:AbortSignal){const r=await fetch(`/api/tournament-checkin?id=${id}`,{cache:'no-store',signal});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);setData(d);}
- useEffect(()=>{const abort=new AbortController();void fetch(`/api/tournament-checkin?id=${id}`,{cache:'no-store',signal:abort.signal}).then(async r=>{if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);if(!abort.signal.aborted)setData(d);}).catch(e=>{if(!abort.signal.aborted){setError(e.message);if(e.message==='Sign in required')setData(null);}});return()=>abort.abort();},[id]);
- async function save(payload:Record<string,unknown>){setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);await load();setNotice(text('Готовность обновлена.','Check-in updated.'));}catch(e){setError(e instanceof Error?e.message:'Unavailable');if(e instanceof Error&&e.message==='Sign in required')setData(null);}finally{setBusy(false);}}
+ const load=useCallback(async()=>{request.current?.abort();const abort=new AbortController();request.current=abort;
+  try{const r=await fetch(`/api/tournament-checkin?id=${id}`,{cache:'no-store',signal:abort.signal});if(abort.signal.aborted)return false;if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(abort.signal.aborted)return false;if(!r.ok)throw new Error(d.error);setData(d);setError('');return true;}catch(e){if(abort.signal.aborted)return false;throw e;}
+ },[id]);
+ useEffect(()=>{let active=true;void Promise.resolve().then(()=>active?load():false).catch(fail);return()=>{active=false;request.current?.abort();};},[load,fail]);
+ async function save(payload:Record<string,unknown>){setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);if(await load())setNotice(text('Готовность обновлена.','Check-in updated.'));}catch(e){fail(e);}finally{setBusy(false);}}
  function configure(e:FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);const enabled=f.get('enabled')==='on';try{void save({action:'configure',tournament_id:id,enabled,opens_at:enabled?new Date(String(f.get('opens_at'))+'Z').toISOString():null,closes_at:enabled?new Date(String(f.get('closes_at'))+'Z').toISOString():null,reason:f.get('reason')});}catch{setError('Invalid check-in window');}}
  const w=data?.window;
  const current=(c:Checkin)=>c.ready&&c.window_version===w?.version&&c.policy_version===policyVersion&&c.rules_version===data?.rulesVersion;
@@ -32,7 +36,7 @@ export default function TournamentCheckin({id,owner,ru,locked,userId,players,ent
  {error?<p role="alert" className="text-red-300">{readable(error)}</p>:null}{notice?<p role="status">{notice}</p>:null}
  {!data&&!error?<p role="status">{text('Загрузка…','Loading…')}</p>:null}
  {data?<p>{w?.enabled?`${dates(w.opens_at)} — ${dates(w.closes_at)}`:text('Обязательный check-in не включён.','Required check-in is not enabled.')}</p>:null}
- <button type="button" disabled={busy} className="min-h-11 text-[#22D3EE]" onClick={()=>{setError('');setNotice('');void load().catch(e=>{setError(e.message);if(e.message==='Sign in required')setData(null);});}}>{text('Обновить готовность','Refresh check-in')}</button>
+ <button type="button" disabled={busy} className="min-h-11 text-[#22D3EE]" onClick={()=>{setError('');setNotice('');void load().catch(fail);}}>{text('Обновить готовность','Refresh check-in')}</button>
  {owner&&!locked&&data?<form key={w?.version||'new'} className="space-y-3" onSubmit={configure}>
  <label className="flex min-h-11 items-center gap-3"><input type="checkbox" name="enabled" defaultChecked={w?.enabled??false}/>{text('Требовать check-in перед запуском','Require check-in before launch')}</label>
  <div className="grid gap-3 sm:grid-cols-2"><label>{text('Начало · UTC','Opens · UTC')}<input type="datetime-local" name="opens_at" className={field} defaultValue={w?.opens_at?.slice(0,16)||''}/></label><label>{text('Окончание · UTC','Closes · UTC')}<input type="datetime-local" name="closes_at" className={field} defaultValue={w?.closes_at?.slice(0,16)||''}/></label></div>
