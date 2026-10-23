@@ -50,3 +50,24 @@ test('a mismatched linked SteamID cannot display another account nickname or ava
  const Component=component(async()=>Response.json({...available,steamId:'76561198000000002'}));let view;await act(async()=>{view=create(React.createElement(Component,{steamId:id,ru:true}));});
  assert.ok(!text(view).includes(available.profile.name));assert.equal(view.root.findAllByType('img').length,0);await act(async()=>view.unmount());
 });
+for(const ru of [true,false]){
+ test(`expired Steam profile session hides the previous verified link RU=${ru}`,async()=>{
+  const Component=component(async()=>new Response('',{status:401}));let view;
+  await act(async()=>{view=create(React.createElement(Component,{steamId:id,ru}));});
+  assert.ok(text(view).includes(ru?'Войдите снова, чтобы посмотреть подключённый Steam.':'Sign in again to view your connected Steam account.'));
+  assert.ok(!text(view).includes(id));assert.equal(view.root.findAllByType('a').length,0);assert.equal(view.root.findAllByType('img').length,0);assert.equal(view.root.findAllByType('time').length,0);
+  await act(async()=>view.unmount());
+ });
+ for(const [kind,response] of [
+  ['unlinked',{linked:false}],
+  ['outer ID mismatch',{...available,steamId:'76561198000000002'}],
+  ['nested ID mismatch',{...available,profile:{...available.profile,steamId:'76561198000000002'}}],
+ ])test(`Steam ${kind} cannot claim a current verified profile RU=${ru}`,async()=>{
+  const Component=component(async()=>Response.json(response));let view;
+  await act(async()=>{view=create(React.createElement(Component,{steamId:id,ru}));});
+  assert.ok(text(view).includes(ru?'Не удалось подтвердить текущую привязку Steam. Обновите страницу.':'Could not verify the current Steam link. Reload the page.'));
+  assert.ok(!text(view).includes(id));assert.ok(!text(view).includes(available.profile.name));assert.ok(!text(view).includes(ru?'Источник: Steam.':'Source: Steam.'));
+  assert.equal(view.root.findAllByType('a').length,0);assert.equal(view.root.findAllByType('img').length,0);assert.equal(view.root.findAllByType('time').length,0);
+  await act(async()=>view.unmount());
+ });
+}

@@ -21,3 +21,13 @@ function query(table){let filters=[],take=Infinity;const q={select(){return q},o
 const scopedHub=load('app/api/hub/route.ts',{'next/server':{NextResponse:{json:(data,init)=>Response.json(data,init)}},'@/lib/supabase/server':{createClient:async()=>({auth:client.auth,from:query})}});
 test('exact tournament history link loads event beyond first 500 and genuine solo roster',async()=>{user={id:'me'};const global=await (await scopedHub.GET()).json();assert.equal(global.tournaments.length,500);queries=[];const selected=await (await scopedHub.GET({nextUrl:new URL('https://preview.example/api/hub?tournament='+tournaments[550].id)})).json();assert.equal(selected.tournaments.length,1);assert.equal(selected.tournaments[0].id,tournaments[550].id);assert.equal(selected.entries[0].player_nickname,'Registered player');assert.equal(selected.teams.length,0);assert.ok(!queries.some(q=>q.table==='hub_teams'));assert.ok(queries.filter(q=>['hub_entries','hub_matches','hub_engines'].includes(q.table)).every(q=>q.filters.some(([field,id])=>field==='tournament_id'&&id===tournaments[550].id)));});
 test('exact tournament query rejects invalid identifiers without competition table reads',async()=>{queries=[];assert.equal((await scopedHub.GET({nextUrl:new URL('https://preview.example/api/hub?tournament=invalid')})).status,400);assert.equal(queries.length,0);});
+for(const ru of [true,false])test(`history dates identify UTC and stay stable across player time zones RU=${ru}`,()=>{
+ const before=process.env.TZ;
+ try{
+  for(const dates of [{confirmed_at:'2026-11-01T18:30:00Z'},{scheduled_at:'2026-11-01T18:30:00Z'},{tournament_starts_at:'2026-11-01T18:30:00Z'}]){
+   const labels=['Etc/UTC','America/Los_Angeles','Asia/Tokyo','Europe/Minsk'].map(zone=>{process.env.TZ=zone;return helpers.historyDate({...item,...dates},ru);});
+   assert.equal(new Set(labels).size,1,'The same historical timestamp changed with the browser zone');
+   assert.ok(labels[0].endsWith('18:30:00 UTC'));
+  }
+ }finally{if(before===undefined)delete process.env.TZ;else process.env.TZ=before;}
+});

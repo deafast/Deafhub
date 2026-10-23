@@ -27,7 +27,7 @@ test('hub API forwards confirmed engine schedule and its cancellation to the mat
 const historyLabels=load('lib/hub-history.ts');
 for(const ru of [true,false])test(`match list labels use scheduled time without claiming completion RU=${ru}`,()=>{
  const match={engine_match:'U1.0',starts_at:'2026-10-22T10:00:00Z',scheduled_at:payload.command.scheduledAt};
- const label=historyLabels.matchDateLabel(match,ru);assert.match(label,ru?/^Запланированное время:/:/^Scheduled time:/);assert.ok(label.endsWith(new Date(match.scheduled_at).toLocaleString(ru?'ru-RU':'en-GB')));
+ const label=historyLabels.matchDateLabel(match,ru);assert.match(label,ru?/^Запланированное время:/:/^Scheduled time:/);assert.ok(label.endsWith(new Date(match.scheduled_at).toLocaleString(ru?'ru-RU':'en-GB',{timeZone:'UTC'})+' UTC'));
  assert.match(historyLabels.matchDateLabel({...match,scheduled_at:null},ru),ru?/^Начало турнира:/:/^Tournament start:/);
  assert.equal(historyLabels.matchDateLabel({...match,scheduled_at:'invalid'},ru),ru?'Дата не указана':'Date unavailable');
 });
@@ -60,3 +60,12 @@ test('engine parent refresh retries a failed callback without a newer server rev
  f.setResponse({revision:2,state:stored.state});await f.refresh();assert.equal(refreshes,1);await f.refresh();assert.equal(refreshes,2);await f.refresh();assert.equal(refreshes,2);
 });
 test('engine unchanged initial revision does not reload the full catalog',async t=>{let refreshes=0;const f=await mountEngine(t,false,async()=>{refreshes++;});await f.refresh();assert.equal(refreshes,0);});
+for(const ru of [true,false])test(`published match time stays UTC across player time zones RU=${ru}`,()=>{
+ const before=process.env.TZ;
+ try{
+  const match={engine_match:'U1.0',starts_at:'2026-10-22T10:00:00Z',scheduled_at:payload.command.scheduledAt};
+  const labels=['Etc/UTC','America/Los_Angeles','Asia/Tokyo','Europe/Minsk'].map(zone=>{process.env.TZ=zone;return historyLabels.matchDateLabel(match,ru);});
+  assert.equal(new Set(labels).size,1,'The same published match changed its displayed time');
+  assert.ok(labels[0].endsWith('18:30:00 UTC'));
+ }finally{if(before===undefined)delete process.env.TZ;else process.env.TZ=before;}
+});
