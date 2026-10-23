@@ -44,7 +44,7 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
             <option className="bg-[#0D131A]" value="cis">{ru ? 'СНГ' : 'CIS'}</option>
             <option className="bg-[#0D131A]" value="other">{ru ? 'Другой' : 'Other'}</option>
         </select></label>
-        <label className="text-sm">Telegram<input className={field} name="telegram" defaultValue={initial.telegram} maxLength={32} placeholder="@username" autoComplete="off" /></label>
+        <label className="text-sm">Telegram<input className={field} name="telegram" defaultValue={initial.telegram} maxLength={33} placeholder="@username" autoComplete="off" /></label>
         <label className="text-sm">VK<input className={field} name="vk" defaultValue={initial.vk} maxLength={64} placeholder="username" autoComplete="off" /></label>
         <p className="text-xs leading-relaxed text-white/50">{ru ? 'Контакты видны только вам. Указание имени не подтверждает владение аккаунтом и не открывает доступ в группы капитанов.' : 'Contacts are private. Entering a username does not verify account ownership or grant access to captain groups.'}</p>
         <Button type="submit" disabled={busy} className="h-12 rounded-2xl bg-[#22D3EE] text-[#0A0F14]">{busy ? (ru ? 'Сохранение…' : 'Saving…') : (ru ? 'Сохранить профиль' : 'Save profile')}</Button>
