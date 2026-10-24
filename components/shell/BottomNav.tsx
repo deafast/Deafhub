@@ -18,7 +18,7 @@ export default function BottomNav() {
     ];
 
     return (
-        <nav aria-label={language === 'ru' ? 'Основная навигация' : 'Main navigation'} className="fixed bottom-0 left-0 z-50 flex h-20 w-full items-center justify-around border-t border-white/10 bg-background/95 px-4 backdrop-blur-md md:hidden">
+        <nav aria-label={language === 'ru' ? 'Основная навигация' : 'Main navigation'} className="fixed bottom-0 left-0 z-50 flex h-20 w-full items-center justify-around border-t border-white/10 bg-background/95 px-4 backdrop-blur-none md:hidden">
             {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href + '/'));
