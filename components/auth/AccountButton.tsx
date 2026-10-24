@@ -15,6 +15,7 @@ export default function AccountButton() {
     const [signedIn, setSignedIn] = useState(false);
     const [open, setOpen] = useState(false);
     const dialogOpen = useRef(false);
+    const authGeneration = useRef(0);
     useEffect(() => { dialogOpen.current = open; }, [open]);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
@@ -24,8 +25,9 @@ export default function AccountButton() {
         if (!client) return;
         let active = true;
         const syncUser = () => {
+            const generation = ++authGeneration.current;
             void client.auth.getUser().then(({ data }) => {
-                if (!active) return;
+                if (!active || generation !== authGeneration.current) return;
                 setSignedIn(Boolean(data.user));
                 if (data.user && dialogOpen.current) {
                     dialogOpen.current = false;
@@ -39,9 +41,10 @@ export default function AccountButton() {
         window.addEventListener('deafhub:auth-complete', syncUser);
         const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
             if (!active) return;
+            authGeneration.current++;
             setSignedIn(Boolean(session?.user));
             if (session?.user) {
-                if (dialogOpen.current) { router.replace('/profile'); router.refresh(); }
+                if (dialogOpen.current) { dialogOpen.current = false; router.replace('/profile'); router.refresh(); }
                 setOpen(false);
             }
         });
@@ -56,6 +59,7 @@ export default function AccountButton() {
             if (!client) throw new Error('Unavailable');
             const { error } = await client.auth.signOut();
             if (error) throw error;
+            authGeneration.current++;
             setSignedIn(false);
             router.replace('/');
             router.refresh();

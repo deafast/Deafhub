@@ -8,7 +8,7 @@ const source = readFileSync(resolve(__dirname, '../../lib/team-directory.ts'), '
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
 const scope = { exports: {} };
 vm.runInNewContext(compiled, scope);
-const { getTeamAvailability, TEAM_CAPACITY } = scope.exports;
+const { getTeamAvailability, TEAM_CAPACITY, indexTeamDirectory } = scope.exports;
 const fixtures = (count, status, entryStatus = 'approved') => ({
  members: Array.from({ length: count }, (_, i) => ({ team_id: 'team', user_id: String(i), nickname: 'Test' })),
  entries: status ? [{ team_id: 'team', tournament_id: 'tournament', status: entryStatus }] : [],
@@ -80,4 +80,35 @@ for(const ru of [true,false])test(`individual FC entry is reachable from teams w
  assert.match(html,ru?/Турниры EA Sports FC/:/EA Sports FC tournaments/);
  assert.doesNotMatch(html,/Индивидуальная регистрация ещё не подключена|Individual registration is not connected yet/);
  assert.doesNotMatch(html.match(/<form[\s\S]*?<\/form>/)[0],/<option value="fc">/);
+});
+
+test('indexed team directory preserves availability, roster order and first invite without mutating input',()=>{
+ const data={userId:'viewer',teams:[],members:[],entries:[],tournaments:[],invites:[]};
+ for(let i=0;i<120;i++){
+  const id=`team-${i}`,game=i%2?'cs2':'dota2';
+  data.teams.push({id,game,captain_id:`captain-${i}`,name:id});
+  for(let n=0;n<i%13;n++)data.members.push({team_id:id,user_id:n===0&&i%7===0?'viewer':`${i}-${n}`,nickname:`Player ${i}-${n}`});
+  data.tournaments.push({id:`event-${i}`,status:['open','closed','finished'][i%3]});
+  for(let j=0;j<3;j++)data.entries.push({team_id:j===2?null:id,tournament_id:j===1?'missing':`event-${i}`,status:['pending','approved','rejected'][(i+j)%3]});
+  data.invites.push({team_id:id,code:`first-${i}`},{team_id:id,code:`second-${i}`});
+ }
+ const before=JSON.stringify(data),index=indexTeamDirectory(data);
+ for(const team of [...data.teams,{id:'missing-team',game:'cs2'}]){
+  assert.equal(JSON.stringify(index.availability(team.id)),JSON.stringify(getTeamAvailability(data,team.id)));
+  assert.equal(JSON.stringify(index.membersByTeam.get(team.id)??[]),JSON.stringify(data.members.filter(m=>m.team_id===team.id)));
+  assert.equal(index.invitesByTeam.get(team.id),data.invites.find(i=>i.team_id===team.id));
+  assert.equal(index.mine.has(team.id),data.members.some(m=>m.team_id===team.id&&m.user_id===data.userId));
+  assert.equal(index.ownGames.has(team.game),data.teams.some(t=>t.game===team.game&&data.members.some(m=>m.team_id===t.id&&m.user_id===data.userId)));
+ }
+ assert.equal(JSON.stringify(data),before);
+});
+
+test('directory index is rebuilt from a changed roster and finished tournament',()=>{
+ const data={...fixtures(10,'open'),userId:'0',teams:[{id:'team',game:'cs2'}],invites:[]};
+ assert.equal(indexTeamDirectory(data).availability('team').canJoin,false);
+ const next={...data,members:data.members.slice(1),tournaments:[{id:'tournament',status:'finished'}]};
+ const index=indexTeamDirectory(next);
+ assert.equal(index.availability('team').canJoin,true);
+ assert.equal(index.mine.has('team'),false);
+ assert.equal(index.ownGames.has('cs2'),false);
 });

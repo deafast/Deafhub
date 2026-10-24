@@ -1,9 +1,9 @@
 'use client';
 
-import { useId, useRef, useState, type FormEvent } from 'react';
+import { useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import type { HubData } from '@/lib/hub-types';
-import { getTeamAvailability, TEAM_CAPACITY } from '@/lib/team-directory';
+import { indexTeamDirectory, TEAM_CAPACITY } from '@/lib/team-directory';
 
 const field = 'mt-2 block min-h-11 w-full rounded-xl border border-white/20 bg-[#0A0F14] p-3 text-base text-[#EAFBFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#22D3EE]';
 const card = 'rounded-2xl border border-white/10 bg-[#0D131A] p-5';
@@ -28,11 +28,11 @@ export default function TeamsDirectory({ data, ru, own, busy, onSubmit, onAction
     const inviteInput = useRef<HTMLInputElement>(null);
     const inviteHeading = useId();
     const filterId = useId();
-    const mine = new Set(data.members.filter(m => m.user_id === data.userId).map(m => m.team_id));
+    const { membersByTeam, mine, ownGames, invitesByTeam, availability } = useMemo(() => indexTeamDirectory(data), [data]);
     const teams = data.teams.filter(team => (!own || mine.has(team.id))
         && (game === 'all' || team.game === game)
         && team.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
-        && (!availableOnly || getTeamAvailability(data, team.id).canJoin));
+        && (!availableOnly || availability(team.id).canJoin));
 
     function showInvitation(name: string) {
         setTarget(name);
@@ -73,11 +73,11 @@ export default function TeamsDirectory({ data, ru, own, busy, onSubmit, onAction
             <p className="text-sm leading-6 text-slate-300">{text('Лимит команды — 10 участников. Размер состава на матч задаётся регламентом турнира; это не число свободных мест в матче.', 'Teams can have up to 10 members. Tournament rules define the match roster size; this is not the number of open match positions.')}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">{teams.map(team => {
-            const state = getTeamAvailability(data, team.id);
-            const members = data.members.filter(m => m.team_id === team.id);
-            const invite = team.captain_id === data.userId ? data.invites.find(i => i.team_id === team.id) : undefined;
+            const state = availability(team.id);
+            const members = membersByTeam.get(team.id) ?? [];
+            const invite = team.captain_id === data.userId ? invitesByTeam.get(team.id) : undefined;
             const member = mine.has(team.id);
-            const sameGame = data.teams.some(t => mine.has(t.id) && t.game === team.game);
+            const sameGame = ownGames.has(team.game);
             return <article key={team.id} className={card + ' min-w-0 space-y-4'}>
                 <div><p className="text-sm text-[#22D3EE]">{games.find(g => g.id === team.game)?.name || team.game}</p><h3 className="mt-2 break-words text-xl font-bold">{team.name}</h3></div>
                 <p className="text-base text-slate-200">{text(`${state.count} из ${TEAM_CAPACITY} участников · свободных мест: ${state.remaining}`, `${state.count} of ${TEAM_CAPACITY} members · open places: ${state.remaining}`)}</p>
