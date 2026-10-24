@@ -47,6 +47,19 @@ for(const ru of [true,false])test(`profile contact save ignores duplicate submit
  assert.equal(view.root.findAll(n=>n.props.role==='alert').length,0);
  await act(async()=>view.unmount());
 });
+for(const ru of [true,false])test(`profile contact save does not refresh another page after closing RU=${ru}`,async()=>{
+ let finish,refreshes=0;
+ const Component=load('components/auth/ProfileForm.tsx',{
+  fetch:()=>new Promise(resolve=>{finish=resolve;}),
+  require:name=>({'next/navigation':{useRouter:()=>({refresh:()=>refreshes++})},'@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},'@/lib/profile':{profileSchema:load('lib/profile.ts').profileSchema},'@/components/ui/button':{Button:props=>React.createElement('button',props)}}[name]??require(name)),
+ }).default;
+ const initial={nickname:'Player',region:'europe',telegram:'@valid_name',vk:'player'};let view,pending;
+ await act(async()=>{view=create(React.createElement(Component,{initial}));});
+ await act(async()=>{pending=view.root.findByType('form').props.onSubmit({preventDefault(){},currentTarget:initial});});
+ await act(async()=>view.unmount());
+ await act(async()=>{finish(Response.json({saved:true}));await pending;});
+ assert.equal(refreshes,0,'completed save refreshed the page visited after profile settings');
+});
 for(const response of ['unauthorized','failure'])test(`obsolete admission refresh ${response} cannot replace the new tournament state`,async()=>{
  let calls=0,finish;
  const Component=load('components/hub/TournamentAutoAdmission.tsx',{fetch:async()=>++calls===2?new Promise(resolve=>{finish=resolve;}):Response.json({enabled:false})}).default;

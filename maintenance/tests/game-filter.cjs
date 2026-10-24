@@ -121,3 +121,28 @@ for(const ru of [true,false])test(`realtime catalog callback reports a refresh f
  assert.match(JSON.stringify(view.toJSON()),/CURRENT CATALOG/);assert.doesNotMatch(JSON.stringify(view.toJSON()),/Competition service unavailable/);
  await Renderer.act(async()=>view.unmount());
 });
+for(const ru of [true,false])for(const phase of ['response','json'])test(`closed catalog does not reload after a late action ${phase} RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let gets=0,finish;
+ global.fetch=async(url,init={})=>{
+  if(init.method!=='POST'){gets++;return Response.json(hubFixture());}
+  return phase==='response'?new Promise(resolve=>{finish=()=>resolve(Response.json({saved:true}));}):{ok:true,status:200,json:()=>new Promise(resolve=>{finish=()=>resolve({saved:true});})};
+ };
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
+ await Renderer.act(async()=>{view.root.findAllByType('button').find(b=>caption(b)===(ru?'Допустить':'Approve')).props.onClick();});
+ await Renderer.act(async()=>view.unmount());
+ await Renderer.act(async()=>{finish();await new Promise(resolve=>setImmediate(resolve));});
+ assert.equal(gets,1,'action completed on a closed page but reloaded the private catalog');
+});
+for(const ru of [true,false])test(`catalog cancels an in-flight action refresh on unmount RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let gets=0,finish,signal;
+ global.fetch=async(url,init={})=>{
+  if(init.method==='POST')return Response.json({saved:true});
+  if(++gets===1)return Response.json(hubFixture());
+  signal=init.signal;return new Promise(resolve=>{finish=resolve;});
+ };
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
+ await Renderer.act(async()=>{view.root.findAllByType('button').find(b=>caption(b)===(ru?'Допустить':'Approve')).props.onClick();});
+ await Renderer.act(async()=>view.unmount());
+ assert.equal(signal?.aborted,true,'action refresh remained active after the catalog closed');
+ await Renderer.act(async()=>{finish(Response.json(hubFixture()));await new Promise(resolve=>setImmediate(resolve));});
+});
