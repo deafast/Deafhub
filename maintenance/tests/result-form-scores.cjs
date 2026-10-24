@@ -16,3 +16,17 @@ for(const ru of [true,false])for(const scenario of ['dota2','cs2','fc-empty','fc
  }
  await Renderer.act(async()=>view.unmount());
 });
+for(const ru of [true,false])for(const game of ['dota2','cs2'])test(`report rejects missing or invalid series scores, preserves explicit zero, and retries ${game} RU=${ru}`,async t=>{
+ const previous=global.fetch;t.after(()=>{global.fetch=previous;});const posts=[];
+ global.fetch=async(url,init={})=>{if(init.method==='POST'){posts.push(JSON.parse(init.body));return Response.json({saved:true});}return Response.json(url.includes('tournament-engine')?{state:{game,matches:[{id:'U1.0',a:entry,b:uid,status:'ready'}]}}:{rules:null,referees:[],reports:[],confirmations:[],captainEntries:[entry],userId:uid});};
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(load(),{id:uid,owner:false,ru,locked:true,name:id=>id,players:[]}));});
+ const submit=async values=>Renderer.act(async()=>{view.root.findByType('form').props.onSubmit({preventDefault(){},currentTarget:values});await new Promise(resolve=>setImmediate(resolve));});
+ for(const invalid of [null,'','  ','-1','1.5','1001','NaN','Infinity'])for(const side of ['a','b']){
+  const values={a:'1',b:'0',evidence:'Captain report'};if(invalid===null)delete values[side];else values[side]=invalid;
+  await submit(values);assert.equal(posts.length,0,`${side}=${invalid} must not produce a report`);assert.equal(view.root.findAll(n=>n.props.role==='alert').length,1);
+ }
+ await submit({a:'0',b:'1',evidence:'Verified captain report'});
+ assert.equal(posts.length,1);assert.deepEqual(posts[0].result,{kind:'played',a:0,b:1});
+ assert.equal(view.root.findAll(n=>n.props.role==='alert').length,0);
+ await Renderer.act(async()=>view.unmount());
+});

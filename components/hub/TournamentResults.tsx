@@ -16,6 +16,7 @@ export default function TournamentResults({id,owner,ru,locked,name,players}:{id:
  useEffect(()=>{let active=true;void Promise.resolve().then(()=>active?refresh():false).catch(fail);return()=>{active=false;request.current?.abort();};},[refresh,fail]);
  async function save(payload:Record<string,unknown>){setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,...payload})});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);if(await refresh())setNotice(text('Сохранено. Результат в сетке публикует организатор.','Saved. The organizer publishes the result to the bracket.'));}catch(e){fail(e);}finally{setBusy(false);}}
  const errorText:Record<string,string>={
+ 'Invalid score':text('Проверьте счёт матча.','Check the match score.'),
  'Complete both shootout scores':text('Укажите оба значения счёта пенальти или оставьте оба поля пустыми.','Enter both shootout scores or leave both fields empty.'),
  'Match captain required':text('Действие доступно капитану участвующей команды или участнику FC.','Only the match captain or FC player can perform this action.'),
  'Report changed; refresh the match':text('Протокол изменился. Обновите данные и проверьте счёт.','The report changed. Refresh and verify the score.'),
@@ -24,7 +25,16 @@ export default function TournamentResults({id,owner,ru,locked,name,players}:{id:
  'Revoke awards before correcting results':text('Перед исправлением организатор должен отозвать награды.','The organizer must revoke awards before a correction.'),
  'Sign in required':text('Войдите в аккаунт.','Sign in to continue.'),
  };
- function submit(event:FormEvent<HTMLFormElement>,match:string,entry:string){event.preventDefault();const f=new FormData(event.currentTarget),pa=String(f.get('pa')??'').trim(),pb=String(f.get('pb')??'').trim();if(state?.game==='fc'&&Boolean(pa)!==Boolean(pb)){setNotice('');setError('Complete both shootout scores');return;}const penalties=state?.game==='fc'&&pa!==''&&pb!==''?{a:Number(pa),b:Number(pb)}:undefined;void save({action:'submit',match_id:match,entry_id:entry,result:{kind:'played',a:Number(f.get('a')),b:Number(f.get('b')),...(penalties?{penalties}:{})},evidence:f.get('evidence')});}
+ function submit(event:FormEvent<HTMLFormElement>,match:string,entry:string){
+  event.preventDefault();const f=new FormData(event.currentTarget),pa=String(f.get('pa')??'').trim(),pb=String(f.get('pb')??'').trim();
+  if(state?.game==='dota2'||state?.game==='cs2'){
+   const invalid=['a','b'].some(key=>{const raw=f.get(key),score=Number(raw);return typeof raw!=='string'||raw.trim()===''||!Number.isSafeInteger(score)||score<0||score>1000;});
+   if(invalid){setNotice('');setError('Invalid score');return;}
+  }
+  if(state?.game==='fc'&&Boolean(pa)!==Boolean(pb)){setNotice('');setError('Complete both shootout scores');return;}
+  const penalties=state?.game==='fc'&&pa!==''&&pb!==''?{a:Number(pa),b:Number(pb)}:undefined;
+  void save({action:'submit',match_id:match,entry_id:entry,result:{kind:'played',a:Number(f.get('a')),b:Number(f.get('b')),...(penalties?{penalties}:{})},evidence:f.get('evidence')});
+ }
  return <section className="space-y-4 rounded-2xl border border-white/10 p-4"><h4 className="font-bold">{text('Протоколы матчей и подтверждения','Match reports and confirmations')}</h4>
  <p className="text-sm text-white/70">{text('Капитан отправляет счёт, соперник подтверждает его или оставляет возражение. Протоколы и доказательства доступны участникам матча, организатору и назначенным судьям.','The captain reports the score; the opponent confirms or disputes it. Reports and evidence are visible to match participants, the organizer and assigned referees.')}</p>
  {error?<p role="alert" className="text-red-300">{errorText[error]||text('Не удалось сохранить или загрузить протокол. Обновите данные и проверьте права доступа.','Could not save or load the report. Refresh and check permissions.')}</p>:null}{notice?<p role="status">{notice}</p>:null}
