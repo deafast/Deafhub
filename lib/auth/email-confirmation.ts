@@ -1,5 +1,10 @@
 export const CONFIRMATION_COOLDOWN_MS = 60_000;
 export const CONFIRMATION_COOLDOWN_KEY = 'deafhub:confirmation-cooldown:v1';
+export function readConfirmationCooldown(deadline=0) {
+ let stored=0;
+ try { stored=Number(sessionStorage.getItem(CONFIRMATION_COOLDOWN_KEY)); } catch {}
+ return Math.max(0,Number.isFinite(deadline)?deadline:0,Number.isFinite(stored)?stored:0);
+}
 export function startConfirmationCooldown(now=Date.now()) {
  const deadline=now+CONFIRMATION_COOLDOWN_MS;
  try { sessionStorage.setItem(CONFIRMATION_COOLDOWN_KEY,String(deadline)); } catch {}

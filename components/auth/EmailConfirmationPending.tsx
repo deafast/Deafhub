@@ -2,22 +2,22 @@
 import {useEffect,useRef,useState} from 'react';
 import {MailCheck} from 'lucide-react';
 import {createClient} from '@/lib/supabase/client';
-import {CONFIRMATION_COOLDOWN_KEY,startConfirmationCooldown,confirmationCallback,confirmationError,emailProvider,remainingConfirmationSeconds} from '@/lib/auth/email-confirmation';
+import {readConfirmationCooldown,startConfirmationCooldown,confirmationCallback,confirmationError,emailProvider,remainingConfirmationSeconds} from '@/lib/auth/email-confirmation';
 
 export default function EmailConfirmationPending({email,ru,deadline,onBack,disabled=false,demo=false}:{email:string;ru:boolean;deadline:number;onBack:()=>void;disabled?:boolean;demo?:boolean}){
  const [until,setUntil]=useState(deadline),[seconds,setSeconds]=useState(60),[busy,setBusy]=useState(false),[error,setError]=useState(''),[sent,setSent]=useState(false);
  const inFlight=useRef(false);const provider=emailProvider(email),t=(r:string,e:string)=>ru?r:e;
  useEffect(()=>{
   let active=true;
-  const tick=()=>{const remaining=remainingConfirmationSeconds(until,Date.now());setSeconds(remaining);if(remaining===0)clearInterval(timer);};
+  const tick=()=>{const remaining=remainingConfirmationSeconds(readConfirmationCooldown(until),Date.now());setSeconds(remaining);if(remaining===0)clearInterval(timer);};
   const timer=setInterval(tick,1000);
   queueMicrotask(()=>{if(active)tick();});
   return()=>{active=false;clearInterval(timer);};
  },[until]);
  async function resend(){
   if(demo||disabled||inFlight.current)return;
-  let stored=0;try{stored=Number(sessionStorage.getItem(CONFIRMATION_COOLDOWN_KEY))||0;}catch{}
-  if(Math.max(until,stored)>Date.now())return;
+  const deadline=readConfirmationCooldown(until),remaining=remainingConfirmationSeconds(deadline,Date.now());
+  if(remaining>0){setUntil(deadline);setSeconds(remaining);return;}
   const client=createClient();if(!client){setError(t('Отправка временно недоступна.','Email delivery is temporarily unavailable.'));return;}
   inFlight.current=true;setBusy(true);setError('');setSent(false);
   const next=startConfirmationCooldown();setUntil(next);setSeconds(60);
