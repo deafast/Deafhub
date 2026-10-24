@@ -36,6 +36,29 @@ function hubFixture(){return {userId:'me',organizer:true,engineIds:[],engines:[]
  teams:[{id:'team',name:'PRIVATE REGISTERED TEAM',game:'cs2',captain_id:'me'}],members:[{team_id:'team',user_id:'me',nickname:'PRIVATE PLAYER'}],
  entries:[{id:'entry',team_id:'team',tournament_id:'event',status:'pending'}],
  tournaments:[{id:'event',game:'cs2',title:'PRIVATE TOURNAMENT',organizer_id:'me',starts_at:'2027-01-01T12:00:00Z',status:'open',rules:'Published tournament regulation',rules_version:'rules',roster_size:5}]};}
+for(const ru of [true,false])for(const [file,labels] of [
+ ['app/tournaments/TournamentHub.tsx',['Турниры','Tournaments']],
+ ['app/team/page.tsx',['Центр команд','Team center']],
+ ['app/live/page.tsx',['Матчи и результаты','Matches and results']],
+])test(`catalog page has one primary heading through loading, auth, failure and success ${file} RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});
+ const Component=load(file,{'@/components/hub/HubPanel':{default:panel(ru)}}).default;
+ for(const state of ['loading','auth','failure','success']){
+  global.fetch=()=>state==='loading'?new Promise(()=>{}):Promise.resolve(state==='success'?Response.json({...hubFixture(),organizer:false}):Response.json({error:'Unavailable'},{status:state==='auth'?401:503}));
+  let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(Component));});
+  try{
+   const headings=view.root.findAllByType('h1');assert.equal(headings.length,1,state+' lacks one primary page heading');
+   assert.equal(headings[0].children.join(''),labels[ru?0:1]);
+  }finally{await Renderer.act(async()=>view.unmount());}
+ }
+});
+for(const ru of [true,false])test(`embedded profile panel retains its secondary heading RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});global.fetch=async()=>Response.json(hubFixture());
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'stats',own:true}));});
+ assert.equal(view.root.findAllByType('h1').length,0);
+ assert.ok(view.root.findAllByType('h2').some(n=>n.children.join('')===(ru?'Моя статистика DeafHub':'My DeafHub statistics')));
+ await Renderer.act(async()=>view.unmount());
+});
 for(const ru of [true,false])test(`catalog tournament date states UTC independent of device timezone RU=${ru}`,async t=>{
  const original=global.fetch;t.after(()=>{global.fetch=original;});global.fetch=async()=>Response.json(hubFixture());
  let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
