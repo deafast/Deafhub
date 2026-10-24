@@ -24,6 +24,7 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
  const [creationGame,setCreationGame]=useState('dota2');
  const [query,setQuery]=useState(''); const [game,setGame]=useGameFilter();
  const loadGeneration=useRef(0);
+ const sessionGeneration=useRef(0);
  const mutating=useRef(false);
  const active=useRef(false),reading=useRef<AbortController|null>(null);
  const invalidateLoads=useCallback(()=>{loadGeneration.current++;reading.current?.abort();},[]);
@@ -36,7 +37,7 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
   const acceptCurrent=()=>{if(current())return true;if(strict)throw new Error('Catalog refresh superseded');return false;};
   const selected=new URLSearchParams(window.location.search).get('tournament');
   return fetch('/api/hub'+(selected?'?tournament='+encodeURIComponent(selected):''),{cache:'no-store',signal:controller.signal})
-   .then(async response=>{if(!acceptCurrent())return;setUnauth(response.status===401);if(response.status===401){setData(null);setNotice('');}if(!response.ok)throw new Error(response.status===401?'Sign in required':'Competition service unavailable');const value=await response.json();if(acceptCurrent()){setData(value);setError('');}})
+   .then(async response=>{if(!acceptCurrent())return;setUnauth(response.status===401);if(response.status===401){sessionGeneration.current++;setData(null);setNotice('');}if(!response.ok)throw new Error(response.status===401?'Sign in required':'Competition service unavailable');const value=await response.json();if(acceptCurrent()){setData(value);setError('');}})
    .catch(e=>{if(current())setError(e instanceof Error?e.message:'Unavailable');if(strict)throw e;})
    .finally(()=>{if(current())setLoading(false);});
  },[]);
@@ -45,9 +46,10 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
  async function mutate(payload:Record<string,unknown>) {
   if(!active.current||mutating.current)return;
   mutating.current=true;
+  const generation=sessionGeneration.current,current=()=>active.current&&generation===sessionGeneration.current;
   setBusy(true); setError(''); setNotice('');
-  try {const response=await fetch('/api/hub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!active.current)return;if(response.status===401){invalidateLoads();setData(null);setNotice('');setUnauth(true);throw new Error('Sign in required');}const result=await response.json();if(!active.current)return;if(!response.ok) throw new Error(result.error);await refreshCatalog();if(active.current)setNotice(ru?'Сохранено.':'Saved.');}
-  catch(e) {if(active.current)setError(e instanceof Error?e.message:'Could not save');} finally {mutating.current=false;if(active.current)setBusy(false);}
+  try {const response=await fetch('/api/hub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!current())return;if(response.status===401){sessionGeneration.current++;invalidateLoads();setData(null);setNotice('');setUnauth(true);setError('Sign in required');return;}const result=await response.json();if(!current())return;if(!response.ok) throw new Error(result.error);await refreshCatalog();if(current())setNotice(ru?'Сохранено.':'Saved.');}
+  catch(e) {if(current())setError(e instanceof Error?e.message:'Could not save');} finally {mutating.current=false;if(active.current)setBusy(false);}
  }
  async function submit(event:FormEvent<HTMLFormElement>) {
   event.preventDefault(); const values:Record<string,unknown>=Object.fromEntries(new FormData(event.currentTarget));

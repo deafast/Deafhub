@@ -146,3 +146,20 @@ for(const ru of [true,false])test(`catalog cancels an in-flight action refresh o
  assert.equal(signal?.aborted,true,'action refresh remained active after the catalog closed');
  await Renderer.act(async()=>{finish(Response.json(hubFixture()));await new Promise(resolve=>setImmediate(resolve));});
 });
+for(const ru of [true,false])for(const phase of ['response','json'])test(`catalog ignores an older saved ${phase} after current GET401 RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let gets=0,finishGet,finishPost;
+ global.fetch=async(url,init={})=>{
+  if(init.method==='POST')return phase==='response'?new Promise(resolve=>{finishPost=()=>resolve(Response.json({saved:true}));}):{ok:true,status:200,json:()=>new Promise(resolve=>{finishPost=()=>resolve({saved:true});})};
+  if(++gets===2)return new Promise(resolve=>{finishGet=resolve;});
+  return Response.json(hubFixture());
+ };
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
+ await Renderer.act(async()=>view.root.findAllByType('button').find(b=>caption(b)==='QA refresh').props.onClick());
+ await Renderer.act(async()=>view.root.findAllByType('button').find(b=>caption(b)===(ru?'Допустить':'Approve')).props.onClick());
+ await Renderer.act(async()=>finishGet(new Response('Session expired',{status:401})));
+ await Renderer.act(async()=>{finishPost();await new Promise(resolve=>setImmediate(resolve));});
+ assert.equal(gets,2,'old action reloaded the catalog after session expiry');
+ assert.doesNotMatch(JSON.stringify(view.toJSON()),/PRIVATE TOURNAMENT|PRIVATE PLAYER|Сохранено\.|Saved\./);
+ assert.equal(view.root.findAllByType('form').length,0);
+ await Renderer.act(async()=>view.unmount());
+});
