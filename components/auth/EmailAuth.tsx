@@ -33,7 +33,10 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
     const [confirmationDeadline,setConfirmationDeadline]=useState(0);
     const [canReset, setCanReset] = useState(false);
     const [resetDone, setResetDone] = useState(false);
+    const mounted = useRef(false);
     const locked = disabled || pending;
+
+    useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
 
     useEffect(() => {
         if (!reset) return;
@@ -124,6 +127,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
     }
 
     function finishSignIn() {
+        if (!mounted.current) return;
         window.dispatchEvent(new Event('deafhub:auth-complete'));
         router.replace('/profile');
         router.refresh();

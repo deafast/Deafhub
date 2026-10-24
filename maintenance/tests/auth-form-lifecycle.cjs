@@ -2,6 +2,22 @@ const fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript'),test=
 const React=require('react'),{create,act}=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
 function load(file,imports,extra={}){const scope={exports:{},AbortController,Event,...extra,require:name=>imports[name]??require(name)};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,scope);return scope.exports.default;}
 const ui={Button:props=>React.createElement('button',props),Input:props=>React.createElement('input',props)};
+for(const ru of [true,false])for(const mode of ['login','signup'])for(const unmount of [true,false])test(`email ${mode} completion respects mounted=${!unmount} RU=${ru}`,async()=>{
+ let finish;const routes=[],events=[],router={replace:path=>routes.push(path),refresh(){}};
+ const send=()=>new Promise(resolve=>{finish=resolve;});
+ const Component=load('components/auth/EmailAuth.tsx',{
+  'next/navigation':{useRouter:()=>router},'lucide-react':{Eye:()=>null,EyeOff:()=>null,Mail:()=>null,LockKeyhole:()=>null},
+  '@/lib/supabase/client':{createClient:()=>({auth:{signInWithPassword:send,signUp:send}})},
+  '@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},'@/components/ui/input':ui,'@/components/ui/button':ui,
+  './EmailConfirmationPending':{__esModule:true,default:()=>null},'@/lib/auth/email-confirmation':{confirmationCallback:origin=>origin+'/auth/callback'},
+ },{window:{location:{origin:'https://preview.example'},dispatchEvent:event=>events.push(event.type)}});
+ let view,pending;await act(async()=>{view=create(React.createElement(Component));});
+ if(mode==='signup')await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Регистрация':'Sign up')).props.onClick());
+ await act(async()=>{for(const input of view.root.findAllByType('input'))input.props.onChange({target:{value:input.props.name==='email'?'player@example.test':'LongPassword123!'}});});
+ await act(async()=>{pending=view.root.findByType('form').props.onSubmit({preventDefault(){}});});if(unmount)await act(async()=>view.unmount());
+ await act(async()=>{finish({data:{session:{user:{id:'player'}}},error:null});await pending;});assert.deepEqual(routes,unmount?[]:['/profile']);assert.deepEqual(events,unmount?[]:['deafhub:auth-complete']);
+ if(!unmount)await act(async()=>view.unmount());
+});
 for(const ru of [true,false])for(const failure of ['response','network'])test(`password reset reports sign-out ${failure} failure without retrying password update RU=${ru}`,async()=>{
  let updates=0,signouts=0;const router={replace(){},refresh(){}};
  const Component=load('components/auth/EmailAuth.tsx',{
