@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import AccountButton from '@/components/auth/AccountButton';
 
@@ -26,6 +27,7 @@ const RU_FLAG = (
 
 export default function Header() {
     const { t, language, setLanguage } = useLanguageStore();
+    const pathname = usePathname();
 
     const navItems = [
         { label: t.nav.home, href: '/' },
@@ -53,11 +55,12 @@ export default function Header() {
                 </div>
 
                 {/* Center: Nav */}
-                <nav className="hidden md:flex items-center gap-8">
+                <nav aria-label={language === 'ru' ? 'Основная навигация' : 'Main navigation'} className="hidden md:flex items-center gap-8">
                     {navItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
+                            aria-current={pathname === item.href ? 'page' : item.href !== '/' && pathname?.startsWith(item.href + '/') ? 'location' : undefined}
                             className="text-sm font-medium text-foreground/70 transition-colors hover:text-[#22D3EE]"
                         >
                             {item.label}
