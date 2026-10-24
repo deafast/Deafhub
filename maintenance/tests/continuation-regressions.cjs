@@ -89,3 +89,25 @@ test('admission save completing after a tournament switch does not refresh or an
  assert.equal(view.root.findAllByType('input').find(n=>n.props.type==='checkbox').props.defaultChecked,false);
  await act(async()=>view.unmount());
 });
+for(const ru of [true,false])for(const field of ['nickname','telegram'])test(`profile rejects invalid ${field}, associates its error and clears it on valid retry RU=${ru}`,async()=>{
+ const requests=[];
+ const Component=load('components/auth/ProfileForm.tsx',{
+  fetch:async(_url,options)=>{requests.push(JSON.parse(options.body));return Response.json({saved:true});},
+  require:name=>({'next/navigation':{useRouter:()=>({refresh(){}})},'@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},'@/lib/profile':{profileSchema:load('lib/profile.ts').profileSchema},'@/components/ui/button':{Button:props=>React.createElement('button',props)}}[name]??require(name)),
+ }).default;
+ const valid={nickname:'Player',region:'europe',telegram:'@valid_name',vk:'player'};let view;
+ await act(async()=>{view=create(React.createElement(Component,{initial:valid}));});
+ const invalid={...valid,[field]:field==='nickname'?'🙂🙂':'https://t.me/valid_name'};
+ await act(async()=>view.root.findByType('form').props.onSubmit({preventDefault(){},currentTarget:invalid}));
+ assert.equal(requests.length,0,'invalid contact values were sent to the API');
+ const alert=view.root.find(node=>node.props.role==='alert'),input=()=>view.root.findAllByType('input').find(node=>node.props.name===field);
+ assert.equal(input().props['aria-invalid'],true,'field with rejected value was not identified as invalid');
+ assert.ok(alert.props.id);assert.equal(input().props['aria-describedby'],alert.props.id);
+ const other=view.root.findAllByType('input').find(node=>node.props.name===(field==='nickname'?'telegram':'nickname'));
+ assert.notEqual(other.props['aria-invalid'],true,'valid field was incorrectly identified as invalid');
+ await act(async()=>view.root.findByType('form').props.onSubmit({preventDefault(){},currentTarget:valid}));
+ assert.equal(requests.length,1);assert.equal(requests[0].telegram,'valid_name');
+ assert.notEqual(input().props['aria-invalid'],true);assert.equal(input().props['aria-describedby'],undefined);
+ assert.equal(view.root.findAll(node=>node.props.role==='alert').length,0);
+ await act(async()=>view.unmount());
+});
