@@ -19,15 +19,15 @@ const errors:Record<string,[string,string]>={
 export default function TournamentCheckin({id,owner,ru,locked,userId,players,entries,policyVersion,name}:Props){
  const [data,setData]=useState<{window:Window|null;checkins:Checkin[];rulesVersion:string}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const request=useRef<AbortController|null>(null);
+ const lifecycle=useRef(0),saving=useRef(false);
  const fail=useCallback((e:unknown)=>{const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required'){request.current?.abort();setData(null);setNotice('');}},[]);
  const text=(r:string,e:string)=>ru?r:e;
  const readable=(message:string)=>errors[message]?.[ru?0:1]||text('Не удалось выполнить действие. Обновите данные и повторите попытку.','Could not complete the action. Refresh and try again.');
  const load=useCallback(async()=>{request.current?.abort();const abort=new AbortController();request.current=abort;
   try{const r=await fetch(`/api/tournament-checkin?id=${id}`,{cache:'no-store',signal:abort.signal});if(abort.signal.aborted)return false;if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(abort.signal.aborted)return false;if(!r.ok)throw new Error(d.error);setData(d);setError('');return true;}catch(e){if(abort.signal.aborted)return false;throw e;}
  },[id]);
- useEffect(()=>{let active=true;void Promise.resolve().then(()=>active?load():false).catch(fail);return()=>{active=false;request.current?.abort();};},[load,fail]);
- const saving=useRef(false);
- async function save(payload:Record<string,unknown>){if(saving.current)return;saving.current=true;setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);if(await load())setNotice(text('Готовность обновлена.','Check-in updated.'));}catch(e){fail(e);}finally{saving.current=false;setBusy(false);}}
+ useEffect(()=>{let active=true;const generation=++lifecycle.current;void Promise.resolve().then(()=>active?load():false).catch(e=>{if(active)fail(e);}).finally(()=>{if(active&&!saving.current)setBusy(false);});return()=>{active=false;lifecycle.current=generation+1;saving.current=false;request.current?.abort();};},[load,fail]);
+ async function save(payload:Record<string,unknown>){if(saving.current)return;saving.current=true;const generation=lifecycle.current,current=()=>generation===lifecycle.current;setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!current())return;if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!current())return;if(!r.ok)throw new Error(d.error);if(await load()&&current())setNotice(text('Готовность обновлена.','Check-in updated.'));}catch(e){if(current())fail(e);}finally{if(current()){saving.current=false;setBusy(false);}}}
  function configure(e:FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);const enabled=f.get('enabled')==='on';try{void save({action:'configure',tournament_id:id,enabled,opens_at:enabled?new Date(String(f.get('opens_at'))+'Z').toISOString():null,closes_at:enabled?new Date(String(f.get('closes_at'))+'Z').toISOString():null,reason:f.get('reason')});}catch{setError('Invalid check-in window');}}
  const w=data?.window;
  const current=(c:Checkin)=>c.ready&&c.window_version===w?.version&&c.policy_version===policyVersion&&c.rules_version===data?.rulesVersion;

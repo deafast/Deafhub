@@ -9,6 +9,7 @@ const button='min-h-11 rounded-xl border border-white/15 px-4 py-3 text-[#22D3EE
 export default function TournamentResults({id,owner,ru,locked,name,players}:{id:string;owner:boolean;ru:boolean;locked:boolean;name:(id:string)=>string;players:{user_id:string;nickname:string;entry_id:string}[]}){
  const [data,setData]=useState<Data|null>(null),[state,setState]=useState<State|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const request=useRef<AbortController|null>(null);
+ const lifecycle=useRef(0),saving=useRef(false);
  const fail=useCallback((e:unknown)=>{const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required'){request.current?.abort();setData(null);setState(null);setNotice('');}},[]);
  const text=(r:string,e:string)=>ru?r:e;
  const read=useCallback(async(signal?:AbortSignal)=>{
@@ -18,9 +19,8 @@ export default function TournamentResults({id,owner,ru,locked,name,players}:{id:
   const [d,e]=await Promise.all(responses.map(r=>r.json()));if(!responses[0].ok||!responses[1].ok)throw new Error(d.error||e.error);return {d,e};
  },[id]);
  const refresh=useCallback(async()=>{request.current?.abort();const abort=new AbortController();request.current=abort;try{const {d,e}=await read(abort.signal);if(abort.signal.aborted)return false;setData(d);setState(e.state);setError('');return true;}catch(e){if(abort.signal.aborted)return false;throw e;}},[read]);
- useEffect(()=>{let active=true;void Promise.resolve().then(()=>active?refresh():false).catch(fail);return()=>{active=false;request.current?.abort();};},[refresh,fail]);
- const saving=useRef(false);
- async function save(payload:Record<string,unknown>){if(saving.current)return;saving.current=true;setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,...payload})});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);if(await refresh())setNotice(text('Сохранено. Результат в сетке публикует организатор.','Saved. The organizer publishes the result to the bracket.'));}catch(e){fail(e);}finally{saving.current=false;setBusy(false);}}
+ useEffect(()=>{let active=true;const generation=++lifecycle.current;void Promise.resolve().then(()=>active?refresh():false).catch(e=>{if(active)fail(e);}).finally(()=>{if(active&&!saving.current)setBusy(false);});return()=>{active=false;lifecycle.current=generation+1;saving.current=false;request.current?.abort();};},[refresh,fail]);
+ async function save(payload:Record<string,unknown>){if(saving.current)return;saving.current=true;const generation=lifecycle.current,current=()=>generation===lifecycle.current;setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,...payload})});if(!current())return;if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!current())return;if(!r.ok)throw new Error(d.error);if(await refresh()&&current())setNotice(text('Сохранено. Результат в сетке публикует организатор.','Saved. The organizer publishes the result to the bracket.'));}catch(e){if(current())fail(e);}finally{if(current()){saving.current=false;setBusy(false);}}}
  const errorText:Record<string,string>={
  'Invalid score':text('Проверьте счёт матча.','Check the match score.'),
  'Complete both shootout scores':text('Укажите оба значения счёта пенальти или оставьте оба поля пустыми.','Enter both shootout scores or leave both fields empty.'),
