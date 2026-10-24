@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript'),test=
 const React=require('react'),{create,act}=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
 function fixture(ru,seconds){
  let now=100000,sends=0;const timers=new Set(),storage=new Map();
- const helpers={exports:{},URL};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/auth/email-confirmation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,helpers);
+ const helpers={exports:{},URL,Date:class extends Date{static now(){return now;}},sessionStorage:{setItem:(key,value)=>storage.set(key,value)}};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/auth/email-confirmation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,helpers);
  const imports={'@/lib/auth/email-confirmation':helpers.exports,'@/lib/supabase/client':{createClient:()=>({auth:{resend:async()=>{sends++;return {error:null};}}})},'lucide-react':{MailCheck:()=>null}};
  const scope={exports:{},Date:class extends Date{static now(){return now;}},queueMicrotask,window:{location:{origin:'https://preview.example'}},sessionStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},setInterval:callback=>{timers.add(callback);return callback;},clearInterval:timer=>timers.delete(timer),require:name=>imports[name]??require(name)};
  vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/auth/EmailConfirmationPending.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,scope);

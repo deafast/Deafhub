@@ -8,7 +8,7 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import EmailConfirmationPending from './EmailConfirmationPending';
-import {confirmationCallback,CONFIRMATION_COOLDOWN_KEY,CONFIRMATION_COOLDOWN_MS} from '@/lib/auth/email-confirmation';
+import {confirmationCallback,startConfirmationCooldown} from '@/lib/auth/email-confirmation';
 
 type Mode = 'login' | 'signup' | 'forgot' | 'reset';
 
@@ -88,9 +88,8 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
                 setConfirmation('');
                 if (data.session) finishSignIn();
                 else {
-                    const deadline=Date.now()+CONFIRMATION_COOLDOWN_MS;
+                    const deadline=startConfirmationCooldown();
                     setConfirmationDeadline(deadline);
-                    try { sessionStorage.setItem(CONFIRMATION_COOLDOWN_KEY,String(deadline)); } catch {}
                     setAwaitingEmail(email.trim());
                 }
             } else if (mode === 'reset') {

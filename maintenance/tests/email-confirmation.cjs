@@ -6,13 +6,21 @@ const ts=require('typescript');
 const vm=require('node:vm');
 const React=require('react');
 const {renderToStaticMarkup}=require('react-dom/server');
-function load(file,imports={}) {
+function load(file,imports={},globals={}) {
  const source=readFileSync(resolve(__dirname,'../..',file),'utf8');
  const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText;
- const scope={exports:{},URL,process:{cwd:()=>process.cwd(),env:{VERCEL_ENV:'preview',NODE_ENV:'test'}},Response,require:name=>imports[name]||require(name)};
+ const scope={exports:{},URL,process:{cwd:()=>process.cwd(),env:{VERCEL_ENV:'preview',NODE_ENV:'test'}},Response,...globals,require:name=>imports[name]||require(name)};
  vm.runInNewContext(compiled,scope);return scope.exports;
 }
 const helpers=load('lib/auth/email-confirmation.ts');
+test('starting confirmation cooldown stores the same deadline returned to the caller',()=>{
+ const writes=[];const shared=load('lib/auth/email-confirmation.ts',{}, {sessionStorage:{setItem:(key,value)=>writes.push([key,value])}});
+ assert.equal(shared.startConfirmationCooldown(1000),61000);assert.deepEqual(writes,[[helpers.CONFIRMATION_COOLDOWN_KEY,'61000']]);
+});
+test('starting confirmation cooldown still works with unavailable browser storage',()=>{
+ const shared=load('lib/auth/email-confirmation.ts',{}, {sessionStorage:{setItem(){throw Error('Storage unavailable');}}});
+ assert.equal(shared.startConfirmationCooldown(2000),62000);assert.equal(helpers.startConfirmationCooldown(3000),63000);
+});
 for(const [email,provider] of [['user@gmail.com','Gmail'],['user@googlemail.com','Gmail'],['user@mail.ru','Mail.ru'],['user@bk.ru','Mail.ru'],['user@inbox.ru','Mail.ru'],['user@outlook.com','Outlook'],['user@hotmail.com','Outlook'],['user@yandex.ru','Яндекс Почта'],['user@ya.ru','Яндекс Почта']])test(`provider ${email}`,()=>assert.equal(helpers.emailProvider(email).name,provider));
 test('unknown and spoofed providers never become arbitrary links',()=>{for(const value of ['user@company.test','user@gmail.com.evil.test','a@gmail.com@evil.test','javascript:alert(1)'])assert.equal(helpers.emailProvider(value),null);});
 test('cooldown boundaries and callback preserve origin without redirect injection',()=>{

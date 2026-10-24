@@ -61,7 +61,7 @@ for(const ru of [true,false])for(const mode of ['login','signup','forgot','reset
   'next/navigation':{useRouter:()=>router},'lucide-react':{Eye:()=>null,EyeOff:()=>null,Mail:()=>null,LockKeyhole:()=>null},
   '@/lib/supabase/client':{createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'player'}},error:null}),signInWithPassword:send,signUp:send,resetPasswordForEmail:send,updateUser:send,signOut:async()=>({error:null})}})},
   '@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},'@/components/ui/input':ui,'@/components/ui/button':ui,
-  './EmailConfirmationPending':{__esModule:true,default:()=>null},'@/lib/auth/email-confirmation':{confirmationCallback:origin=>origin+'/auth/callback',CONFIRMATION_COOLDOWN_MS:60000,CONFIRMATION_COOLDOWN_KEY:'cooldown'},
+  './EmailConfirmationPending':{__esModule:true,default:()=>null},'@/lib/auth/email-confirmation':{confirmationCallback:origin=>origin+'/auth/callback',startConfirmationCooldown:()=>160000},
  },{window:{location:{origin:'https://preview.example'},dispatchEvent(){}},sessionStorage:{setItem(){}}});
  let view;await act(async()=>{view=create(React.createElement(Component,{reset:mode==='reset',onPendingChange:value=>pending.push(value)}));});
  if(mode==='signup'||mode==='forgot')await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')===(mode==='signup'?(ru?'Регистрация':'Sign up'):(ru?'Забыли пароль?':'Forgot password?'))).props.onClick());
