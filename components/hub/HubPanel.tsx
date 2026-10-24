@@ -24,6 +24,7 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
  const [creationGame,setCreationGame]=useState('dota2');
  const [query,setQuery]=useState(''); const [game,setGame]=useGameFilter();
  const loadGeneration=useRef(0);
+ const mutating=useRef(false);
  const invalidateLoads=useCallback(()=>{loadGeneration.current++;},[]);
  const load=useCallback((signal?:AbortSignal,strict=false)=>{
   const generation=++loadGeneration.current;
@@ -38,9 +39,11 @@ export default function HubPanel({section,own=false}:{section:Section;own?:boole
  const refreshCatalog=useCallback(()=>load(undefined,true),[load]);
  useEffect(()=>{const controller=new AbortController(); void load(controller.signal); return ()=>{controller.abort();invalidateLoads();};},[load,invalidateLoads]);
  async function mutate(payload:Record<string,unknown>) {
+  if(mutating.current)return;
+  mutating.current=true;
   setBusy(true); setError(''); setNotice('');
   try {const response=await fetch('/api/hub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(response.status===401){invalidateLoads();setData(null);setNotice('');setUnauth(true);throw new Error('Sign in required');}const result=await response.json();if(!response.ok) throw new Error(result.error); await refreshCatalog(); setNotice(ru?'Сохранено.':'Saved.');}
-  catch(e) {setError(e instanceof Error?e.message:'Could not save');} finally {setBusy(false);}
+  catch(e) {setError(e instanceof Error?e.message:'Could not save');} finally {mutating.current=false;setBusy(false);}
  }
  async function submit(event:FormEvent<HTMLFormElement>) {
   event.preventDefault(); const values:Record<string,unknown>=Object.fromEntries(new FormData(event.currentTarget));

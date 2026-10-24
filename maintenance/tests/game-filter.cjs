@@ -49,6 +49,19 @@ for(const ru of [true,false])for(const path of ['refresh','mutation'])test(`tour
 });
 
 const caption=node=>node.children.join('');
+for(const ru of [true,false])test(`rapid duplicate catalog actions send one mutation and allow retry after failure RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let posts=0,finish;
+ global.fetch=async(url,init={})=>init.method==='POST'?(++posts===1?new Promise(resolve=>{finish=resolve;}):Response.json({saved:true})):Response.json(hubFixture());
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
+ const approve=()=>view.root.findAllByType('button').find(b=>caption(b)===(ru?'Допустить':'Approve'));
+ await Renderer.act(async()=>{const click=approve().props.onClick;click();click();});
+ assert.equal(posts,1,'duplicate action was sent before React disabled the button');
+ await Renderer.act(async()=>{finish(Response.json({error:'Could not save'},{status:503}));await new Promise(resolve=>setImmediate(resolve));});
+ assert.equal(approve().props.disabled,false);
+ await Renderer.act(async()=>{approve().props.onClick();await new Promise(resolve=>setImmediate(resolve));});
+ assert.equal(posts,2);assert.equal(view.root.findAll(n=>n.props.role==='alert').length,0);assert.match(JSON.stringify(view.toJSON()),ru?/Сохранено\./:/Saved\./);
+ await Renderer.act(async()=>view.unmount());
+});
 for(const ru of [true,false])test(`successful action does not report a saved catalog after failed refresh RU=${ru}`,async t=>{
  const original=global.fetch;t.after(()=>{global.fetch=original;});let gets=0;
  global.fetch=async(url,init={})=>init.method==='POST'?Response.json({ok:true}):++gets===1?Response.json(hubFixture()):Response.json({error:'Unavailable'},{status:503});
