@@ -11,7 +11,12 @@ export default function TournamentResults({id,owner,ru,locked,name,players}:{id:
  const request=useRef<AbortController|null>(null);
  const fail=useCallback((e:unknown)=>{const message=e instanceof Error?e.message:'Unavailable';setError(message);if(message==='Sign in required'){request.current?.abort();setData(null);setState(null);setNotice('');}},[]);
  const text=(r:string,e:string)=>ru?r:e;
- const read=useCallback(async(signal?:AbortSignal)=>{const responses=await Promise.all([fetch(`/api/tournament-results?id=${id}`,{cache:'no-store',signal}),fetch(`/api/tournament-engine?id=${id}`,{cache:'no-store',signal})]);if(responses.some(r=>r.status===401))throw new Error('Sign in required');const [d,e]=await Promise.all(responses.map(r=>r.json()));if(!responses[0].ok||!responses[1].ok)throw new Error(d.error||e.error);return {d,e};},[id]);
+ const read=useCallback(async(signal?:AbortSignal)=>{
+  const responses=await Promise.all([`/api/tournament-results?id=${id}`,`/api/tournament-engine?id=${id}`].map(async url=>{
+   const response=await fetch(url,{cache:'no-store',signal});if(response.status===401)throw new Error('Sign in required');return response;
+  }));
+  const [d,e]=await Promise.all(responses.map(r=>r.json()));if(!responses[0].ok||!responses[1].ok)throw new Error(d.error||e.error);return {d,e};
+ },[id]);
  const refresh=useCallback(async()=>{request.current?.abort();const abort=new AbortController();request.current=abort;try{const {d,e}=await read(abort.signal);if(abort.signal.aborted)return false;setData(d);setState(e.state);setError('');return true;}catch(e){if(abort.signal.aborted)return false;throw e;}},[read]);
  useEffect(()=>{let active=true;void Promise.resolve().then(()=>active?refresh():false).catch(fail);return()=>{active=false;request.current?.abort();};},[refresh,fail]);
  async function save(payload:Record<string,unknown>){setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,...payload})});if(r.status===401)throw new Error('Sign in required');const d=await r.json();if(!r.ok)throw new Error(d.error);if(await refresh())setNotice(text('Сохранено. Результат в сетке публикует организатор.','Saved. The organizer publishes the result to the bracket.'));}catch(e){fail(e);}finally{setBusy(false);}}
