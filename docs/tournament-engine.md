@@ -63,9 +63,10 @@ manual `hub_action` cannot change an engine's entrants/results or bypass complet
   clearly labelled QA tournament. Setup/cleanup SQL is required because the service
   role intentionally does not receive direct writes to legacy competition tables.
 
-No payment, wallet, entry-fee or payout code is added. Remaining product work includes
-captain confirmation/disputes/evidence workflow, referee delegation, check-in,
-realtime subscriptions, per-match scheduling and a separately regulated third place.
+No payment, wallet, entry-fee or payout code is added. Captain reports, objections,
+evidence, scoped referees, check-in, realtime, per-match scheduling and regulated
+bronze are now implemented in the current Preview source. Their complete real-account
+acceptance remains tracked in `deafhub-status.md`; do not implement them again.
 
 ### Reproduce HTTP tests
 
@@ -92,7 +93,9 @@ The engine, request validation and `hub_engine_commit` SQL still limit entries t
 A 100-player FC tournament is **not supported**. Raising just the frontend limit
 would not upgrade the database. The project MCP denied read access and the dashboard
 required sign-in; no migration or live RLS verification was performed in this session.
-Individual FC registration also remains unimplemented in the team-based schema.
+That 19 October schema limitation was superseded by the 21 October individual-FC
+migrations: registration, skill levels and server group draw are implemented. The
+64-entry capacity limit remains; real individual-FC browser acceptance is still open.
 The UI does not ask an individual FC player to create a five-person team.
 
 Tournament filtering uses persisted server records through `filterTournaments`;

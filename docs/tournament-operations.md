@@ -22,8 +22,9 @@ to the same database checks; hiding a button is not the authorization boundary.
 Awards are derived from the finished persisted bracket, never entered as arbitrary
 placements. The organizer publishes one rule: no third place; shared bronze for Single
 semifinal losers; or bronze for the Double lower-final loser. With fewer than three
-ranked entrants, no fictional third place is generated. A separate bronze match is not
-implemented or inferred.
+ranked entrants, no fictional third place is generated. A separate Single bronze match
+is also supported when explicitly configured and regulated (`bronzeMatch` / `BR1`);
+its result is required before that award is derived. It is never inferred silently.
 
 Every registered roster member receives an individual award linked to their account.
 The snapshot stores the tournament title, game, team name, profile nickname (registered

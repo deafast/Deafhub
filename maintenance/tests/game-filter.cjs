@@ -30,12 +30,29 @@ function panel(ru,engine=none){return load('components/hub/HubPanel.tsx',{
  './TournamentOperations':{default:props=>React.createElement('button',{onClick:()=>void props.onSaved()},'QA refresh'),ProfileAwards:()=>null},
  './GameFilter':{default:GameFilter,useGameFilter:()=>React.useState('all')},'@/lib/tournament-filters':filters,
  '@/lib/tournament/fc-levels':{fcLevelLabel:value=>value},'@/lib/hub-history':load('lib/hub-history.ts'),
- '@/store/useLanguageStore':{useLanguageStore:selector=>selector({language:ru?'ru':'en'})},
+ '@/store/useLanguageStore':{useLanguageStore:selector=>selector({language:(typeof ru==='function'?ru():ru)?'ru':'en'})},
  }).default;}
 function hubFixture(){return {userId:'me',organizer:true,engineIds:[],engines:[],matches:[],stats:{matches:0,wins:0,draws:0},steamId:null,invites:[],ownEntryIds:['entry'],
  teams:[{id:'team',name:'PRIVATE REGISTERED TEAM',game:'cs2',captain_id:'me'}],members:[{team_id:'team',user_id:'me',nickname:'PRIVATE PLAYER'}],
  entries:[{id:'entry',team_id:'team',tournament_id:'event',status:'pending'}],
  tournaments:[{id:'event',game:'cs2',title:'PRIVATE TOURNAMENT',organizer_id:'me',starts_at:'2027-01-01T12:00:00Z',status:'open',rules:'Published tournament regulation',rules_version:'rules',roster_size:5}]};}
+for(const ru of [true,false])test(`catalog tournament date states UTC independent of device timezone RU=${ru}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});global.fetch=async()=>Response.json(hubFixture());
+ let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
+ const date=view.root.findAllByType('p').map(n=>n.children.join('')).find(text=>text.includes('2027'));
+ assert.match(date,/12:00:00 UTC/,'tournament start must name its UTC timezone and preserve the saved instant');
+ await Renderer.act(async()=>view.unmount());
+});
+for(const initialRu of [true,false])test(`catalog saved notice follows a language change without another save RU=${initialRu}`,async t=>{
+ const original=global.fetch;t.after(()=>{global.fetch=original;});let requests=0,ru=initialRu;
+ global.fetch=async(_url,options={})=>{requests++;return Response.json(options.method==='POST'?{saved:true}:hubFixture());};
+ const Component=panel(()=>ru);let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(Component,{section:'tournaments'}));});
+ await Renderer.act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Допустить':'Approve')).props.onClick());
+ const before=requests;ru=!ru;await Renderer.act(async()=>view.update(React.createElement(Component,{section:'tournaments'})));
+ const statuses=view.root.findAll(n=>n.props.role==='status').map(n=>n.children.join(''));
+ assert.ok(statuses.includes(ru?'Сохранено.':'Saved.'),'saved feedback retained the previous language');
+ assert.equal(requests,before,'changing language must not repeat the save or catalog request');await Renderer.act(async()=>view.unmount());
+});
 for(const ru of [true,false])for(const path of ['refresh','mutation'])test(`tournament catalog clears private data and actions after ${path} 401 RU=${ru}`,async t=>{
  const before=global.fetch;t.after(()=>{global.fetch=before;});let expired=false;
  global.fetch=async()=>expired?Response.json({error:'Sign in required'},{status:401}):Response.json(hubFixture());
