@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -26,6 +26,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
     const [confirmation, setConfirmation] = useState('');
     const [visible, setVisible] = useState(false);
     const [pending, setPending] = useState(false);
+    const inFlight = useRef(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const [awaitingEmail,setAwaitingEmail]=useState('');
@@ -56,7 +57,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
 
     async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        if (locked || (mode === 'reset' && (!canReset || resetDone))) return;
+        if (inFlight.current || locked || (mode === 'reset' && (!canReset || resetDone))) return;
         setError('');
         setMessage('');
         if ((mode === 'signup' || mode === 'reset') && password !== confirmation) {
@@ -68,6 +69,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
             setError(ru ? 'Вход временно недоступен.' : 'Sign-in is temporarily unavailable.');
             return;
         }
+        inFlight.current = true;
         setPending(true);
         onPendingChange?.(true);
         try {
@@ -95,7 +97,12 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
                 setConfirmation('');
                 setResetDone(true);
                 setMessage(ru ? 'Пароль изменён. Теперь можно войти с новым паролем.' : 'Password updated. You can now sign in with your new password.');
-                await client.auth.signOut();
+                try {
+                    const { error: signOutError } = await client.auth.signOut();
+                    if (signOutError) throw signOutError;
+                } catch {
+                    setError(ru ? 'Пароль изменён, но не удалось выйти. Повторите выход через меню аккаунта.' : 'Password updated, but sign-out failed. Try signing out from the account menu.');
+                }
             } else {
                 const { error } = await client.auth.signInWithPassword({ email: email.trim(), password });
                 if (error) throw error;
@@ -110,6 +117,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
             else if (mode === 'login') setError(ru ? 'Не удалось войти. Проверьте почту, пароль и подтверждение адреса.' : 'Could not sign in. Check your email, password and email confirmation.');
             else setError(ru ? 'Не удалось выполнить запрос. Повторите попытку позже.' : 'Could not complete the request. Please try again later.');
         } finally {
+            inFlight.current = false;
             setPending(false);
             onPendingChange?.(false);
         }

@@ -34,8 +34,9 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
         setBusy(true);
         stopWaiting.current?.();
         let cancelled = false;
+        const request = new AbortController();
         let timer: ReturnType<typeof setInterval> | undefined;
-        const stop = () => { cancelled = true; if (timer) clearInterval(timer); popup.close(); };
+        const stop = () => { cancelled = true; request.abort(); if (timer) clearInterval(timer); popup.close(); };
         stopWaiting.current = stop;
         try {
             popup.sessionStorage.setItem('deafhub-auth-popup', '1');
@@ -51,9 +52,10 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
                     if (cancelled) return;
                     let complete = Boolean(user);
                     if (user) {
-                        const result = await fetch('/auth/steam/status', { cache: 'no-store' });
+                        const result = await fetch('/auth/steam/status', { cache: 'no-store', signal: request.signal });
                         complete = result.ok && Boolean((await result.json()).linked);
                     }
+                    if (cancelled) return;
                     if (complete) {
                         stop();
                         setBusy(false);
