@@ -15,29 +15,38 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
  const [updates,setUpdates]=useState<UpdateStatus>('connecting'),[signedOut,setSignedOut]=useState(false);
  const canManage=owner&&!signedOut;
  const latestRevision=useRef(initial?.revision||0),catalogRevision=useRef(initial?.revision||0),request=useRef<AbortController|null>(null);
+ const active=useRef(false),saving=useRef(false),sessionGeneration=useRef(0);
+ useEffect(()=>{active.current=true;return()=>{active.current=false;request.current?.abort();};},[]);
+ const clearSession=useCallback(()=>{sessionGeneration.current++;request.current?.abort();setSignedOut(true);setState(null);setRevision(0);latestRevision.current=0;catalogRevision.current=0;},[]);
  const accept=useCallback((data:{state:State|null;revision:number})=>{if(data.revision<latestRevision.current)return;latestRevision.current=data.revision;setState(data.state);setRevision(data.revision);},[]);
  const load=useCallback(async()=>{
+  if(!active.current)return;
   request.current?.abort();const controller=new AbortController();request.current=controller;
   const response=await fetch(`/api/tournament-engine?id=${id}`,{cache:'no-store',signal:controller.signal});
-  if(controller.signal.aborted)return;
-  if(response.status===401){setSignedOut(true);setState(null);setRevision(0);latestRevision.current=0;catalogRevision.current=0;await onSaved().catch(()=>{});throw new Error('Sign in required');}
+  if(!active.current||controller.signal.aborted)return;
+  if(response.status===401){clearSession();await onSaved().catch(()=>{});throw new Error('Sign in required');}
   if(!response.ok)throw new Error('Tournament engine unavailable');
-  const data=await response.json();if(!controller.signal.aborted){accept(data);setSignedOut(false);setError('');if(data.revision>catalogRevision.current){await onSaved();catalogRevision.current=Math.max(catalogRevision.current,data.revision);}}
- },[id,accept,onSaved]);
+  const data=await response.json();if(active.current&&!controller.signal.aborted){accept(data);setSignedOut(false);setError('');if(data.revision>catalogRevision.current){await onSaved();if(active.current&&!controller.signal.aborted)catalogRevision.current=Math.max(catalogRevision.current,data.revision);}}
+ },[id,accept,onSaved,clearSession]);
  useEffect(()=>{
   if(demo)return;const client=createClient();if(!client)return;
-  const updates=startTournamentUpdates(client,id,()=>load().catch(e=>{if(e.name!=='AbortError')setError('Tournament engine unavailable');}),setUpdates);
+  const updates=startTournamentUpdates(client,id,()=>load().catch(e=>{if(active.current&&e.name!=='AbortError')setError('Tournament engine unavailable');}),setUpdates);
   const visible=()=>{if(document.visibilityState==='visible')updates.refresh();};
   document.addEventListener('visibilitychange',visible);
   return()=>{updates.stop();request.current?.abort();document.removeEventListener('visibilitychange',visible);};
  },[id,demo,load]);
  async function save(command:Command|{type:'launch';config:Config;entries:string[]}) {
+  if(!active.current||saving.current)return;
+  saving.current=true;const generation=sessionGeneration.current;
+  const current=()=>active.current&&generation===sessionGeneration.current;
   setBusy(true);setError('');
   try {
    const response=await fetch('/api/tournament-engine',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:id,revision,request_id:crypto.randomUUID(),command})});
-   const data=await response.json();if(!response.ok)throw new Error(data.error);
+   if(!current())return;
+   if(response.status===401){clearSession();setError('Sign in required');await onSaved().catch(()=>{});return;}
+   const data=await response.json();if(!current())return;if(!response.ok)throw new Error(data.error);
    accept(data);await onSaved();
-  }catch(e){setError(e instanceof Error?e.message:'Could not save');await load().catch(()=>{});}finally{setBusy(false);}
+  }catch(e){if(!current())return;setError(e instanceof Error?e.message:'Could not save');await load().catch(()=>{});}finally{saving.current=false;if(active.current)setBusy(false);}
  }
  function launch(event:FormEvent<HTMLFormElement>) {
   event.preventDefault();const values=new FormData(event.currentTarget),count=Number(values.get('groups'));
@@ -76,7 +85,7 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
  'Revision conflict; reload tournament':'Данные изменились. Обновите турнир перед сохранением.',
  }[error]||error):error}</p>:null}
  {!demo?<p role="status" className="mt-3 text-sm text-white/60">{updates==='live'?text('Автообновление подключено','Live updates connected'):updates==='fallback'?text('Связь прервана: проверяем обновления каждые 30 секунд','Connection interrupted: checking updates every 30 seconds'):text('Подключаем автообновление…','Connecting live updates…')}</p>:null}
- {!demo?<button disabled={busy} type="button" className="mt-3 text-sm text-[#22D3EE]" onClick={()=>void load().catch(e=>setError(e.message))}>{text('Обновить этапы','Refresh stages')}</button>:null}
+ {!demo?<button disabled={busy} type="button" className="mt-3 text-sm text-[#22D3EE]" onClick={()=>void load().catch(e=>{if(active.current)setError(e.message);})}>{text('Обновить этапы','Refresh stages')}</button>:null}
  {!state?(canManage?<form onSubmit={launch} className="mt-4 grid gap-4 sm:grid-cols-2">
   <p className="text-sm text-white/60 sm:col-span-2">{text('Запуск закрывает регистрацию и фиксирует допущенные команды. Сначала рассмотрите все заявки. Группы распределяются по очереди из списка команд по названию. Очки и порядок тай-брейков должны соответствовать опубликованному регламенту: очки → победы → разница → забито; оставшееся равенство решает организатор.','Launching closes registration and locks approved entries. Review every entry first. Groups alternate through entries sorted by name. Publish matching rules: points → wins → difference → scored; the organizer resolves remaining ties.')}</p>
   <label>{text('Плей-офф','Playoffs')}<select name="format" className={field}><option value="single">Single Elimination</option><option value="double">Double Elimination</option></select></label>
