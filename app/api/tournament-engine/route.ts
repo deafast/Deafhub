@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import {declaredBodyTooLarge,readBoundedJson} from '@/lib/request-body';
 import { createTournament, transition, type State } from '@/lib/tournament/engine';
 import {drawFcGroups} from '@/lib/tournament/fc-groups';
 import type {FcLevel} from '@/lib/tournament/fc-levels';
@@ -35,10 +36,11 @@ export async function GET(req:NextRequest) {
 }
 export async function POST(req:NextRequest) {
  if(req.headers.get('origin')!==req.nextUrl.origin)return reply({error:'Forbidden'},403);
- if(Number(req.headers.get('content-length'))>100000)return reply({error:'Request too large'},413);
+ if(declaredBodyTooLarge(req,100000))return reply({error:'Request too large'},413);
  const client=await createClient(),admin=createAdminClient();if(!client||!admin)return reply({error:'Unavailable'},503);
  const {data:{user},error}=await client.auth.getUser();if(error||!user)return reply({error:'Sign in required'},401);
- const parsed=payload.safeParse(await req.json().catch(()=>null));if(!parsed.success)return reply({error:'Check all fields'},400);
+ const body=await readBoundedJson(req,100000);if(body.tooLarge)return reply({error:'Request too large'},413);
+ const parsed=payload.safeParse(body.value);if(!parsed.success)return reply({error:'Check all fields'},400);
  const p=parsed.data;
  const [t,role,stored,prior]=await Promise.all([
   client.from('hub_tournaments').select('game,organizer_id').eq('id',p.tournament_id).maybeSingle(),

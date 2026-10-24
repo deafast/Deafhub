@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import {declaredBodyTooLarge,readBoundedJson} from '@/lib/request-body';
 import type { State } from '@/lib/tournament/engine';
 import type { HubData } from '@/lib/hub-types';
 const uuid=z.string().uuid();
@@ -75,11 +76,13 @@ export async function GET(request:NextRequest) {
 }
 export async function POST(request:NextRequest) {
  if(request.headers.get('origin')!==request.nextUrl.origin) return NextResponse.json({error:'Forbidden'},{status:403,headers});
+ if(declaredBodyTooLarge(request,100000))return NextResponse.json({error:'Request too large'},{status:413,headers});
  const client=await createClient();
  if(!client) return NextResponse.json({error:'Unavailable'},{status:503,headers});
  const {data:{user},error}=await client.auth.getUser();
  if(error||!user) return NextResponse.json({error:'Sign in required'},{status:401,headers});
- const parsed=actionSchema.safeParse(await request.json().catch(()=>null));
+ const body=await readBoundedJson(request,100000);if(body.tooLarge)return NextResponse.json({error:'Request too large'},{status:413,headers});
+ const parsed=actionSchema.safeParse(body.value);
  if(!parsed.success) return NextResponse.json({error:'Check all fields'},{status:400,headers});
  const {action,...p}=parsed.data;
  const {data,error:rpcError}=parsed.data.action==='register_fc'

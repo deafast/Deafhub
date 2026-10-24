@@ -16,7 +16,7 @@ function fixture(count,{cap=1000,guest=false,failAt=Infinity,repeat=false,select
    }).then(resolve,reject);
   }};return q;
  }};
- const scope={exports:{},require:name=>name==='next/server'?{NextResponse:{json:(value,init)=>Response.json(value,init)}}:name==='@/lib/supabase/server'?{createClient:async()=>client}:require(name)};
+ const scope={exports:{},require:name=>name==='@/lib/request-body'?require('../test-support/request-body.cjs'):name==='next/server'?{NextResponse:{json:(value,init)=>Response.json(value,init)}}:name==='@/lib/supabase/server'?{createClient:async()=>client}:require(name)};
  vm.runInNewContext(ts.transpileModule(fs.readFileSync('app/api/hub/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,scope);
  return {calls,get:()=>scope.exports.GET({nextUrl:new URL('https://preview.example/api/hub'+(selected?'?tournament='+tid:''))})};
 }

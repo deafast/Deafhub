@@ -14,7 +14,7 @@ function fixture({count=1205,cap=1000,guest=false,failTable=null,repeat=false,pr
    const offset=repeat&&table==='hub_award_batches'?0:f.offset;return {data:rows.slice(offset,offset+Math.min(cap,f.size)),error:null};
   }).then(resolve,reject);}};return q;
  }};
- const scope={exports:{},require:name=>name==='next/server'?{NextResponse:{json:(value,options)=>Response.json(value,options)}}:name==='@/lib/supabase/server'?{createClient:async()=>client}:require(name)};
+ const scope={exports:{},require:name=>name==='@/lib/request-body'?require('../test-support/request-body.cjs'):name==='next/server'?{NextResponse:{json:(value,options)=>Response.json(value,options)}}:name==='@/lib/supabase/server'?{createClient:async()=>client}:require(name)};
  vm.runInNewContext(ts.transpileModule(fs.readFileSync('app/api/tournament-operations/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,scope);
  return {calls,get:()=>scope.exports.GET({nextUrl:new URL('https://preview.example/api/tournament-operations?'+(profile?'profile=me':'id='+tid))})};
 }

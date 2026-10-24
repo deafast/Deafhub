@@ -1,4 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';import {z} from 'zod';import {createClient} from '@/lib/supabase/server';
+import {declaredBodyTooLarge,readBoundedJson} from '@/lib/request-body';
 const uuid=z.string().uuid(),score=z.number().int().min(0).max(1000),common={tournament_id:uuid,match_id:z.string().min(1).max(64)};
 const payload=z.discriminatedUnion('action',[
  z.object({action:z.literal('configure'),tournament_id:uuid,required:z.boolean()}),
@@ -57,9 +58,10 @@ export async function GET(req:NextRequest){
 }
 export async function POST(req:NextRequest){
  if(req.headers.get('origin')!==req.nextUrl.origin)return reply({error:'Forbidden'},403);
- if(Number(req.headers.get('content-length'))>12000)return reply({error:'Request too large'},413);
+ if(declaredBodyTooLarge(req,12000))return reply({error:'Request too large'},413);
  const client=await createClient();if(!client)return reply({error:'Unavailable'},503);const {data:{user},error}=await client.auth.getUser();if(error||!user)return reply({error:'Sign in required'},401);
- const parsed=payload.safeParse(await req.json().catch(()=>null));if(!parsed.success)return reply({error:'Check all fields'},400);
+ const body=await readBoundedJson(req,12000);if(body.tooLarge)return reply({error:'Request too large'},413);
+ const parsed=payload.safeParse(body.value);if(!parsed.success)return reply({error:'Check all fields'},400);
  const {action,...p}=parsed.data;const result=await client.rpc('hub_result_action',{action,p});
  const allowed=['Organizer required','Tournament not found','Result rules are locked','Registered participant required','Playable match required','Revoke awards before correcting results','Match captain required','Report changed; refresh the match','Explain the dispute','Referee required','A participant cannot adjudicate their match','Explain the decision','Invalid result report'];
  if(result.error)return reply({error:allowed.includes(result.error.message)?result.error.message:'Could not save match report'},['Organizer required','Match captain required','Referee required'].includes(result.error.message)?403:400);

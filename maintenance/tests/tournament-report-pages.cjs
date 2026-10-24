@@ -19,7 +19,7 @@ function fixture(count,maxRows=1000,{guest=false,failReportsAt=Infinity,repeat=f
   }).then(resolve,reject)}};return q;
  }};
  const source=readFileSync('app/api/tournament-results/route.ts','utf8');const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- const scope={exports:{},require:name=>name==='next/server'?{NextResponse:{json:(v,init)=>Response.json(v,init)}}:name==='@/lib/supabase/server'?{createClient:async()=>client}:require(name)};vm.runInNewContext(code,scope);
+ const scope={exports:{},require:name=>name==='@/lib/request-body'?require('../test-support/request-body.cjs'):name==='next/server'?{NextResponse:{json:(v,init)=>Response.json(v,init)}}:name==='@/lib/supabase/server'?{createClient:async()=>client}:require(name)};vm.runInNewContext(code,scope);
  return {get:()=>scope.exports.GET({nextUrl:new URL('https://preview.example/api/tournament-results?id='+tid)}),calls};
 }
 test('report GET reads 1205 reports and 2410 votes beyond one REST response',async()=>{const f=fixture(1205);const r=await f.get();assert.equal(r.status,200);const d=await r.json();assert.equal(d.reports.length,1205);assert.equal(new Set(d.reports.map(x=>x.id)).size,1205);assert.equal(d.confirmations.length,2410);assert.ok(f.calls.filter(c=>c.table==='hub_current_result_reports').every(c=>c.eq.tournament_id===tid));assert.ok(f.calls.filter(c=>c.table==='hub_result_confirmations').every(c=>c.in[1].length<=80));});

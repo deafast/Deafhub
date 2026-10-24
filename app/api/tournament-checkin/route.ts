@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {z} from 'zod';
 import {createClient} from '@/lib/supabase/server';
+import {declaredBodyTooLarge,readBoundedJson} from '@/lib/request-body';
 const uuid=z.string().uuid();
 const payload=z.discriminatedUnion('action',[
  z.object({action:z.literal('configure'),tournament_id:uuid,enabled:z.boolean(),opens_at:z.string().datetime().nullable(),closes_at:z.string().datetime().nullable(),reason:z.string().trim().min(3).max(500)}),
@@ -23,10 +24,11 @@ export async function GET(req:NextRequest){
 }
 export async function POST(req:NextRequest){
  if(req.headers.get('origin')!==req.nextUrl.origin)return reply({error:'Forbidden'},403);
- if(Number(req.headers.get('content-length'))>10000)return reply({error:'Request too large'},413);
+ if(declaredBodyTooLarge(req,10000))return reply({error:'Request too large'},413);
  const client=await createClient();if(!client)return reply({error:'Unavailable'},503);
  const {data:{user},error}=await client.auth.getUser();if(error||!user)return reply({error:'Sign in required'},401);
- const parsed=payload.safeParse(await req.json().catch(()=>null));if(!parsed.success)return reply({error:'Check all fields'},400);
+ const body=await readBoundedJson(req,10000);if(body.tooLarge)return reply({error:'Request too large'},413);
+ const parsed=payload.safeParse(body.value);if(!parsed.success)return reply({error:'Check all fields'},400);
  const {action,...p}=parsed.data;
  const result=await client.rpc('hub_checkin_action',{action,p});
  const allowed=['Organizer required','Tournament not found','Check-in is locked after launch','Reason required','Invalid check-in window','Approved registered player required','Refresh the check-in window','Check-in window is closed','Registered roster is incomplete','Confirm current participation rules first'];
