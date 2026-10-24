@@ -13,6 +13,17 @@ const headers={'Cache-Control':'private, no-store'};
 const reply=(data:unknown,status=200)=>NextResponse.json(data,{status,headers});
 type Client=NonNullable<Awaited<ReturnType<typeof createClient>>>;
 type EntryRow={entry_id:string;user_id?:string;[key:string]:unknown};
+type BatchRow={id:string;[key:string]:unknown};
+async function readAwardBatches(client:Client,id:string){
+ const data:BatchRow[]=[],seen=new Set<string>();let offset=0;
+ for(;;){
+  const page=await client.from('hub_award_batches').select('*').eq('tournament_id',id).order('created_at',{ascending:false}).order('id').range(offset,offset+199);
+  if(page.error||!page.data)return {data:null,error:true};
+  if(!page.data.length)return {data,error:false};
+  for(const row of page.data as BatchRow[]){if(seen.has(row.id)||data.length>=5000)return {data:null,error:true};seen.add(row.id);data.push(row);}
+  offset+=page.data.length;
+ }
+}
 async function readEntries(client:Client,id:string){
  const data:{id:string}[]=[],seen=new Set<string>();let offset=0;
  for(;;){
@@ -24,18 +35,18 @@ async function readEntries(client:Client,id:string){
  }
 }
 // Order by each table's primary key and retain authenticated RLS on each page.
-async function readEntryRows(client:Client,table:'hub_entry_players'|'hub_entry_attestations'|'hub_eligibility_reviews',ids:string[]){
+async function readEntryRows(client:Client,table:'hub_entry_players'|'hub_entry_attestations'|'hub_eligibility_reviews'|'hub_awards',ids:string[]){
  const data:EntryRow[]=[],seen=new Set<string>();
  for(let start=0;start<ids.length;start+=80){
   const batch=ids.slice(start,start+80);let offset=0;
   for(;;){
-   let query=client.from(table).select('*').in('entry_id',batch).order('entry_id');
-   if(table!=='hub_eligibility_reviews')query=query.order('user_id');
+   let query=client.from(table).select('*').in('entry_id',batch).order(table==='hub_awards'?'id':'entry_id');
+   if(table==='hub_entry_players'||table==='hub_entry_attestations')query=query.order('user_id');
    const page=await query.range(offset,offset+199);
    if(page.error||!page.data)return {data:null,error:true};
    if(!page.data.length)break;
    for(const row of page.data as EntryRow[]){
-    const key=row.entry_id+'/'+(row.user_id??'');
+    const key=table==='hub_awards'?String(row.id):row.entry_id+'/'+(row.user_id??'');
     if(seen.has(key)||data.length>=5000)return {data:null,error:true};
     seen.add(key);data.push(row);
    }
@@ -60,8 +71,8 @@ export async function GET(req:NextRequest){
   readEntryRows(client,'hub_entry_players',ids),
   readEntryRows(client,'hub_entry_attestations',ids),
   readEntryRows(client,'hub_eligibility_reviews',ids),
-  client.from('hub_award_batches').select('*').eq('tournament_id',tid.data).order('created_at',{ascending:false}),
-  client.from('hub_awards').select('*').in('entry_id',ids),
+  readAwardBatches(client,tid.data),
+  readEntryRows(client,'hub_awards',ids),
   client.from('hub_ops_audit').select('*').eq('tournament_id',tid.data).order('created_at',{ascending:false}).limit(100),
   client.from('hub_engine_audit').select('revision,command,actor_id,created_at').eq('tournament_id',tid.data).order('revision',{ascending:false}).limit(100),
  ]);

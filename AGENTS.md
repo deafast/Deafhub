@@ -26,3 +26,11 @@
 - Fetch and compare remote state at the start of a work session and before pushing. Do not repeatedly fetch unchanged files through the GitHub connector or download ZIP copies for routine local work.
 - Run checks appropriate to the change locally, then commit and push verified changes to the Preview branch. Report actual commit SHAs and distinguish local verification from deployed Preview checks.
 - Never modify `main`, production `www.deafhub.cc`, payments, or approved design without the owner's explicit authorization for that scope.
+
+## AUTONOMOUS CONTINUATION (OWNER REQUIREMENT)
+- Continue technically available tasks from unfinished, planned, and deferred work without waiting for another user message after a fix or package. Keep FC/FIFA last.
+- Use docs/codex-checkpoint.md and docs/deafhub-status.md to resume; do not repeat the general project audit or redevelop completed features.
+- Reproduce concrete defects and run targeted checks after edits. Run shared checks once per logically connected package unless new changes or failures justify another run.
+- Accumulate verified edits locally. Update both continuation documents and create one logical commit per completed package; synchronize verified packages to preview/deafhub-setup without pushing every small step.
+- Record a blocked task and its exact cause, then move to another available task. Do not bypass access restrictions or require approval again for work already authorized.
+- Keep updates brief and factual. A package report is not a reason to stop. When the session must end, preserve progress and the next concrete task in checkpoint; report checks, real SHAs, and remaining work honestly.
