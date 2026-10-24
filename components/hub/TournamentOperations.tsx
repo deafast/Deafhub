@@ -28,11 +28,19 @@ export default function TournamentOperations({id,owner,ru,status,locked,entries,
  const dataGeneration=useRef(0);
  const sessionGeneration=useRef(0);
  const loadingOwner=useRef(0);
+ const request=useRef<AbortController|null>(null);
  const active=useRef(true),saving=useRef(false);
- useEffect(()=>{active.current=true;return()=>{active.current=false;};},[]);
+ useEffect(()=>{active.current=true;return()=>{active.current=false;request.current?.abort();};},[]);
  const text=(r:string,e:string)=>ru?r:e;
- function requireSession(response:Response){if(response.status===401){dataGeneration.current++;sessionGeneration.current++;setData(null);setNotice('');const message=text('Войдите снова, чтобы открыть условия и награды.','Sign in again to view rules and awards.');setError(message);throw new Error(message);}}
- async function load(force=false){if(!active.current||(fetching.current&&!force))return false;fetching.current=true;const generation=++dataGeneration.current;loadingOwner.current=generation;setLoading(true);setError('');setNotice('');try{const r=await fetch(`/api/tournament-operations?id=${id}`,{cache:'no-store'});if(!active.current||generation!==dataGeneration.current)return false;requireSession(r);const d=await r.json();if(!active.current||generation!==dataGeneration.current)return false;if(!r.ok)throw new Error(d.error);setData(d);return true;}finally{if(active.current&&loadingOwner.current===generation){fetching.current=false;setLoading(false);}}}
+ function requireSession(response:Response){if(response.status===401){dataGeneration.current++;sessionGeneration.current++;request.current?.abort();setData(null);setNotice('');const message=text('Войдите снова, чтобы открыть условия и награды.','Sign in again to view rules and awards.');setError(message);throw new Error(message);}}
+ async function load(force=false){
+  if(!active.current||(fetching.current&&!force))return false;
+  request.current?.abort();const abort=new AbortController();request.current=abort;
+  fetching.current=true;const generation=++dataGeneration.current;loadingOwner.current=generation;setLoading(true);setError('');setNotice('');
+  try{const r=await fetch(`/api/tournament-operations?id=${id}`,{cache:'no-store',signal:abort.signal});if(abort.signal.aborted||!active.current||generation!==dataGeneration.current)return false;requireSession(r);const d=await r.json();if(abort.signal.aborted||!active.current||generation!==dataGeneration.current)return false;if(!r.ok)throw new Error(d.error);setData(d);return true;}
+  catch(e){if(abort.signal.aborted)return false;throw e;}
+  finally{if(active.current&&loadingOwner.current===generation){fetching.current=false;setLoading(false);}}
+ }
  async function save(payload:Record<string,unknown>){if(!active.current||saving.current)return;saving.current=true;const generation=sessionGeneration.current,current=()=>active.current&&generation===sessionGeneration.current;setBusy(true);setError('');setNotice('');try{const r=await fetch('/api/tournament-operations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!current())return;requireSession(r);const d=await r.json();if(!current())return;if(!r.ok)throw new Error(d.error);if(!await load(true)||!current())return;await onSaved();if(current())setNotice(text('Сохранено.','Saved.'));}catch(e){if(current())setError(e instanceof Error?e.message:'Could not save');}finally{saving.current=false;if(active.current)setBusy(false);}}
  function policySubmit(event:FormEvent<HTMLFormElement>){event.preventDefault();const f=new FormData(event.currentTarget);void save({action:'set_policy',tournament_id:id,body:f.get('body'),bronze:f.get('bronze'),require_acceptance:f.get('require_acceptance')==='on'});}
  const [entryQuery,setEntryQuery]=useState(''),[entryStatus,setEntryStatus]=useState('');
