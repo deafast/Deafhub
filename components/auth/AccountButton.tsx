@@ -19,6 +19,12 @@ export default function AccountButton() {
     useEffect(() => { dialogOpen.current = open; }, [open]);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
+    const mounted = useRef(false);
+    const signingOut = useRef(false);
+    useEffect(() => {
+        mounted.current = true;
+        return () => { mounted.current = false; };
+    }, []);
 
     useEffect(() => {
         const client = createClient();
@@ -52,20 +58,24 @@ export default function AccountButton() {
     }, [router]);
 
     async function signOut() {
+        if (!mounted.current || signingOut.current) return;
+        signingOut.current = true;
         setBusy(true);
         setError('');
         try {
             const client = createClient();
             if (!client) throw new Error('Unavailable');
             const { error } = await client.auth.signOut();
+            if (!mounted.current) return;
             if (error) throw error;
             authGeneration.current++;
             setSignedIn(false);
             router.replace('/');
             router.refresh();
         } catch {
+            if (!mounted.current) return;
             setError(ru ? 'Не удалось выйти. Повторите попытку.' : 'Could not sign out. Please try again.');
-        } finally { setBusy(false); }
+        } finally { signingOut.current = false; if (mounted.current) setBusy(false); }
     }
 
     if (signedIn) return <div className="flex flex-wrap items-center gap-2">

@@ -34,3 +34,6 @@
 - Accumulate verified edits locally. Update both continuation documents and create one logical commit per completed package; synchronize verified packages to preview/deafhub-setup without pushing every small step.
 - Record a blocked task and its exact cause, then move to another available task. Do not bypass access restrictions or require approval again for work already authorized.
 - Keep updates brief and factual. A package report is not a reason to stop. When the session must end, preserve progress and the next concrete task in checkpoint; report checks, real SHAs, and remaining work honestly.
+
+## OWNER BROWSER FOR QA
+- Use only Brave for the owner's DEAF|HUB browser checks. Do not launch or use Google Chrome or its profiles for this project.
