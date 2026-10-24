@@ -75,3 +75,52 @@ for(const ru of [true,false])for(const mode of ['login','signup','forgot','reset
  await act(async()=>{finish({data:{session:null},error:null});await retry;});assert.deepEqual(pending,[true,false,true,false]);
  await act(async()=>view.unmount());
 });
+
+async function steamReturnFixture(ru,phase='ready'){
+ let poll,finish,closed=0,requests=0;const routes=[],events=[],timers=new Set(),signals=[];
+ const popup={sessionStorage:{setItem(){}},location:{href:''},close:()=>closed++};
+ const user={data:{user:{id:'current-player'}}};
+ const client={auth:{getUser:()=>phase==='user'?new Promise(resolve=>{finish=()=>resolve(user);}):Promise.resolve(user)}};
+ const Component=load('components/auth/AuthPanel.tsx',{
+  'next/navigation':{useRouter:()=>({replace:path=>routes.push(path),refresh(){}})},
+  'next/image':{__esModule:true,default:()=>null},'./EmailAuth':{__esModule:true,default:()=>null},
+  '@/lib/supabase/client':{createClient:()=>client},'@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},'@/components/ui/button':ui,
+ },{URL,window:{location:{origin:'https://preview.example'},open:()=>popup,dispatchEvent:event=>events.push(event.type)},fetch:async(_url,init)=>{
+  if(++requests===1)return Response.json({enabled:true});
+  signals.push(init.signal);
+  if(phase==='response')return new Promise(resolve=>{finish=()=>resolve(Response.json({linked:true}));});
+  if(phase==='json')return {ok:true,json:()=>new Promise(resolve=>{finish=()=>resolve({linked:true});})};
+  return Response.json({linked:false});
+ },setInterval:callback=>{poll=callback;timers.add(callback);return callback;},clearInterval:timer=>timers.delete(timer)});
+ let view;await act(async()=>{view=create(React.createElement(Component,{steamOnly:true}));});
+ const start=()=>view.root.findAllByType('button')[0].props.onClick();await act(async()=>start());
+ popup.location.href='https://steamcommunity.com/openid/login';
+ return {view,popup,routes,events,timers,signals,start,tick:()=>poll(),finish:()=>finish(),closed:()=>closed};
+}
+for(const ru of [true,false])for(const phase of ['ready','user','response','json'])test(`Steam callback return failure stops waiting and ignores delayed ${phase} RU=${ru}`,async()=>{
+ const f=await steamReturnFixture(ru,phase);let pending;
+ if(phase!=='ready')await act(async()=>{pending=f.tick();});
+ f.popup.location.href='https://preview.example/sign-in?error=steam';
+ await act(async()=>{await f.tick();});
+ assert.equal(f.view.root.findAllByType('button')[0].props.disabled,false,'callback rejection must release the form before the three-minute timeout');
+ assert.equal(f.timers.size,0);assert.ok(f.closed()>0);assert.ok(f.signals.every(signal=>signal.aborted));
+ const alert=f.view.root.findAll(n=>n.props.role==='alert');assert.equal(alert.length,1);
+ assert.match(alert[0].children.join(''),ru?/Вход не завершён/:/Sign-in was not completed/);
+ if(pending)await act(async()=>{f.finish();await pending;});
+ assert.deepEqual(f.routes,[]);assert.deepEqual(f.events,[]);
+ if(phase==='ready'){
+  await act(async()=>f.start());
+  assert.equal(f.view.root.findAll(n=>n.props.role==='alert').length,0);assert.equal(f.timers.size,1);
+  assert.equal(f.view.root.findAllByType('button')[0].props.disabled,true);
+ }
+ await act(async()=>f.view.unmount());
+});
+for(const ru of [true,false])for(const page of ['foreign-origin','different-path','different-error','cross-origin-access'])test(`Steam callback return ignores ${page} RU=${ru}`,async()=>{
+ const f=await steamReturnFixture(ru);
+ if(page==='cross-origin-access')Object.defineProperty(f.popup,'location',{get(){throw new DOMException('Cross-origin access','SecurityError');}});
+ else f.popup.location.href=page==='foreign-origin'?'https://untrusted.example/sign-in?error=steam':page==='different-path'?'https://preview.example/other?error=steam':'https://preview.example/sign-in?error=callback';
+ await act(async()=>{await f.tick();});
+ assert.equal(f.view.root.findAllByType('button')[0].props.disabled,true);assert.equal(f.timers.size,1);
+ assert.equal(f.closed(),0);assert.equal(f.view.root.findAll(n=>n.props.role==='alert').length,0);
+ assert.deepEqual(f.routes,[]);assert.deepEqual(f.events,[]);await act(async()=>f.view.unmount());
+});

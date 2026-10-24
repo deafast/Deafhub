@@ -45,7 +45,17 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
             const started = Date.now();
             let checking = false;
             timer = setInterval(async () => {
-                if (checking || cancelled) return;
+                if (cancelled) return;
+                try {
+                    const returned = new URL(popup.location.href);
+                    if (returned.origin === window.location.origin && returned.pathname === '/sign-in' && returned.searchParams.get('error') === 'steam') {
+                        stop();
+                        setBusy(false);
+                        setError(ru ? 'Вход не завершён. Попробуйте ещё раз.' : 'Sign-in was not completed. Please try again.');
+                        return;
+                    }
+                } catch { /* Steam remains cross-origin until its callback returns. */ }
+                if (checking) return;
                 checking = true;
                 try {
                     const { data: { user } } = await supabase.auth.getUser();
