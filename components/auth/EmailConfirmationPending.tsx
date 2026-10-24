@@ -7,7 +7,13 @@ import {CONFIRMATION_COOLDOWN_KEY,CONFIRMATION_COOLDOWN_MS,confirmationCallback,
 export default function EmailConfirmationPending({email,ru,deadline,onBack,disabled=false,demo=false}:{email:string;ru:boolean;deadline:number;onBack:()=>void;disabled?:boolean;demo?:boolean}){
  const [until,setUntil]=useState(deadline),[seconds,setSeconds]=useState(60),[busy,setBusy]=useState(false),[error,setError]=useState(''),[sent,setSent]=useState(false);
  const inFlight=useRef(false);const provider=emailProvider(email),t=(r:string,e:string)=>ru?r:e;
- useEffect(()=>{const tick=()=>setSeconds(remainingConfirmationSeconds(until,Date.now()));const timer=setInterval(tick,1000);return()=>clearInterval(timer);},[until]);
+ useEffect(()=>{
+  let active=true;
+  const tick=()=>{const remaining=remainingConfirmationSeconds(until,Date.now());setSeconds(remaining);if(remaining===0)clearInterval(timer);};
+  const timer=setInterval(tick,1000);
+  queueMicrotask(()=>{if(active)tick();});
+  return()=>{active=false;clearInterval(timer);};
+ },[until]);
  async function resend(){
   if(demo||disabled||inFlight.current)return;
   let stored=0;try{stored=Number(sessionStorage.getItem(CONFIRMATION_COOLDOWN_KEY))||0;}catch{}

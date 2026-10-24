@@ -17,7 +17,7 @@ test('hub API forwards confirmed engine schedule and its cancellation to the mat
  const at='2026-11-01T18:30:00.000Z';let scheduledAt=at;
  const hubClient={auth:{getUser:async()=>({data:{user:{id:uuid(3)}},error:null})},from:table=>{
   const data=()=>table==='hub_tournaments'?[{id:uuid(4),starts_at:'2026-10-22T10:00:00.000Z'}]:table==='hub_engines'?[{tournament_id:uuid(4),revision:2,state:{matches:[{id:'U1.0',a:entries[0],b:entries[1],status:'ready',scheduledAt}]}}]:[];
-  const q={select(){return q},order(){return q},eq(){return q},limit(){return q},maybeSingle:async()=>({data:null,error:null}),then:resolve=>Promise.resolve({data:data(),error:null}).then(resolve)};return q;
+  const q={select(){return q},order(){return q},eq(){return q},limit(){return q},range(){return q},maybeSingle:async()=>({data:null,error:null}),then:resolve=>Promise.resolve({data:data(),error:null}).then(resolve)};return q;
  }};
  const hub=load('app/api/hub/route.ts',{'next/server':{NextResponse:{json:(v,init)=>Response.json(v,init)}},'@/lib/supabase/server':{createClient:async()=>hubClient}});
  const req={nextUrl:new URL('https://preview.example/api/hub')};

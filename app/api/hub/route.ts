@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import type { State } from '@/lib/tournament/engine';
+import type { HubData } from '@/lib/hub-types';
 const uuid=z.string().uuid();
 const game=z.enum(['dota2','cs2','fc']);
 const date=z.string().datetime({offset:true});
@@ -20,6 +21,25 @@ const actionSchema=z.discriminatedUnion('action',[
  z.object({action:z.literal('close_tournament'),tournament_id:uuid}),
 ]).refine(value=>value.action!=='create_tournament'||value.game!=='fc'||value.roster_size===1,{message:'FC requires an individual 1v1 roster'});
 const headers={'Cache-Control':'private, no-store'};
+type Client=NonNullable<Awaited<ReturnType<typeof createClient>>>;
+// Use the same authenticated client/RLS for every page; keep the existing 5000-row bound.
+async function readMembers(client:Client,teamIds:string[]|null){
+ const data:HubData['members']=[],seen=new Set<string>();let offset=0;
+ if(teamIds&&!teamIds.length)return {data,error:false};
+ for(;;){
+  let query=client.from('hub_members').select('*').order('team_id').order('user_id').range(offset,Math.min(offset+199,5000));
+  if(teamIds)query=query.in('team_id',teamIds);
+  const page=await query;
+  if(page.error||!page.data)return {data:null,error:true};
+  if(!page.data.length)return {data,error:false};
+  for(const member of page.data){
+   const key=member.team_id+'/'+member.user_id;
+   if(seen.has(key)||data.length>=5000)return {data:null,error:true};
+   seen.add(key);data.push(member);
+  }
+  offset+=page.data.length;
+ }
+}
 export async function GET(request:NextRequest) {
  const client=await createClient();
  if(!client) return NextResponse.json({error:'Unavailable'},{status:503,headers});
@@ -32,13 +52,12 @@ export async function GET(request:NextRequest) {
  if(selectedEntries?.error)return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
  const selectedTeams=[...new Set((selectedEntries?.data||[]).map(e=>e.team_id).filter((id):id is string=>Boolean(id)))];
  const teamsQuery=client.from('hub_teams').select('*').order('created_at',{ascending:false});
- const membersQuery=client.from('hub_members').select('*');
  const tournamentQuery=client.from('hub_tournaments').select('*').order('starts_at');
  const matchesQuery=client.from('hub_matches').select('*').order('starts_at',{ascending:false});
  const enginesQuery=client.from('hub_engines').select('tournament_id,revision,state');
  const results=await Promise.all([
   selected?(selectedTeams.length?teamsQuery.in('id',selectedTeams).limit(500):Promise.resolve({data:[],error:null})):teamsQuery.limit(500),
-  selected?(selectedTeams.length?membersQuery.in('team_id',selectedTeams).limit(5000):Promise.resolve({data:[],error:null})):membersQuery.limit(5000),
+  readMembers(client,selected?selectedTeams:null),
   (selected?tournamentQuery.eq('id',selected):tournamentQuery).limit(500),
   selectedEntries||client.from('hub_entries').select('*').limit(5000),
   (selected?matchesQuery.eq('tournament_id',selected):matchesQuery).limit(500),
