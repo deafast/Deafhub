@@ -13,10 +13,11 @@ export default function SteamProfile({steamId,ru}:{steamId:string;ru:boolean}){
  const invalidLink=data&&(!data.linked||data.steamId!==steamId||(data.status==='available'&&data.profile?.steamId!==steamId));
  if(signedOut)return <p role="status" className="text-sm leading-6 text-slate-300">{t('Войдите снова, чтобы посмотреть подключённый Steam.','Sign in again to view your connected Steam account.')}</p>;
  if(invalidLink)return <p role="status" className="text-sm leading-6 text-slate-300">{t('Не удалось подтвердить текущую привязку Steam. Обновите страницу.','Could not verify the current Steam link. Reload the page.')}</p>;
- const profile=data?.linked&&data.status==='available'?data.profile:null;
- return <div className="space-y-3"><p>Steam · <a className="break-all text-[#22D3EE]" href={steamProfileUrl(steamId)} target="_blank" rel="noopener noreferrer">{steamId}</a></p><p className="text-sm text-slate-300">{t('SteamID подтверждён при привязке через Steam.','SteamID verified when linked through Steam.')}</p>
- {profile?<div className="flex min-w-0 items-center gap-3">{profile.avatar?<Image unoptimized src={profile.avatar} alt="" width={48} height={48} referrerPolicy="no-referrer" className="h-12 w-12 shrink-0 rounded-xl"/>:null}<p className="min-w-0 break-words font-semibold" translate="no">{profile.name}</p></div>:null}
- <p role="status" className="text-sm leading-6 text-slate-300">{failed?t('Не удалось загрузить сведения Steam. Привязка сохранена.','Could not load Steam details. Your link is preserved.'):!data?t('Загрузка публичного профиля Steam…','Loading public Steam profile…'):data.status==='private'?t('Профиль Steam закрыт. Закрытые сведения не отображаются.','Steam profile is private. Private details are not displayed.'):data.status==='unconfigured'?t('Публичные сведения Steam пока не подключены. SteamID сохранён.','Public Steam details are not connected yet. SteamID is saved.'):data.status==='unavailable'||!data.linked?t('Публичные сведения Steam сейчас недоступны.','Public Steam details are currently unavailable.'):t('Источник: Steam.','Source: Steam.')}</p>
- {data?.status==='available'&&Number.isFinite(Date.parse(data.checkedAt))?<p className="text-sm text-slate-400">{t('Проверено: ','Checked: ')}<time dateTime={data.checkedAt}>{new Date(data.checkedAt).toLocaleString(ru?'ru-RU':'en-GB')}</time></p>:null}
+ const label=t('Steam — привязан. Открыть профиль.','Steam — connected. Open profile.');
+ return <div className="inline-flex">
+ <a href={steamProfileUrl(steamId)} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04] transition-colors hover:border-[#22D3EE]/60 hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#22D3EE]">
+ <Image src="/auth/steam-mark.svg" width={34} height={34} alt="" />
+ </a>
+ {failed?<span role="status" className="sr-only">{t('Не удалось загрузить сведения Steam. Привязка сохранена.','Could not load Steam details. Your link is preserved.')}</span>:!data?<span role="status" className="sr-only">{t('Проверка привязки Steam…','Checking the Steam connection…')}</span>:null}
  </div>;
 }

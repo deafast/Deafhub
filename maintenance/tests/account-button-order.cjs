@@ -23,7 +23,7 @@ for(const ru of [true,false]){
   const f=fixture(ru,async()=>++calls===1?new Promise(resolve=>{finish=resolve;}):{error:null});let view;
   await act(async()=>{view=create(React.createElement(f.Component));});
   await act(async()=>f.pending[0]({data:{user}}));
-  const logout=()=>view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Выйти':'Sign out')).props.onClick;
+  const logout=()=>view.root.findAllByType('button').find(n=>n.props['aria-label']===(ru?'Выйти':'Sign out')).props.onClick;
   let first,duplicate;await act(async()=>{const click=logout();first=click();duplicate=click();});
   assert.equal(calls,1,'sign-out was sent twice before the button became disabled');
   await act(async()=>{finish({error:new Error('Unavailable')});await Promise.all([first,duplicate]);});
@@ -37,7 +37,7 @@ for(const ru of [true,false]){
   let finish;const f=fixture(ru,()=>new Promise(resolve=>{finish=resolve;}));let view,pending;
   await act(async()=>{view=create(React.createElement(f.Component));});
   await act(async()=>f.pending[0]({data:{user}}));
-  await act(async()=>{pending=view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Выйти':'Sign out')).props.onClick();});
+  await act(async()=>{pending=view.root.findAllByType('button').find(n=>n.props['aria-label']===(ru?'Выйти':'Sign out')).props.onClick();});
   await act(async()=>view.unmount());
   await act(async()=>{finish({error:null});await pending;});
   assert.deepEqual(f.routes,[],'late sign-out redirected after the account control closed');
@@ -46,13 +46,24 @@ for(const ru of [true,false]){
   let calls=0;const f=fixture(ru,async()=>{calls++;return {error:null};});let view;
   await act(async()=>{view=create(React.createElement(f.Component));});
   await act(async()=>f.pending[0]({data:{user}}));
-  const click=view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Выйти':'Sign out')).props.onClick;
+  const click=view.root.findAllByType('button').find(n=>n.props['aria-label']===(ru?'Выйти':'Sign out')).props.onClick;
   await act(async()=>view.unmount());await act(async()=>click());
   assert.equal(calls,0);assert.deepEqual(f.routes,[]);
  });
 }
 const user={id:'registered-player'};
 const profileLinks=view=>view.root.findAll(n=>n.type==='a'&&n.props.href==='/profile');
+for(const ru of [true,false])test(`profile and sign-out use named icons without visible duplicate text RU=${ru}`,async()=>{
+ const f=fixture(ru);let view;await act(async()=>{view=create(React.createElement(f.Component));});
+ await act(async()=>f.pending[0]({data:{user}}));
+ const profile=profileLinks(view)[0],logout=view.root.findAllByType('button').find(n=>n.props['aria-label']===(ru?'Выйти':'Sign out'));
+ assert.equal(profile.props['aria-label'],ru?'Мой профиль':'My profile');assert.equal(profile.props.title,profile.props['aria-label']);
+ assert.equal(logout.props.title,logout.props['aria-label']);assert.match(profile.props.className,/h-11 w-11/);assert.match(logout.props.className,/h-11 w-11/);
+ assert.equal(profile.findAllByType('svg').length,1);assert.equal(logout.findAllByType('svg').length,1);
+ const group=view.root.find(n=>n.props.role==='group');assert.equal(group.props['aria-label'],ru?'Аккаунт':'Account');assert.equal(group.findAllByType('svg').length,2);
+ assert.ok(!profile.children.some(n=>typeof n==='string'));assert.ok(!logout.children.some(n=>typeof n==='string'));
+ await act(async()=>view.unmount());
+});
 for(const ru of [true,false]){
  for(const signedIn of [true,false])test(`auth event wins over a late initial user response: signedIn=${signedIn}, RU=${ru}`,async()=>{
   const f=fixture(ru);let view;await act(async()=>{view=create(React.createElement(f.Component));});
@@ -80,7 +91,7 @@ for(const ru of [true,false]){
   const f=fixture(ru);let view;await act(async()=>{view=create(React.createElement(f.Component));});
   await act(async()=>f.pending[0]({data:{user}}));
   await act(async()=>f.listeners.get('deafhub:auth-complete')());
-  await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Выйти':'Sign out')).props.onClick());
+  await act(async()=>view.root.findAllByType('button').find(n=>n.props['aria-label']===(ru?'Выйти':'Sign out')).props.onClick());
   await act(async()=>view.root.findByType('Dialog').props.onOpenChange(true));
   await act(async()=>f.pending[1]({data:{user}}));
   assert.equal(profileLinks(view).length,0);assert.deepEqual(f.routes,['/']);

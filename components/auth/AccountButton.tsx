@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { LogOut, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import AuthPanel from './AuthPanel';
+
+const accountControlClass = 'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-0 bg-transparent p-0 text-[#22D3EE] shadow-none transition-colors hover:bg-[#22D3EE]/10 hover:text-[#22D3EE] dark:bg-transparent dark:hover:bg-[#22D3EE]/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE] motion-reduce:transition-none';
 
 export default function AccountButton() {
     const ru = useLanguageStore((state) => state.language === 'ru');
@@ -78,10 +81,17 @@ export default function AccountButton() {
         } finally { signingOut.current = false; if (mounted.current) setBusy(false); }
     }
 
-    if (signedIn) return <div className="flex flex-wrap items-center gap-2">
-        <Link href="/profile" className="text-sm text-[#22D3EE]">{ru ? 'Мой профиль' : 'My profile'}</Link>
-        <Button variant="outline" disabled={busy} onClick={signOut}>{ru ? 'Выйти' : 'Sign out'}</Button>
-        {error ? <p role="alert" className="text-xs text-red-300">{error}</p> : null}
+    if (signedIn) return <div className="relative shrink-0">
+        <div role="group" aria-label={ru ? 'Аккаунт' : 'Account'} className="inline-flex items-center rounded-xl border border-[#22D3EE]/30 bg-[#22D3EE]/5 p-0.5">
+            <Link href="/profile" aria-label={ru ? 'Мой профиль' : 'My profile'} title={ru ? 'Мой профиль' : 'My profile'} className={accountControlClass}>
+                <UserRound className="size-5" aria-hidden="true" />
+            </Link>
+            <span aria-hidden="true" className="h-5 w-px shrink-0 bg-[#22D3EE]/20" />
+            <Button type="button" variant="outline" size="icon" className={accountControlClass} disabled={busy} aria-busy={busy} aria-label={ru ? 'Выйти' : 'Sign out'} title={ru ? 'Выйти' : 'Sign out'} onClick={signOut}>
+                <LogOut className="size-5" aria-hidden="true" />
+            </Button>
+        </div>
+        {error ? <p role="alert" className="absolute right-0 top-full z-10 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-white/10 bg-[#0D131A] p-3 text-xs text-red-300">{error}</p> : null}
     </div>;
 
     return <Dialog open={open} onOpenChange={setOpen}>
