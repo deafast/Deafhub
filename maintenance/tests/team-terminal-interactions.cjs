@@ -24,3 +24,20 @@ for(const ru of [true,false])test(`invitation action opens the collapsed form be
  await act(async()=>invite.props.onClick());assert.equal(panel.open,true);assert.equal(focus,1);assert.equal(scroll,1);
  assert.ok(view.root.findAll(n=>n.props.role==='status').some(n=>n.children.join('').includes('Alpha')));
 });
+for(const ru of [true,false])test(`my teams explains missing membership when other players have teams RU=${ru}`,async t=>{
+ let view;await act(async()=>{view=create(React.createElement(Component,{data,ru,own:true,busy:false,onSubmit:async()=>{},onAction:async()=>{}}));});t.after(async()=>act(async()=>view.unmount()));
+ assert.equal(view.root.findAllByType('article').length,0);
+ const statuses=view.root.findAll(n=>n.props.role==='status').map(n=>n.children.join(''));
+ assert.ok(statuses.some(value=>value.includes(ru?'У вас пока нет команд. Создайте команду или вступите по приглашению.':'You have no teams yet. Create a team or join by invitation.')));
+ assert.equal(view.root.findAllByType('button').some(n=>n.children.join('')===(ru?'Сбросить фильтры':'Reset filters')),false);
+});
+for(const ru of [true,false])test(`filtering existing own teams offers reset and restores only own teams RU=${ru}`,async t=>{
+ const ownData={...data,members:[{team_id:'a',user_id:'viewer',nickname:'Viewer'}]};let view;
+ await act(async()=>{view=create(React.createElement(Component,{data:ownData,ru,own:true,busy:false,onSubmit:async()=>{},onAction:async()=>{}}));});t.after(async()=>act(async()=>view.unmount()));
+ assert.equal(view.root.findAllByType('article').length,1);
+ await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')==='CS2').props.onClick());
+ assert.equal(view.root.findAllByType('article').length,0);
+ assert.ok(view.root.findAll(n=>n.props.role==='status').some(n=>n.children.join('').includes(ru?'По выбранным условиям команд нет. Измените или сбросьте фильтры.':'No teams match. Change or reset the filters.')));
+ await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Сбросить фильтры':'Reset filters')).props.onClick());
+ const articles=view.root.findAllByType('article');assert.equal(articles.length,1);assert.ok(JSON.stringify(view.toJSON()).includes('Alpha'));assert.equal(articles[0].findAllByType('h4')[0].children.join(''),'Alpha');
+});

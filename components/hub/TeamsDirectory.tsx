@@ -34,8 +34,8 @@ export default function TeamsDirectory({ data, ru, own, busy, headingLevel = 3, 
     const inviteHeading = useId();
     const filterId = useId();
     const { membersByTeam, mine, ownGames, invitesByTeam, availability } = useMemo(() => indexTeamDirectory(data), [data]);
-    const teams = data.teams.filter(team => (!own || mine.has(team.id))
-        && (game === 'all' || team.game === game)
+    const baseTeams = own ? data.teams.filter(team => mine.has(team.id)) : data.teams;
+    const teams = baseTeams.filter(team => (game === 'all' || team.game === game)
         && team.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
         && (!availableOnly || availability(team.id).canJoin));
 
@@ -66,7 +66,7 @@ export default function TeamsDirectory({ data, ru, own, busy, headingLevel = 3, 
                 {invite ? <div className="space-y-3 border-t border-white/15 pt-4"><p className="text-sm leading-6 text-slate-300">{text('Пригласить игрока: передайте код только выбранному участнику.', 'Invite a player: share the code only with the intended player.')}</p><code className="block break-all text-sm text-[#22D3EE]">{invite.code}</code><button type="button" disabled={busy} className="min-h-11 text-sm text-[#22D3EE] underline underline-offset-4" onClick={() => void onAction({ action: 'rotate_invite', team_id: team.id })}>{text('Заменить код приглашения', 'Replace invitation code')}</button></div> : null}
             </article>;
         })}</div>
-        {!teams.length ? <div role="status" className="px-6 py-16 text-center text-sm leading-6 text-slate-400"><Users aria-hidden="true" size={32} className="mx-auto mb-5 text-slate-600"/>{data.teams.length ? text('По выбранным условиям команд нет. Измените или сбросьте фильтры.', 'No teams match. Change or reset the filters.') : text('Команд пока нет. Создайте первую команду.', 'No teams yet. Create the first team.')}</div> : null}
+        {!teams.length ? <div role="status" className="px-6 py-16 text-center text-sm leading-6 text-slate-400"><Users aria-hidden="true" size={32} className="mx-auto mb-5 text-slate-600"/>{baseTeams.length ? text('По выбранным условиям команд нет. Измените или сбросьте фильтры.', 'No teams match. Change or reset the filters.') : own ? text('У вас пока нет команд. Создайте команду или вступите по приглашению.', 'You have no teams yet. Create a team or join by invitation.') : text('Команд пока нет. Создайте первую команду.', 'No teams yet. Create the first team.')}</div> : null}
 
         </section><aside className="min-w-0 space-y-4"><div className="rounded-2xl border border-[#22D3EE]/20 bg-[#22D3EE]/[0.04] p-5"><Users size={20} aria-hidden="true" className="mb-4 text-[#22D3EE]"/><Heading className="text-lg font-black uppercase italic">{text('Твой следующий состав','Your next roster')}</Heading><p className="mt-3 text-sm leading-6 text-slate-400">{text('Создай свою команду или присоединись по коду капитана. Одна команда на каждую игру.','Create your own team or join with a captain’s code. One team per game.')}</p></div>
 <details className={card}><summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-[#22D3EE]"><Plus size={18} aria-hidden="true" className="text-[#22D3EE]"/>{text('Создать команду', 'Create team')}</summary>            <form className="mt-4 space-y-4 border-t border-white/10 pt-4" onSubmit={onSubmit} aria-label={text('Создать команду', 'Create team')}>
