@@ -52,7 +52,7 @@ const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
 const componentSource = readFileSync(resolve(__dirname, '../../components/hub/TeamsDirectory.tsx'), 'utf8');
 const componentCode = ts.transpileModule(componentSource, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText;
-const componentScope = { exports: {}, require: name => name === '@/lib/team-directory' ? scope.exports : require(name) };
+const componentScope = { exports: {}, require: name => name === '@/lib/team-directory' ? scope.exports : name === './PlayerLfp' ? { __esModule:true, default:()=>null } : require(name) };
 vm.runInNewContext(componentCode, componentScope);
 const TeamsDirectory = componentScope.exports.default;
 const renderDirectory = (data, ru = true) => renderToStaticMarkup(React.createElement(TeamsDirectory, {

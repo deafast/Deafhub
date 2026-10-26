@@ -4,7 +4,7 @@ const React=require('react'),{create,act}=require('react-test-renderer');
 global.IS_REACT_ACT_ENVIRONMENT=true;
 function load(file,imports={}){const scope={exports:{},require:name=>imports[name]||require(name)};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,scope);return scope.exports;}
 const directory=load('lib/team-directory.ts');
-const Component=load('components/hub/TeamsDirectory.tsx',{'@/lib/team-directory':directory,'next/link':{__esModule:true,default:p=>React.createElement('a',p)}}).default;
+const Component=load('components/hub/TeamsDirectory.tsx',{'@/lib/team-directory':directory,'./PlayerLfp':{__esModule:true,default:()=>null},'next/link':{__esModule:true,default:p=>React.createElement('a',p)}}).default;
 const data={userId:'viewer',teams:[{id:'a',game:'dota2',name:'Alpha',captain_id:'captain-a'},{id:'b',game:'cs2',name:'Beta',captain_id:'captain-b'}],members:[],invites:[],entries:[{team_id:'b',tournament_id:'cup',status:'pending'}],tournaments:[{id:'cup',status:'open'}]};
 for(const ru of [true,false])test(`terminal game, search, availability and reset keep real filtering RU=${ru}`,async t=>{
  let view;await act(async()=>{view=create(React.createElement(Component,{data,ru,own:false,busy:false,onSubmit:async()=>{},onAction:async()=>{throw Error('filters must not mutate data');}}));});t.after(async()=>act(async()=>view.unmount()));

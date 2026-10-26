@@ -71,8 +71,18 @@ export async function GET(request:NextRequest) {
  ]);
  if(results.some(r=>r.error)) return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
  const [teams,members,tournaments,entries,matches,invites,ownEntries,organizer,steam,engines,stats]=results;
+ let teamRows=teams.data||[];
+ if(!selected){
+  const visibleIds=new Set(teamRows.map(team=>team.id));
+  const missingOwn=[...new Set((members.data||[]).filter(member=>member.user_id===user.id&&!visibleIds.has(member.team_id)).map(member=>member.team_id))];
+  if(missingOwn.length){
+   const ownTeams=await client.from('hub_teams').select('*').in('id',missingOwn).order('created_at',{ascending:false}).limit(missingOwn.length);
+   if(ownTeams.error||!ownTeams.data||ownTeams.data.length!==missingOwn.length)return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
+   teamRows=[...teamRows,...ownTeams.data];
+  }
+ }
  const engineMatches=(engines.data||[]).flatMap(e=>(e.state as State).matches.filter(m=>m.a&&m.b&&['ready','finished'].includes(m.status)).map(m=>({id:`${e.tournament_id}/${m.id}`,tournament_id:e.tournament_id,entry_a:m.a!,entry_b:m.b!,starts_at:tournaments.data?.find(t=>t.id===e.tournament_id)?.starts_at,score_a:m.result?.kind==='played'?m.result.a:null,score_b:m.result?.kind==='played'?m.result.b:null,status:m.status==='ready'?'scheduled':'finished',engine_match:m.id,scheduled_at:m.scheduledAt??null,result_kind:m.result?.kind||null,penalties:m.result?.kind==='played'?m.result.penalties??null:null})));
- return NextResponse.json({engines:engines.data||[],engineIds:engines.data?.map(e=>e.tournament_id)||[],userId:user.id,teams:teams.data,members:members.data,tournaments:tournaments.data,entries:entries.data,matches:[...(matches.data||[]),...engineMatches],invites:invites.data,ownEntryIds:ownEntries.data?.map(e=>e.entry_id),organizer:Boolean(organizer.data),steamId:steam.data?.steam_id||null,stats:stats.data||{matches:0,wins:0,draws:0}},{headers});
+ return NextResponse.json({engines:engines.data||[],engineIds:engines.data?.map(e=>e.tournament_id)||[],userId:user.id,teams:teamRows,members:members.data,tournaments:tournaments.data,entries:entries.data,matches:[...(matches.data||[]),...engineMatches],invites:invites.data,ownEntryIds:ownEntries.data?.map(e=>e.entry_id),organizer:Boolean(organizer.data),steamId:steam.data?.steam_id||null,stats:stats.data||{matches:0,wins:0,draws:0}},{headers});
 }
 export async function POST(request:NextRequest) {
  if(request.headers.get('origin')!==request.nextUrl.origin) return NextResponse.json({error:'Forbidden'},{status:403,headers});

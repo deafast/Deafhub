@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, Users, Plus, KeyRound } from 'lucide-react';
 import type { HubData } from '@/lib/hub-types';
 import { indexTeamDirectory, TEAM_CAPACITY } from '@/lib/team-directory';
+import PlayerLfp from './PlayerLfp';
 
 const field = 'mt-2 block min-h-11 w-full rounded-xl border border-white/20 bg-[#0A0F14] p-3 text-base text-[#EAFBFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#22D3EE]';
 const card = 'rounded-2xl border border-white/10 bg-white/[0.025] p-5';
@@ -17,11 +18,13 @@ type Props = {
     own: boolean;
     busy: boolean;
     headingLevel?: 2 | 3;
+    onJoined: () => Promise<void>;
+    onExpired: () => void;
     onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
     onAction: (payload: Record<string, unknown>) => Promise<void>;
 };
 
-export default function TeamsDirectory({ data, ru, own, busy, headingLevel = 3, onSubmit, onAction }: Props) {
+export default function TeamsDirectory({ data, ru, own, busy, headingLevel = 3, onSubmit, onAction, onJoined, onExpired }: Props) {
     const text = (r: string, e: string) => ru ? r : e;
     const Heading = headingLevel === 2 ? 'h2' : 'h3';
     const RowHeading = headingLevel === 2 ? 'h3' : 'h4';
@@ -48,7 +51,7 @@ export default function TeamsDirectory({ data, ru, own, busy, headingLevel = 3, 
 
     return <div className="space-y-6 font-sans text-[#EAFBFF]">
         <div className="flex flex-wrap items-center justify-between gap-4"><div><p className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">DEAF|HUB / TEAM TERMINAL</p><p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">{text('Твоя игра. Твой состав. Найди команду и выходи на турнир вместе.', 'Your game. Your roster. Find a team and enter the tournament together.')}</p></div><div role="group" aria-label={text('Фильтр команд по игре', 'Filter teams by game')} className="flex flex-wrap gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-1">{[{id:'all',name:text('Все игры','All games')},...games].map(item=><button key={item.id} type="button" aria-pressed={game===item.id} onClick={()=>setGame(item.id)} className={'min-h-11 rounded-xl px-4 text-xs font-bold uppercase tracking-wide transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#22D3EE] '+(game===item.id?'bg-[#22D3EE] text-[#0A0F14]':'text-slate-400 hover:bg-white/5 hover:text-white')}>{item.name}</button>)}</div></div>
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(320px,38%)]">
         <section className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025]">
             <div className="space-y-4 border-b border-white/10 p-5 sm:p-6"><div className="flex flex-wrap items-center justify-between gap-4"><Heading className="text-2xl font-black uppercase italic tracking-tight">{own?text('Мои команды','My teams'):text('Команды','Teams')}</Heading><label className="relative min-w-0 flex-1 basis-52 sm:max-w-xs"><span className="sr-only">{text('Поиск команды','Search teams')}</span><Search aria-hidden="true" size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"/><input type="search" placeholder={text('Найти команду…','Find a team…')} className={field+' !mt-0 !pl-10'} value={query} onChange={event=>setQuery(event.target.value)}/></label></div><div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-slate-400"><p role="status">{text('Найдено команд: ','Teams found: ')}<span className="font-mono text-[#EAFBFF]">{teams.length}</span></p><label htmlFor={filterId} className="flex min-h-11 cursor-pointer items-center gap-2"><input id={filterId} type="checkbox" checked={availableOnly} onChange={event=>setAvailableOnly(event.target.checked)} className="h-4 w-4 accent-[#22D3EE]"/>{text('Есть места и состав открыт','Has room and roster is unlocked')}</label>{query||game!=='all'||availableOnly?<button type="button" className="min-h-11 text-[#22D3EE] underline-offset-4 hover:underline" onClick={()=>{setQuery('');setGame('all');setAvailableOnly(false);}}>{text('Сбросить фильтры','Reset filters')}</button>:null}</div></div>
         <div className="divide-y divide-white/10">{teams.map(team => {
@@ -68,7 +71,7 @@ export default function TeamsDirectory({ data, ru, own, busy, headingLevel = 3, 
         })}</div>
         {!teams.length ? <div role="status" className="px-6 py-16 text-center text-sm leading-6 text-slate-400"><Users aria-hidden="true" size={32} className="mx-auto mb-5 text-slate-600"/>{baseTeams.length ? text('По выбранным условиям команд нет. Измените или сбросьте фильтры.', 'No teams match. Change or reset the filters.') : own ? text('У вас пока нет команд. Создайте команду или вступите по приглашению.', 'You have no teams yet. Create a team or join by invitation.') : text('Команд пока нет. Создайте первую команду.', 'No teams yet. Create the first team.')}</div> : null}
 
-        </section><aside className="min-w-0 space-y-4"><div className="rounded-2xl border border-[#22D3EE]/20 bg-[#22D3EE]/[0.04] p-5"><Users size={20} aria-hidden="true" className="mb-4 text-[#22D3EE]"/><Heading className="text-lg font-black uppercase italic">{text('Твой следующий состав','Your next roster')}</Heading><p className="mt-3 text-sm leading-6 text-slate-400">{text('Создай свою команду или присоединись по коду капитана. Одна команда на каждую игру.','Create your own team or join with a captain’s code. One team per game.')}</p></div>
+        </section><aside className="min-w-0 space-y-4"><PlayerLfp game={game} ru={ru} headingLevel={headingLevel} onJoined={onJoined} onExpired={onExpired}/>
 <details className={card}><summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-[#22D3EE]"><Plus size={18} aria-hidden="true" className="text-[#22D3EE]"/>{text('Создать команду', 'Create team')}</summary>            <form className="mt-4 space-y-4 border-t border-white/10 pt-4" onSubmit={onSubmit} aria-label={text('Создать команду', 'Create team')}>
                 <h3 className="sr-only">{text('Создать команду', 'Create team')}</h3>
                 <input type="hidden" name="action" value="create_team" />

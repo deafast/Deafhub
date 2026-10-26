@@ -25,8 +25,8 @@ for(const ru of [true,false])test(`game controls are accessible, all games suppo
 });
 const Renderer=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
 const none={default:()=>null};
-function panel(ru,engine=none){return load('components/hub/HubPanel.tsx',{
- 'next/link':{default:props=>React.createElement('a',props)},'./TournamentEngine':engine,'./TeamsDirectory':none,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
+function panel(ru,engine=none,teams=none){return load('components/hub/HubPanel.tsx',{
+ 'next/link':{default:props=>React.createElement('a',props)},'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
  './TournamentOperations':{default:props=>React.createElement('button',{onClick:()=>void props.onSaved()},'QA refresh'),ProfileAwards:()=>null},
  './GameFilter':{default:GameFilter,useGameFilter:()=>React.useState('all')},'@/lib/tournament-filters':filters,
  '@/lib/tournament/fc-levels':{fcLevelLabel:value=>value},'@/lib/hub-history':load('lib/hub-history.ts'),
@@ -36,6 +36,14 @@ function hubFixture(){return {userId:'me',organizer:true,engineIds:[],engines:[]
  teams:[{id:'team',name:'PRIVATE REGISTERED TEAM',game:'cs2',captain_id:'me'}],members:[{team_id:'team',user_id:'me',nickname:'PRIVATE PLAYER'}],
  entries:[{id:'entry',team_id:'team',tournament_id:'event',status:'pending'}],
  tournaments:[{id:'event',game:'cs2',title:'PRIVATE TOURNAMENT',organizer_id:'me',starts_at:'2027-01-01T12:00:00Z',status:'open',rules:'Published tournament regulation',rules_version:'rules',roster_size:5}]};}
+for(const ru of [true,false])test(`LFP session expiry clears the parent catalog and rejects late refresh RU=${ru}`,async t=>{
+ const original=global.fetch;let finish,calls=0,signal;global.fetch=(_url,options)=>{calls++;if(calls===1)return Promise.resolve(Response.json(hubFixture()));signal=options.signal;return new Promise(resolve=>{finish=resolve;});};t.after(()=>{global.fetch=original;});
+ const Teams={default:props=>React.createElement('team-test',props,'PRIVATE INVITE')};const Component=panel(ru,none,Teams);let view,pending;
+ await Renderer.act(async()=>{view=Renderer.create(React.createElement(Component,{section:'teams'}));});t.after(async()=>Renderer.act(async()=>view.unmount()));
+ const child=view.root.findByType('team-test');await Renderer.act(async()=>{pending=child.props.onJoined().catch(()=>{});});await Renderer.act(async()=>child.props.onExpired());
+ assert.equal(signal.aborted,true);assert.equal(view.root.findAllByType('team-test').length,0);assert.doesNotMatch(JSON.stringify(view.toJSON()),/PRIVATE INVITE|PRIVATE REGISTERED TEAM/);
+ await Renderer.act(async()=>{finish(Response.json(hubFixture()));await pending;});assert.equal(view.root.findAllByType('team-test').length,0);assert.match(JSON.stringify(view.toJSON()),ru?/Войдите/:/Sign in/);
+});
 for(const ru of [true,false])for(const [file,labels] of [
  ['app/tournaments/TournamentHub.tsx',['Турниры','Tournaments']],
  ['app/team/page.tsx',['Центр команд','Team center']],
