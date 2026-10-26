@@ -10,12 +10,19 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
     const ru = useLanguageStore((state) => state.language === 'ru');
     const router = useRouter();
     const [busy, setBusy] = useState(false);
-    const [message, setMessage] = useState('');
+    const [notice, setNotice] = useState<'' | 'invalid' | 'saved' | 'failed'>('');
     const [failed, setFailed] = useState(false);
     const [invalid, setInvalid] = useState<string[]>([]);
     const messageId = useId();
     const saving = useRef(false);
     const active = useRef(false);
+    const message = notice === 'invalid'
+        ? (ru ? 'Проверьте ник и контакты. Telegram — имя без ссылки, VK — короткий адрес страницы.' : 'Check your nickname and contacts. Enter Telegram and VK usernames, without links.')
+        : notice === 'saved'
+            ? (ru ? 'Профиль сохранён.' : 'Profile saved.')
+            : notice === 'failed'
+                ? (ru ? 'Не удалось сохранить профиль. Попробуйте ещё раз.' : 'Could not save your profile. Please try again.')
+                : '';
     useEffect(() => {
         active.current = true;
         return () => { active.current = false; };
@@ -26,13 +33,13 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
         if (!active.current || saving.current) return;
         const form = new FormData(event.currentTarget);
         const parsed = profileSchema.safeParse(Object.fromEntries(form));
-        setMessage('');
+        setNotice('');
         setFailed(false);
         setInvalid([]);
         if (!parsed.success) {
             setInvalid(parsed.error.issues.map(issue => String(issue.path[0])));
             setFailed(true);
-            setMessage(ru ? 'Проверьте ник и контакты. Telegram — имя без ссылки, VK — короткий адрес страницы.' : 'Check your nickname and contacts. Enter Telegram and VK usernames, without links.');
+            setNotice('invalid');
             return;
         }
         saving.current = true;
@@ -41,12 +48,12 @@ export default function ProfileForm({ initial }: { initial: PlayerProfile }) {
             const result = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(parsed.data) });
             if (!active.current) return;
             if (!result.ok) throw new Error('Save failed');
-            setMessage(ru ? 'Профиль сохранён.' : 'Profile saved.');
+            setNotice('saved');
             router.refresh();
         } catch {
             if (!active.current) return;
             setFailed(true);
-            setMessage(ru ? 'Не удалось сохранить профиль. Попробуйте ещё раз.' : 'Could not save your profile. Please try again.');
+            setNotice('failed');
         } finally { saving.current = false; if (active.current) setBusy(false); }
     }
 

@@ -21,7 +21,7 @@ export default function AccountButton() {
     const authGeneration = useRef(0);
     useEffect(() => { dialogOpen.current = open; }, [open]);
     const [busy, setBusy] = useState(false);
-    const [error, setError] = useState('');
+    const [signOutFailed, setSignOutFailed] = useState(false);
     const mounted = useRef(false);
     const signingOut = useRef(false);
     useEffect(() => {
@@ -64,7 +64,7 @@ export default function AccountButton() {
         if (!mounted.current || signingOut.current) return;
         signingOut.current = true;
         setBusy(true);
-        setError('');
+        setSignOutFailed(false);
         try {
             const client = createClient();
             if (!client) throw new Error('Unavailable');
@@ -77,7 +77,7 @@ export default function AccountButton() {
             router.refresh();
         } catch {
             if (!mounted.current) return;
-            setError(ru ? 'Не удалось выйти. Повторите попытку.' : 'Could not sign out. Please try again.');
+            setSignOutFailed(true);
         } finally { signingOut.current = false; if (mounted.current) setBusy(false); }
     }
 
@@ -91,7 +91,7 @@ export default function AccountButton() {
                 <LogOut className="size-5" aria-hidden="true" />
             </Button>
         </div>
-        {error ? <p role="alert" className="absolute right-0 top-full z-10 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-white/10 bg-[#0D131A] p-3 text-xs text-red-300">{error}</p> : null}
+        {signOutFailed ? <p role="alert" className="absolute right-0 top-full z-10 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-white/10 bg-[#0D131A] p-3 text-xs text-red-300">{ru ? 'Не удалось выйти. Повторите попытку.' : 'Could not sign out. Please try again.'}</p> : null}
     </div>;
 
     return <Dialog open={open} onOpenChange={setOpen}>

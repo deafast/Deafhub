@@ -3,19 +3,19 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const React=require('react'),{create,act}=require('react-test-renderer');
 global.IS_REACT_ACT_ENVIRONMENT=true;
 function fixture(ru,signOut=async()=>({error:null})){
- const pending=[],listeners=new Map(),routes=[];let authChange,unsubscribed=false;
+ const pending=[],listeners=new Map(),routes=[];let authChange,unsubscribed=false,language=ru?'ru':'en';
  const client={auth:{getUser:()=>new Promise(resolve=>pending.push(resolve)),onAuthStateChange:callback=>{authChange=callback;return {data:{subscription:{unsubscribe:()=>{unsubscribed=true;}}}};},signOut}};
  const router={replace:path=>routes.push(path),refresh:()=>{}};
  const dialog={};for(const name of ['Dialog','DialogContent','DialogHeader','DialogTitle','DialogTrigger','DialogDescription'])dialog[name]=props=>React.createElement(name,props,props.children);
  const imports={
   'next/navigation':{useRouter:()=>router},'next/link':{__esModule:true,default:props=>React.createElement('a',props,props.children)},
-  '@/lib/supabase/client':{createClient:()=>client},'@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},
+  '@/lib/supabase/client':{createClient:()=>client},'@/store/useLanguageStore':{useLanguageStore:select=>select({language})},
   '@/components/ui/button':{Button:props=>React.createElement('button',props,props.children)},'@/components/ui/dialog':dialog,
   './AuthPanel':{__esModule:true,default:()=>null},
  };
  const scope={exports:{},window:{addEventListener:(name,callback)=>listeners.set(name,callback),removeEventListener:name=>listeners.delete(name)},require:name=>imports[name]??require(name)};
  vm.runInNewContext(ts.transpileModule(readFileSync('components/auth/AccountButton.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,scope);
- return {Component:scope.exports.default,pending,listeners,routes,emit:(event,user)=>authChange(event,user?{user}:null),unsubscribed:()=>unsubscribed};
+ return {Component:scope.exports.default,pending,listeners,routes,setLanguage:value=>{language=value;},emit:(event,user)=>authChange(event,user?{user}:null),unsubscribed:()=>unsubscribed};
 }
 for(const ru of [true,false]){
  test(`sign-out sends one request for rapid clicks and allows retry after failure RU=${ru}`,async()=>{
@@ -53,6 +53,19 @@ for(const ru of [true,false]){
 }
 const user={id:'registered-player'};
 const profileLinks=view=>view.root.findAll(n=>n.type==='a'&&n.props.href==='/profile');
+for(const ru of [true,false])for(const during of [true,false])test(`sign-out failure follows language changes ${during?'during':'after'} the request RU=${ru}`,async t=>{
+ let finish,calls=0;const f=fixture(ru,()=>{calls++;return new Promise(resolve=>{finish=resolve;});});let view,pending;
+ await act(async()=>{view=create(React.createElement(f.Component));});t.after(async()=>act(async()=>view.unmount()));
+ await act(async()=>f.pending[0]({data:{user}}));
+ await act(async()=>{pending=view.root.findAllByType('button').find(n=>n.props['aria-label']===(ru?'Выйти':'Sign out')).props.onClick();});
+ assert.equal(view.root.findAllByType('button').find(n=>n.props['aria-busy']).props.disabled,true);
+ const switchLanguage=async()=>act(async()=>{f.setLanguage(ru?'en':'ru');view.update(React.createElement(f.Component));});
+ if(during)await switchLanguage();
+ await act(async()=>{finish({error:new Error('Unavailable')});await pending;});
+ if(!during)await switchLanguage();
+ assert.equal(view.root.find(n=>n.props.role==='alert').children.join(''),ru?'Could not sign out. Please try again.':'Не удалось выйти. Повторите попытку.');
+ assert.equal(calls,1);assert.equal(f.pending.length,1);assert.equal(profileLinks(view).length,1);assert.deepEqual(f.routes,[]);
+});
 for(const ru of [true,false])test(`profile and sign-out use named icons without visible duplicate text RU=${ru}`,async()=>{
  const f=fixture(ru);let view;await act(async()=>{view=create(React.createElement(f.Component));});
  await act(async()=>f.pending[0]({data:{user}}));
