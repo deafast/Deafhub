@@ -12,6 +12,21 @@ import {confirmationCallback,startConfirmationCooldown} from '@/lib/auth/email-c
 
 type Mode = 'login' | 'signup' | 'forgot' | 'reset';
 
+const emailErrors = {
+    mismatch: ['Пароли не совпадают.', 'Passwords do not match.'],
+    unavailable: ['Вход временно недоступен.', 'Sign-in is temporarily unavailable.'],
+    resetSignout: ['Пароль изменён, но не удалось выйти. Повторите выход через меню аккаунта.', 'Password updated, but sign-out failed. Try signing out from the account menu.'],
+    rateLimit: ['Слишком много попыток. Повторите позже.', 'Too many attempts. Please try again later.'],
+    address: ['Отправка писем на этот адрес пока недоступна в тестовой версии.', 'Email delivery to this address is not available in this preview yet.'],
+    weak: ['Выберите более надёжный пароль.', 'Please choose a stronger password.'],
+    login: ['Не удалось войти. Проверьте почту, пароль и подтверждение адреса.', 'Could not sign in. Check your email, password and email confirmation.'],
+    request: ['Не удалось выполнить запрос. Повторите попытку позже.', 'Could not complete the request. Please try again later.'],
+} as const;
+const emailNotices = {
+    recovery: ['Если для этой почты доступно восстановление, вы получите письмо со ссылкой. Проверьте также папку «Спам».', 'If password recovery is available for this email, you will receive a link. Please also check spam.'],
+    reset: ['Пароль изменён. Теперь можно войти с новым паролем.', 'Password updated. You can now sign in with your new password.'],
+} as const;
+
 export default function EmailAuth({ reset = false, disabled = false, onPendingChange }: {
     reset?: boolean;
     disabled?: boolean;
@@ -27,8 +42,8 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
     const [visible, setVisible] = useState(false);
     const [pending, setPending] = useState(false);
     const inFlight = useRef(false);
-    const [error, setError] = useState('');
-    const [message, setMessage] = useState('');
+    const [error, setError] = useState<keyof typeof emailErrors | ''>('');
+    const [message, setMessage] = useState<keyof typeof emailNotices | ''>('');
     const [awaitingEmail,setAwaitingEmail]=useState('');
     const [confirmationDeadline,setConfirmationDeadline]=useState(0);
     const [canReset, setCanReset] = useState(false);
@@ -64,12 +79,12 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
         setError('');
         setMessage('');
         if ((mode === 'signup' || mode === 'reset') && password !== confirmation) {
-            setError(ru ? 'Пароли не совпадают.' : 'Passwords do not match.');
+            setError('mismatch');
             return;
         }
         const client = createClient();
         if (!client) {
-            setError(ru ? 'Вход временно недоступен.' : 'Sign-in is temporarily unavailable.');
+            setError('unavailable');
             return;
         }
         inFlight.current = true;
@@ -80,7 +95,7 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
             if (mode === 'forgot') {
                 const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${callback}?flow=recovery` });
                 if (error) throw error;
-                setMessage(ru ? 'Если для этой почты доступно восстановление, вы получите письмо со ссылкой. Проверьте также папку «Спам».' : 'If password recovery is available for this email, you will receive a link. Please also check spam.');
+                setMessage('recovery');
             } else if (mode === 'signup') {
                 const { data, error } = await client.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: confirmationCallback(window.location.origin), data:{locale:ru?'ru':'en'} } });
                 if (error) throw error;
@@ -98,12 +113,12 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
                 setPassword('');
                 setConfirmation('');
                 setResetDone(true);
-                setMessage(ru ? 'Пароль изменён. Теперь можно войти с новым паролем.' : 'Password updated. You can now sign in with your new password.');
+                setMessage('reset');
                 try {
                     const { error: signOutError } = await client.auth.signOut();
                     if (signOutError) throw signOutError;
                 } catch {
-                    setError(ru ? 'Пароль изменён, но не удалось выйти. Повторите выход через меню аккаунта.' : 'Password updated, but sign-out failed. Try signing out from the account menu.');
+                    setError('resetSignout');
                 }
             } else {
                 const { error } = await client.auth.signInWithPassword({ email: email.trim(), password });
@@ -113,11 +128,11 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
             }
         } catch (caught) {
             const code = typeof caught === 'object' && caught !== null && 'code' in caught ? String(caught.code) : '';
-            if (code === 'over_email_send_rate_limit' || code === 'over_request_rate_limit') setError(ru ? 'Слишком много попыток. Повторите позже.' : 'Too many attempts. Please try again later.');
-            else if (code === 'email_address_not_authorized') setError(ru ? 'Отправка писем на этот адрес пока недоступна в тестовой версии.' : 'Email delivery to this address is not available in this preview yet.');
-            else if (code === 'weak_password') setError(ru ? 'Выберите более надёжный пароль.' : 'Please choose a stronger password.');
-            else if (mode === 'login') setError(ru ? 'Не удалось войти. Проверьте почту, пароль и подтверждение адреса.' : 'Could not sign in. Check your email, password and email confirmation.');
-            else setError(ru ? 'Не удалось выполнить запрос. Повторите попытку позже.' : 'Could not complete the request. Please try again later.');
+            if (code === 'over_email_send_rate_limit' || code === 'over_request_rate_limit') setError('rateLimit');
+            else if (code === 'email_address_not_authorized') setError('address');
+            else if (code === 'weak_password') setError('weak');
+            else if (mode === 'login') setError('login');
+            else setError('request');
         } finally {
             inFlight.current = false;
             setPending(false);
@@ -154,8 +169,8 @@ export default function EmailAuth({ reset = false, disabled = false, onPendingCh
             {mode === 'login' ? <button type="button" onClick={() => changeMode('forgot')} disabled={locked} className="justify-self-end text-xs text-[#22D3EE] hover:underline disabled:opacity-50">{ru ? 'Забыли пароль?' : 'Forgot password?'}</button> : null}
             <Button type="submit" disabled={locked || (reset && !canReset)} className="h-11 w-full rounded-[10px] bg-[#22D3EE] font-semibold text-[#0A0F14] hover:bg-[#67E8F9]">{pending ? (ru ? 'Подождите…' : 'Please wait…') : label}</Button>
         </form> : null}
-        {error ? <p role="alert" className="text-sm leading-5 text-red-300">{error}</p> : null}
-        {message ? <p role="status" className="text-sm leading-6 text-[#A5F3FC]">{message}</p> : null}
+        {error ? <p role="alert" className="text-sm leading-5 text-red-300">{emailErrors[error][ru ? 0 : 1]}</p> : null}
+        {message ? <p role="status" className="text-sm leading-6 text-[#A5F3FC]">{emailNotices[message][ru ? 0 : 1]}</p> : null}
         {!reset ? <p className="text-center text-xs text-white/50">{mode === 'login' ? (ru ? 'Нет аккаунта? ' : 'No account? ') : mode === 'signup' ? (ru ? 'Уже есть аккаунт? ' : 'Already registered? ') : ''}<button type="button" onClick={() => changeMode(mode === 'login' ? 'signup' : 'login')} disabled={locked} className="text-[#22D3EE] hover:underline disabled:opacity-50">{mode === 'login' ? (ru ? 'Регистрация' : 'Sign up') : (ru ? 'Вернуться ко входу' : 'Back to sign in')}</button></p> : <a href="/sign-in" className="text-center text-sm text-[#22D3EE] hover:underline">{ru ? 'Вернуться ко входу' : 'Back to sign in'}</a>}
     </div>;
 }
