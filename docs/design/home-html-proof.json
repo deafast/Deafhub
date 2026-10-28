@@ -1,0 +1,10 @@
+{
+  "imageSize": {
+    "width": 1672,
+    "height": 941
+  },
+  "unchangedOutsideTextAreas": true,
+  "outsideChanges": 0,
+  "typography": "Real HTML paragraphs, Arial 20px, line-height 1.18, transparent flex column",
+  "review": "Condensed raster typography rejected by owner; replaced by separate HTML/CSS. Final visual acceptance remains with owner."
+}

@@ -1,0 +1,13 @@
+{
+  "source": "home-reference-before-logo.png",
+  "result": "home-approved-logo.png",
+  "changedArea": {
+    "left": 50,
+    "top": 10,
+    "width": 330,
+    "height": 100
+  },
+  "unchangedOutsideArea": true,
+  "logoSource": "../../public/branding/approved-2026-10-28/",
+  "method": "Imagegen restores only header background; exact supplied DH and wordmark PNG exports composited without retyping."
+}
