@@ -11,3 +11,16 @@ test('browser PNG and ICO dimensions remain valid without replacing brand assets
  for(const size of [16,32,48,180]){const data=readFileSync(resolve(root,`public/branding/deafhub-browser-${size}.png`));assert.equal(data.readUInt32BE(16),size);assert.equal(data.readUInt32BE(20),size);}
  const ico=readFileSync(resolve(root,'public/branding/deafhub-browser.ico'));assert.equal(ico.readUInt16LE(2),1);const sizes=Array.from({length:ico.readUInt16LE(4)},(_,i)=>ico[6+i*16]||256).sort((a,b)=>a-b);assert.equal(sizes.join(','),'16,32,48');
 });
+
+test('social metadata points to an existing square 512px brand image',()=>{
+ const source=readFileSync(resolve(root,'app/layout.tsx'),'utf8');
+ const metadataScope={exports:{},URL,require:name=>name==='next/font/google'?{Geist:()=>({}),Geist_Mono:()=>({})}: {}};
+ vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,metadataScope);
+ const {openGraph,twitter}=metadataScope.exports.metadata;
+ for(const src of [openGraph.images[0].url,twitter.images[0]]){
+  const data=readFileSync(resolve(root,'public'+src));
+  assert.equal(data.subarray(1,4).toString(),'PNG');
+  assert.equal(data.readUInt32BE(16),512);assert.equal(data.readUInt32BE(20),512);
+ }
+ assert.equal(openGraph.images[0].width,512);assert.equal(openGraph.images[0].height,512);
+});

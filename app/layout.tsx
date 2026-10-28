@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/brand/logo_circle.png",
+        url: "/branding/deafhub-dh-icon-512.png",
         width: 512,
         height: 512,
         alt: siteName,
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteName,
     description: siteDescription,
-    images: ["/brand/logo_circle.png"],
+    images: ["/branding/deafhub-dh-icon-512.png"],
   },
   manifest: "/manifest.webmanifest",
   icons: {
