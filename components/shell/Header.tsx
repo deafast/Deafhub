@@ -44,10 +44,10 @@ export default function Header() {
                 <div className="flex items-center gap-4">
                     <Link href="/" className="flex items-center gap-2 sm:gap-4 group">
                         <Image
-                            src="/branding/deafhub-wordmark-no-glints.png"
+                            src="/branding/approved-2026-10-28/wordmark-tagline.png"
                             alt="DeafHub Esports"
-                            width={2172}
-                            height={724}
+                            width={610}
+                            height={115}
                             priority
                             className="h-auto w-[120px] sm:w-[180px]"
                         />

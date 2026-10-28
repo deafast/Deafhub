@@ -1,0 +1,55 @@
+{
+  "source": "https://chatgpt.com/s/m_6ae24e7321cc81918ff9c3cce5f07a97",
+  "sourceSha256": "a9389138b873e122dcace1bbe1a16cf3ccaa27e4eeeafe28606754e0fb85c0fe",
+  "sourceSize": {
+    "width": 1697,
+    "height": 927
+  },
+  "method": "Original RGB pixels, near-black alpha export (24..56), rectangular separation; no generative outputs used.",
+  "svg": "Embedded PNG containers, not vector artwork.",
+  "font": "Original raster glyphs preserved. Font family and font files unavailable.",
+  "regions": {
+    "logo": {
+      "left": 544,
+      "top": 230,
+      "width": 610,
+      "height": 445,
+      "sha256": "7adc1bd929a1e1c4f741ff09e43dd868841204b7b03f9874db9bab0e524385b6"
+    },
+    "dh": {
+      "left": 548,
+      "top": 230,
+      "width": 605,
+      "height": 324,
+      "sha256": "9d548040d57b7864c2e8f7c74e4d0ba91c1bff0a6100be82debda30a50ba3240"
+    },
+    "wordmark": {
+      "left": 544,
+      "top": 560,
+      "width": 610,
+      "height": 75,
+      "sha256": "e491cdb9b76e4ba8158b804604bfb3ac297f6ad864e46a8a8bfd6466bdf552d0"
+    },
+    "wordmark-tagline": {
+      "left": 544,
+      "top": 560,
+      "width": 610,
+      "height": 115,
+      "sha256": "8ba77999dc87be38d2e736d5377f4e1cb97c3a639dccc7a4dbefb724b1efb3c1"
+    },
+    "shirt-back": {
+      "left": 544,
+      "top": 560,
+      "width": 610,
+      "height": 115,
+      "sha256": "8ba77999dc87be38d2e736d5377f4e1cb97c3a639dccc7a4dbefb724b1efb3c1"
+    },
+    "tagline": {
+      "left": 564,
+      "top": 640,
+      "width": 568,
+      "height": 35,
+      "sha256": "18b6d150549724b65a98372bf57ef508b6cfe125846acefa663e54cb04fc2f25"
+    }
+  }
+}

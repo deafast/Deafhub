@@ -8,8 +8,8 @@ test('installation manifest uses existing square branded PNG 192 and 512 with ex
  assert.equal(manifest.icons.map(i=>i.sizes).join(','),'192x192,512x512');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
 });
 test('browser PNG and ICO dimensions remain valid without replacing brand assets',()=>{
- for(const size of [16,32,48,180]){const data=readFileSync(resolve(root,`public/branding/deafhub-browser-${size}.png`));assert.equal(data.readUInt32BE(16),size);assert.equal(data.readUInt32BE(20),size);}
- const ico=readFileSync(resolve(root,'public/branding/deafhub-browser.ico'));assert.equal(ico.readUInt16LE(2),1);const sizes=Array.from({length:ico.readUInt16LE(4)},(_,i)=>ico[6+i*16]||256).sort((a,b)=>a-b);assert.equal(sizes.join(','),'16,32,48');
+ for(const size of [16,32,48,180]){const data=readFileSync(resolve(root,`public/branding/approved-2026-10-28/icon-${size}.png`));assert.equal(data.readUInt32BE(16),size);assert.equal(data.readUInt32BE(20),size);}
+ const ico=readFileSync(resolve(root,'public/branding/approved-2026-10-28/favicon.ico'));assert.equal(ico.readUInt16LE(2),1);const sizes=Array.from({length:ico.readUInt16LE(4)},(_,i)=>ico[6+i*16]||256).sort((a,b)=>a-b);assert.equal(sizes.join(','),'16,32,48');
 });
 
 test('social metadata points to an existing square 512px brand image',()=>{

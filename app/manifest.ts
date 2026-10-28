@@ -11,12 +11,12 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0A0F14",
     icons: [
       {
-        src: "/branding/deafhub-favicon-192.png",
+        src: "/branding/approved-2026-10-28/icon-192.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/branding/deafhub-dh-icon-512.png",
+        src: "/branding/approved-2026-10-28/icon-512.png",
         sizes: "512x512",
         type: "image/png",
       },

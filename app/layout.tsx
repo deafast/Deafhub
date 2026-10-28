@@ -16,7 +16,7 @@ const siteUrl = "https://www.deafhub.cc";
 const siteName = "DEAF|HUB Esports";
 const siteDescription = "DeafHub — a community esports project for Deaf and hard of hearing players.";
 
-const socialImagePath = "/branding/deafhub-dh-icon-512.png";
+const socialImagePath = "/branding/approved-2026-10-28/icon-512.png";
 const socialImage = process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL
   ? new URL(socialImagePath, `https://${process.env.VERCEL_URL}`).href
   : socialImagePath;
@@ -56,13 +56,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
-      { url: "/branding/deafhub-browser.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
-      { url: "/branding/deafhub-browser-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/branding/deafhub-browser-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/branding/deafhub-browser-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/branding/approved-2026-10-28/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
+      { url: "/branding/approved-2026-10-28/icon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/branding/approved-2026-10-28/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/branding/approved-2026-10-28/icon-48.png", sizes: "48x48", type: "image/png" },
     ],
-    shortcut: "/branding/deafhub-browser.ico",
-    apple: { url: "/branding/deafhub-browser-180.png", sizes: "180x180", type: "image/png" },
+    shortcut: "/branding/approved-2026-10-28/favicon.ico",
+    apple: { url: "/branding/approved-2026-10-28/icon-180.png", sizes: "180x180", type: "image/png" },
   },
 };
 
