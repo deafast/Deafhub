@@ -14,7 +14,7 @@ test('browser PNG and ICO dimensions remain valid without replacing brand assets
 
 test('social metadata points to an existing square 512px brand image',()=>{
  const source=readFileSync(resolve(root,'app/layout.tsx'),'utf8');
- const metadataScope={exports:{},URL,require:name=>name==='next/font/google'?{Geist:()=>({}),Geist_Mono:()=>({})}: {}};
+ const metadataScope={exports:{},URL,process:{env:{}},require:name=>name==='next/font/google'?{Geist:()=>({}),Geist_Mono:()=>({})}: {}};
  vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,metadataScope);
  const {openGraph,twitter}=metadataScope.exports.metadata;
  for(const src of [openGraph.images[0].url,twitter.images[0]]){
@@ -23,4 +23,18 @@ test('social metadata points to an existing square 512px brand image',()=>{
   assert.equal(data.readUInt32BE(16),512);assert.equal(data.readUInt32BE(20),512);
  }
  assert.equal(openGraph.images[0].width,512);assert.equal(openGraph.images[0].height,512);
+});
+
+test('Preview social images use the current deployment without changing production metadata base',()=>{
+ const source=readFileSync(resolve(root,'app/layout.tsx'),'utf8');
+ const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ for(const environment of ['preview','production']){
+  const scope={exports:{},URL,process:{env:{VERCEL_ENV:environment,VERCEL_URL:'qa-deafhub.vercel.app'}},require:name=>name==='next/font/google'?{Geist:()=>({}),Geist_Mono:()=>({})}:{}};
+  vm.runInNewContext(code,scope);
+  const metadata=scope.exports.metadata;
+  const image=new URL(metadata.openGraph.images[0].url,metadata.metadataBase);
+  assert.equal(image.host,environment==='preview'?'qa-deafhub.vercel.app':'www.deafhub.cc');
+  assert.equal(metadata.twitter.images[0],metadata.openGraph.images[0].url);
+  assert.equal(metadata.metadataBase.host,'www.deafhub.cc');
+ }
 });

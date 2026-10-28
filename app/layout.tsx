@@ -16,6 +16,11 @@ const siteUrl = "https://www.deafhub.cc";
 const siteName = "DEAF|HUB Esports";
 const siteDescription = "DeafHub — a community esports project for Deaf and hard of hearing players.";
 
+const socialImagePath = "/branding/deafhub-dh-icon-512.png";
+const socialImage = process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL
+  ? new URL(socialImagePath, `https://${process.env.VERCEL_URL}`).href
+  : socialImagePath;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -35,7 +40,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/branding/deafhub-dh-icon-512.png",
+        url: socialImage,
         width: 512,
         height: 512,
         alt: siteName,
@@ -46,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteName,
     description: siteDescription,
-    images: ["/branding/deafhub-dh-icon-512.png"],
+    images: [socialImage],
   },
   manifest: "/manifest.webmanifest",
   icons: {
