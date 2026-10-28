@@ -61,7 +61,7 @@ export default function PlayerLfp({game,ru,headingLevel,onJoined,onExpired}:Prop
   try{
    const response=await fetch('/api/lfp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...payload}),signal:controller.signal});
    if(!current())return;
-   if(response.status===401){session.current++;generation.current++;reading.current?.abort();setBoard(null);setError('Sign in required');onExpiredRef.current();return;}
+   if(response.status===401){session.current++;generation.current++;reading.current?.abort();setLoading(false);setBoard(null);setError('Sign in required');onExpiredRef.current();return;}
    const result=await response.json();if(!current())return;if(!response.ok)throw Error(typeof result.error==='string'?result.error:'Unavailable');
    const beforeRefresh=generation.current;const refreshed=await loadRef.current();if(!current())return;setNotice(action);
    if(!refreshed&&generation.current===beforeRefresh+1)setError('Refresh failed');

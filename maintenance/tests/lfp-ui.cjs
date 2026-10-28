@@ -39,3 +39,22 @@ test('late response for the previous game cannot replace the current listings',a
 test('a successful invitation remains successful if the follow-up refresh fails',async t=>{let reads=0,posts=0;const f=fixture(blank(),(_url,options)=>{if(options.method==='POST'){posts++;return Promise.resolve(Response.json({saved:true}));}reads++;return Promise.resolve(reads===1?Response.json({...blank(),listings:[listing]}):Response.json({error:'Unavailable'},{status:503}));});let view;await act(async()=>{view=create(React.createElement(f.Component,f.props));});t.after(async()=>act(async()=>view.unmount()));await act(async()=>view.root.findByProps({'aria-label':'Пригласить Player'}).props.onClick());assert.equal(posts,1);assert.match(JSON.stringify(view.toJSON()),/Приглашение отправлено игроку/);assert.match(JSON.stringify(view.toJSON()),/Данные пока не обновились/);});
 test('an unavailable service does not display fake players or a publish form',async t=>{const f=fixture(blank(),()=>Promise.resolve(Response.json({error:'Unavailable'},{status:503})));let view;await act(async()=>{view=create(React.createElement(f.Component,f.props));});t.after(async()=>act(async()=>view.unmount()));assert.equal(view.root.findAllByType('article').length,0);assert.equal(view.root.findAllByType('form').length,0);assert.ok(view.root.findAllByType('button').some(n=>n.children.join('')==='Повторить'));});
 test('more pages append unique listings and preserve the cursor',async t=>{let reads=0;const next={...listing,id:'player-two',nickname:'Second'};const f=fixture(blank(),(_url,options)=>{if(options.method==='POST')throw Error('unexpected mutation');reads++;return Promise.resolve(Response.json(reads===1?{...blank(),listings:[listing],nextCursor:'cursor-one'}:{...blank(),listings:[listing,next]}));});let view;await act(async()=>{view=create(React.createElement(f.Component,f.props));});t.after(async()=>act(async()=>view.unmount()));await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')==='Показать ещё').props.onClick());assert.equal(view.root.findAllByType('article').length,2);assert.equal(reads,2);});
+
+for(const ru of [true,false])test(`LFP POST401 stops a concurrent page-loading indicator RU=${ru}`,async t=>{
+ let reads=0;
+ const f=fixture(blank(),(_url,options)=>{
+  if(options.method==='POST')return Promise.resolve(new Response('expired',{status:401}));
+  reads++;
+  if(reads===1)return Promise.resolve(Response.json({...blank(),listings:[listing],nextCursor:'next-page'}));
+  return new Promise(()=>{});
+ });
+ let view;await act(async()=>{view=create(React.createElement(f.Component,{...f.props,ru}));});
+ t.after(async()=>act(async()=>view.unmount()));
+ await act(async()=>view.root.findAllByType('button').find(n=>n.children.join('')===(ru?'Показать ещё':'Show more')).props.onClick());
+ assert.ok(view.root.findAll(n=>n.props.role==='status').some(n=>n.children.join('')===(ru?'Загрузка…':'Loading…')));
+ await act(async()=>view.root.findByProps({'aria-label':ru?'Пригласить Player':'Invite Player'}).props.onClick());
+ assert.equal(f.expired,1);
+ assert.equal(view.root.findAllByType('article').length,0);
+ assert.equal(view.root.findAllByType('form').length,0);
+ assert.equal(view.root.findAll(n=>n.props.role==='status'&&n.children.join('')===(ru?'Загрузка…':'Loading…')).length,0);
+});
