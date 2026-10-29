@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import BrandImage from 'next/image';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 // Локальные кадры: public/preloader/1.jpg ... 6.jpg
 const FLIP_IMAGES = [
@@ -15,10 +17,11 @@ const FLIP_IMAGES = [
 
 /**
  * PreloaderV8 - Sharp Edge / Marvel Edition.
- * Background frames stay clipped to glyphs through the final color reveal.
- * Swap backgroundImage directly, never animate it independently from clipping.
+ * Background frames stay clipped to the approved brand alpha through the final reveal.
+ * The final frame uses the approved image pixels without retyped lettering.
  */
 export default function PreloaderV8() {
+    const language = useLanguageStore((state) => state.language);
     const [isLoading, setIsLoading] = useState(true);
     const [isSkipped, setIsSkipped] = useState(false);
 
@@ -172,83 +175,44 @@ export default function PreloaderV8() {
                             transition={{ scale: { duration: 2, ease: [0.23, 1, 0.32, 1] }, opacity: { duration: 0.6 } }}
                             className="relative p-4 sm:p-6 md:p-8 flex items-center justify-center overflow-visible bg-transparent"
                         >
-                            <div className="relative z-10 flex items-center gap-3 md:gap-8 bg-transparent">
-                                <motion.h1
-                                    animate={{
-                                        color: isFlipping ? 'transparent' : '#EAFBFF',
-                                    }}
-                                    className="text-[clamp(2rem,10vw,3rem)] md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
+                            <div className="relative z-10 w-[min(84vw,420px)]" style={{ aspectRatio: '610 / 445' }}>
+                                <div
+                                    aria-hidden="true"
+                                    className="absolute inset-0"
                                     style={{
-                                        WebkitBackgroundClip: 'text',
-                                        backgroundClip: 'text',
-                                        backgroundImage: isFlipping ? 'var(--dh-intro-frame, url("/preloader/1.webp"))' : 'none',
+                                        opacity: isFlipping ? 1 : 0,
+                                        backgroundImage: 'var(--dh-intro-frame, url("/preloader/1.webp"))',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
-                                        filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
-                                        backgroundColor: 'transparent'
+                                        filter: 'brightness(3.2) contrast(2)',
+                                        maskImage: 'url("/branding/approved-2026-10-28/logo.png")',
+                                        WebkitMaskImage: 'url("/branding/approved-2026-10-28/logo.png")',
+                                        maskSize: 'contain',
+                                        WebkitMaskSize: 'contain',
+                                        maskRepeat: 'no-repeat',
+                                        WebkitMaskRepeat: 'no-repeat',
                                     }}
-                                >
-                                    DEAF
-                                </motion.h1>
-
-                                {/* THE CENTRAL BAR | */}
-                                <motion.div
-                                    animate={{
-                                        scaleY: isFlipping ? 0.5 : 1,
-                                        skewX: -20,
-                                        backgroundColor: '#22D3EE',
-                                        boxShadow: isFlipping ? '0 0 18px #22D3EE' : '0 0 44px rgba(34,211,238,0.9)',
-                                    }}
-                                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                                    className="h-[64px] md:h-[120px] w-[4px] md:w-[8px] z-20 rounded-sm skew-x-[-20deg]"
                                 />
-
-                                <motion.h1
-                                    animate={{
-                                        color: isFlipping ? 'transparent' : '#22D3EE',
-                                    }}
-                                    className="text-[clamp(2rem,10vw,3rem)] md:text-8xl font-[1000] italic tracking-tight uppercase leading-none bg-transparent"
-                                    style={{
-                                        WebkitBackgroundClip: 'text',
-                                        backgroundClip: 'text',
-                                        backgroundImage: isFlipping ? 'var(--dh-intro-frame, url("/preloader/1.webp"))' : 'none',
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        filter: isFlipping ? 'brightness(3.2) contrast(2)' : 'none',
-                                        backgroundColor: 'transparent'
-                                    }}
-                                >
-                                    HUB
-                                </motion.h1>
+                                <BrandImage
+                                    src="/branding/approved-2026-10-28/logo.png"
+                                    alt="DEAFHUB — ESPORTS ORGANIZATION"
+                                    width={610}
+                                    height={445}
+                                    priority
+                                    sizes="(max-width: 500px) 84vw, 420px"
+                                    className="relative block h-auto w-full"
+                                    style={{ opacity: isFlipping ? 0 : 1 }}
+                                />
                             </div>
-
                         </motion.div>
-
-                        {/* Bottom Slogan */}
-                        <div className="mt-4 md:mt-8 text-center px-4 bg-transparent">
-                            <div className="flex items-center justify-center gap-4 bg-transparent">
-                                <motion.div
-                                    animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.25 : 0.7 }}
-                                    className="h-[2px] bg-[#22D3EE]"
-                                />
-                                <span className="text-sm md:text-2xl font-black italic tracking-[0.35em] text-white/90 uppercase">
-                                    PLATFORM
-                                </span>
-                                <motion.div
-                                    animate={{ width: isFlipping ? 16 : 60, opacity: isFlipping ? 0.25 : 0.7 }}
-                                    className="h-[2px] bg-[#22D3EE]"
-                                />
-                            </div>
-                        </div>
                     </div>
-
                     <button
                         type="button"
                         onClick={skipIntro}
                         style={{ bottom: 'max(16px, env(safe-area-inset-bottom))', right: 'max(16px, env(safe-area-inset-right))' }}
                         className="absolute z-30 min-h-11 min-w-11 rounded-md border border-white/30 bg-black/60 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-cyan-300 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300 motion-reduce:transition-none"
                     >
-                        Skip intro
+                        {language === 'ru' ? 'Пропустить заставку' : 'Skip intro'}
                     </button>
                 </motion.div >
             )}
