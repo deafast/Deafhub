@@ -137,9 +137,12 @@ export default function PreloaderV8() {
                     {/* ФИКС F5: Скрипт защиты от мерцания */}
                     <script dangerouslySetInnerHTML={{
                         __html: `
-            if (sessionStorage.getItem('dh_intro_seen')) {
-              document.getElementById('dh-preloader-container').style.display = 'none';
-            }
+            try {
+              if (sessionStorage.getItem('dh_intro_seen')) {
+                const intro = document.getElementById('dh-preloader-container');
+                if (intro) intro.style.display = 'none';
+              }
+            } catch {}
           `}} />
 
                     {/* FULL SCREEN FLIPPING BACKGROUND */}

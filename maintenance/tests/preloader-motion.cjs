@@ -29,3 +29,17 @@ test('natural intro completion releases media listeners and timers without unmou
  assert.equal(f.timers.size,0);
  await act(async()=>tree.unmount());
 });
+
+test('early intro script tolerates blocked sessionStorage',async()=>{
+ const f=fixture(false);let tree;await act(async()=>{tree=create(React.createElement(f.Component));});
+ const script=tree.root.findByType('script').props.dangerouslySetInnerHTML.__html;
+ assert.doesNotThrow(()=>vm.runInNewContext(script,{sessionStorage:{getItem(){throw Error('Storage denied');}},document:{getElementById(){return {style:{}};}}}));
+ await act(async()=>tree.unmount());
+});
+test('early intro script tolerates a missing target and still hides an existing seen intro',async()=>{
+ const f=fixture(false);let tree;await act(async()=>{tree=create(React.createElement(f.Component));});
+ const script=tree.root.findByType('script').props.dangerouslySetInnerHTML.__html;
+ assert.doesNotThrow(()=>vm.runInNewContext(script,{sessionStorage:{getItem:()=> 'true'},document:{getElementById:()=>null}}));
+ const element={style:{}};vm.runInNewContext(script,{sessionStorage:{getItem:()=> 'true'},document:{getElementById:()=>element}});assert.equal(element.style.display,'none');
+ await act(async()=>tree.unmount());
+});
