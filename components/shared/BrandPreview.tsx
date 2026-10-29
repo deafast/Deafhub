@@ -1,5 +1,4 @@
 'use client';
-import {useEffect,useRef} from 'react';
 import Link from 'next/link';
 import {ArrowRight,Users,Gamepad2,TrendingUp,ShieldCheck} from 'lucide-react';
 import {useLanguageStore} from '@/store/useLanguageStore';
@@ -15,8 +14,6 @@ const games=[
 
 export default function BrandPreview(){
  const ru=useLanguageStore(s=>s.language==='ru');
- const root=useRef<HTMLDivElement>(null);
- useEffect(()=>{const device=navigator as Navigator&{deviceMemory?:number;connection?:{saveData?:boolean}};root.current?.classList.toggle(styles.quiet,Boolean(device.connection?.saveData||(device.deviceMemory&&device.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)));},[]);
  const text=(r:string,e:string)=>ru?r:e;
  const features=[
   {icon:Users,title:text('Инклюзивное сообщество','Inclusive community'),body:text('Играем. Общаемся. Развиваемся вместе.','Play, connect and grow together.')},
@@ -24,7 +21,7 @@ export default function BrandPreview(){
   {icon:TrendingUp,title:text('Развитие и возможности','Growth and opportunities'),body:text('Навыки, опыт, новые горизонты в киберспорте.','Skills, experience and new esports opportunities.')},
   {icon:ShieldCheck,title:text('Уважение и равные условия','Respect and equal opportunities'),body:text('Талант не зависит от слуха.','Talent does not depend on hearing.')},
  ];
- return <div ref={root} className={styles.page}>
+ return <div className={styles.page}>
   <div className={styles.waves}/><LivingWaves/>
   <div className={styles.content}>
    <section className={styles.hero} aria-labelledby="home-title">
