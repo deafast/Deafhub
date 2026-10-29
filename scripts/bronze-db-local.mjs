@@ -1,7 +1,10 @@
 // Isolated in-memory PostgreSQL checks. Never connects to Supabase.
 import {readFileSync,readdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
-import {PGlite} from '@electric-sql/pglite';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {PGlite}=require(process.env.DEAFHUB_PGLITE_PATH||'@electric-sql/pglite');
+const readSql=path=>readFileSync(path,'utf8').replaceAll('\r\n','\n');
 const pg=await PGlite.create();
 let stage='bootstrap';
 try {
@@ -10,14 +13,14 @@ try {
  create table auth.users(id uuid primary key,email text,aud text,role text,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;`);
  for(const name of ['profiles','competition','tournament-engine','tournament-operations']) {
-  stage='base '+name;await pg.exec(readFileSync(`db/${name}.sql`,'utf8'));
+  stage='base '+name;await pg.exec(readSql(`db/${name}.sql`));
  }
  stage='migration';
  const migration='supabase/migrations/'+readdirSync('supabase/migrations').find(n=>n.endsWith('_bronze_match_awards.sql'));
- await pg.exec(readFileSync(migration,'utf8'));
- stage='legacy awards regression';await pg.exec(readFileSync('db/tournament-operations-check.sql','utf8'));
+ await pg.exec(readSql(migration));
+ stage='legacy awards regression';await pg.exec(readSql('db/tournament-operations-check.sql'));
  stage='bronze rollback regression';
- const original=readFileSync('db/tournament-operations-check.sql','utf8').replace(/^begin;\s*/,'').replace(/rollback;\s*$/,'');
+ const original=readSql('db/tournament-operations-check.sql').replace(/^begin;\s*/,'').replace(/rollback;\s*$/,'');
  const bronze=execFileSync(process.execPath,['scripts/bronze-sql-check.mjs'],{encoding:'utf8'});
  await pg.exec('begin;\n'+original+'\n'+bronze+'\nrollback;');
  const count=await pg.query('select count(*)::int n from public.hub_tournaments');
