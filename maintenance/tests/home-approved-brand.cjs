@@ -2,6 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript'),test=
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 for(const ru of [true,false])test(`home uses the agreed game composition and game filters RU=${ru}`,()=>{
  const imports={
+  'next/image':{__esModule:true,default:({unoptimized,...props})=>React.createElement('img',props)},
   'next/link':{__esModule:true,default:({children,...p})=>React.createElement('a',p,children)},
   '@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},
   './BrandPreview.module.css':{__esModule:true,default:new Proxy({},{get:(_,key)=>key})},
@@ -20,4 +21,8 @@ for(const ru of [true,false])test(`home uses the agreed game composition and gam
  for(const phrase of ru?['Стратегия','Командный дух','Игра для каждого']:['Strategy','Team spirit','A game for everyone'])assert.ok(html.includes(phrase));
  assert.ok(!html.includes('/branding/approved-2026-10-28/logo.png'));
  assert.match(html,/<details/);
+ const mobile=html.split('class="mobileGames"')[1].split('</nav>')[0];
+ assert.ok(!mobile.includes('artwork.webp'));
+ assert.ok(!mobile.includes('<svg'));
+ for(const logo of ['dota2.png','cs2.svg','ea-sports-fc.svg'])assert.ok(mobile.includes(`/branding/game-logos/${logo}`));
 });

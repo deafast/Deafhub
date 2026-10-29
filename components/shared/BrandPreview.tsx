@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import {ArrowRight,Users,Gamepad2,TrendingUp,ShieldCheck} from 'lucide-react';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import styles from './BrandPreview.module.css';
@@ -7,9 +8,9 @@ import LivingWaves from './LivingWaves';
 
 const artwork='/branding/home-approved/artwork.webp';
 const games=[
- {id:'dota2',name:'Dota 2',view:'800 410 185 132',clip:'800,410 985,410 985,542 800,542',className:'dota',ru:['Стратегия','Командная игра','Большие возможности'],en:['Strategy','Team play','More opportunities']},
- {id:'cs2',name:'CS2',view:'1040 440 265 110',clip:'1040,440 1305,440 1305,550 1040,550',className:'cs2',ru:['Тактика','Реакция','Командный дух'],en:['Tactics','Reaction','Team spirit']},
- {id:'fc',name:'EA Sports FC',view:'1345 462 240 90',clip:'1345,462 1585,462 1585,552 1345,552',className:'fc',ru:['Футбол','Сообщество','Игра для каждого'],en:['Football','Community','A game for everyone']},
+ {id:'dota2',name:'Dota 2',logo:'/branding/game-logos/dota2.png',width:386,height:76,className:'dota',ru:['Стратегия','Командная игра','Большие возможности'],en:['Strategy','Team play','More opportunities']},
+ {id:'cs2',name:'CS2',logo:'/branding/game-logos/cs2.svg',width:801,height:165,className:'cs2',ru:['Тактика','Реакция','Командный дух'],en:['Tactics','Reaction','Team spirit']},
+ {id:'fc',name:'EA Sports FC',logo:'/branding/game-logos/ea-sports-fc.svg',width:512,height:254,className:'fc',ru:['Футбол','Сообщество','Игра для каждого'],en:['Football','Community','A game for everyone']},
 ];
 
 export default function BrandPreview(){
@@ -46,7 +47,7 @@ export default function BrandPreview(){
    </section>
    <nav aria-label={text('Игры','Games')} className={styles.mobileGames}>
     {games.map(game=><Link key={game.id} href={`/tournaments?game=${game.id}`} className={styles.mobileGame} aria-label={game.name}>
-     <svg viewBox={game.view} aria-hidden="true" className={styles.mobileArt}><defs><clipPath id={`home-game-${game.id}`}><polygon points={game.clip}/></clipPath></defs><image href={artwork} width="1672" height="941" clipPath={`url(#home-game-${game.id})`}/></svg>
+     <Image src={game.logo} width={game.width} height={game.height} alt="" unoptimized className={styles.mobileArt}/>
      <span translate="no" lang="en">{game.name}</span>
     </Link>)}
    </nav>
