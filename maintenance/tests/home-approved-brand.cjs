@@ -24,5 +24,6 @@ for(const ru of [true,false])test(`home uses the agreed game composition and gam
  const mobile=html.split('class="mobileGames"')[1].split('</nav>')[0];
  assert.ok(!mobile.includes('artwork.webp'));
  assert.ok(!mobile.includes('<svg'));
+ assert.ok(!mobile.includes('<span'), 'mobile links contain only the original logo, without duplicate captions');
  for(const logo of ['dota2.png','cs2.svg','ea-sports-fc.svg'])assert.ok(mobile.includes(`/branding/game-logos/${logo}`));
 });

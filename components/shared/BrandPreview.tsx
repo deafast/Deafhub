@@ -48,7 +48,6 @@ export default function BrandPreview(){
    <nav aria-label={text('Игры','Games')} className={styles.mobileGames}>
     {games.map(game=><Link key={game.id} href={`/tournaments?game=${game.id}`} className={styles.mobileGame} aria-label={game.name}>
      <Image src={game.logo} width={game.width} height={game.height} alt="" unoptimized className={styles.mobileArt}/>
-     <span translate="no" lang="en">{game.name}</span>
     </Link>)}
    </nav>
    <section className={styles.features} aria-label={text('О сообществе','Our community')}>
