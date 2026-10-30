@@ -29,3 +29,5 @@
 -Публикация визуального пакета подтверждена: код f024a4f в сборке18747c6, Vercel success. Brave Preview desktop1920: маска и12s движение присутствуют, переполнения нет; реальный снимок qa/screenshots/2026-10-30-scene-icons/published-desktop-1920.png. Выполненное не повторять.
 
 -Последнее подтверждённое уточнение30.10: вокруг игровых карточек НЕ нужны внешние волны. Оставлены только3полные карточки/персонажи/логотипы/рамки/подписи; внешний wave-path и blur из маски удалены. Не возвращать их. Фон страницы отдельно не переделывался. Готовую часть сразу[x] в статусе; снимок qa/screenshots/2026-10-30-scene-icons/cards-only-desktop.png.
+
+-Публикация «только карточки» adb77e4: Vercel success; Brave Preview1920 проверен, outerWavePaths=0, blurFilters=0, overflow=false. Снимок qa/screenshots/2026-10-30-scene-icons/cards-only-published.png.
