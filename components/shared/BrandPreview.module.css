@@ -32,3 +32,6 @@
 @media(prefers-reduced-motion:reduce){.page *{scroll-behavior:auto}}
 
 .mobileArt[src$='ea-sports-fc.svg']{filter:invert(1)}
+
+@media(min-width:1101px) and (prefers-reduced-motion:no-preference){.desktopGames{animation:sceneFloat 12s ease-in-out infinite}}
+@keyframes sceneFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}

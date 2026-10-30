@@ -8,8 +8,8 @@ test('installation manifest uses existing square branded PNG 192 and 512 with ex
  assert.equal(manifest.icons.map(i=>i.sizes).join(','),'192x192,512x512');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
 });
 test('browser PNG and ICO dimensions remain valid without replacing brand assets',()=>{
- for(const size of [16,32,48,180]){const data=readFileSync(resolve(root,`public/branding/approved-2026-10-28/icon-${size}.png`));assert.equal(data.readUInt32BE(16),size);assert.equal(data.readUInt32BE(20),size);}
- const ico=readFileSync(resolve(root,'public/branding/approved-2026-10-28/favicon.ico'));assert.equal(ico.readUInt16LE(2),1);const sizes=Array.from({length:ico.readUInt16LE(4)},(_,i)=>ico[6+i*16]||256).sort((a,b)=>a-b);assert.equal(sizes.join(','),'16,32,48');
+ for(const size of [16,32,48,180]){const data=readFileSync(resolve(root,`public/branding/browser-2026-10-30/icon-${size}.png`));assert.equal(data.readUInt32BE(16),size);assert.equal(data.readUInt32BE(20),size);}
+ const ico=readFileSync(resolve(root,'public/branding/browser-2026-10-30/favicon.ico'));assert.equal(ico.readUInt16LE(2),1);const sizes=Array.from({length:ico.readUInt16LE(4)},(_,i)=>ico[6+i*16]||256).sort((a,b)=>a-b);assert.equal(sizes.join(','),'16,32,48');
 });
 
 test('social metadata points to an existing square 512px brand image',()=>{
@@ -36,5 +36,18 @@ test('Preview social images use the current deployment without changing producti
   assert.equal(image.host,environment==='preview'?'qa-deafhub.vercel.app':'www.deafhub.cc');
   assert.equal(metadata.twitter.images[0],metadata.openGraph.images[0].url);
   assert.equal(metadata.metadataBase.host,'www.deafhub.cc');
+ }
+});
+
+const sharp=require('sharp'),crypto=require('node:crypto');
+test('browser icons retain original DH provenance, increase the mark and add a dark contrast badge',async()=>{
+ const base='public/branding/browser-2026-10-30/';
+ const provenance=JSON.parse(readFileSync(resolve(root,base+'provenance.json')));
+ assert.equal(crypto.createHash('sha256').update(readFileSync(resolve(root,provenance.source))).digest('hex'),provenance.sourceSha256);
+ for(const size of [16,32,48,180,192,512]){
+  const {data,info}=await sharp(resolve(root,base+'icon-'+size+'.png')).ensureAlpha().raw().toBuffer({resolveWithObject:true});assert.equal(info.width,size);assert.equal(info.height,size);assert.ok(data[3]<64);
+  const bg=(Math.floor(size*.2)*size+Math.floor(size/2))*4;assert.deepEqual([...data.subarray(bg,bg+4)],[10,15,20,255]);
+  let left=size,right=-1,top=size,bottom=-1;for(let y=0;y<size;y++)for(let x=0;x<size;x++){const at=(y*size+x)*4;if(data[at+1]>100&&data[at+2]>100&&data[at+1]>data[at]*1.4){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}}
+  assert.ok(right-left+1>=size*.8,'DH is too small horizontally');assert.ok(bottom-top+1>=size*.4,'DH is too small vertically');
  }
 });

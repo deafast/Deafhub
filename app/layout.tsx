@@ -56,13 +56,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
-      { url: "/branding/approved-2026-10-28/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
-      { url: "/branding/approved-2026-10-28/icon-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/branding/approved-2026-10-28/icon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/branding/approved-2026-10-28/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/branding/browser-2026-10-30/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
+      { url: "/branding/browser-2026-10-30/icon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/branding/browser-2026-10-30/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/branding/browser-2026-10-30/icon-48.png", sizes: "48x48", type: "image/png" },
     ],
-    shortcut: "/branding/approved-2026-10-28/favicon.ico",
-    apple: { url: "/branding/approved-2026-10-28/icon-180.png", sizes: "180x180", type: "image/png" },
+    shortcut: "/branding/browser-2026-10-30/favicon.ico",
+    apple: { url: "/branding/browser-2026-10-30/icon-180.png", sizes: "180x180", type: "image/png" },
   },
 };
 

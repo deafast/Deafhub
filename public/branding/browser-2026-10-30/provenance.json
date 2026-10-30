@@ -1,0 +1,19 @@
+{
+  "source": "public/branding/approved-2026-10-28/dh.png",
+  "sourceSha256": "9d548040d57b7864c2e8f7c74e4d0ba91c1bff0a6100be82debda30a50ba3240",
+  "crop": {
+    "left": 9,
+    "top": 8,
+    "width": 582,
+    "height": 306
+  },
+  "method": "Approved raster DH, trim only outer alpha margin, proportionate resize, dark rounded badge for contrast. No new logo or vector claim.",
+  "sizes": [
+    16,
+    32,
+    48,
+    180,
+    192,
+    512
+  ]
+}

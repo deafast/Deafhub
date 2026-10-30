@@ -27,3 +27,10 @@ for(const ru of [true,false])test(`home uses the agreed game composition and gam
  assert.ok(!mobile.includes('<span'), 'mobile links contain only the original logo, without duplicate captions');
  for(const logo of ['dota2.png','cs2.svg','ea-sports-fc.svg'])assert.ok(mobile.includes(`/branding/game-logos/${logo}`));
 });
+
+test('desktop artwork uses a silhouette mask and only gentle motion with reduced-motion opt-out',()=>{
+ const source=fs.readFileSync('components/shared/BrandPreview.tsx','utf8'),css=fs.readFileSync('components/shared/BrandPreview.module.css','utf8');
+ assert.match(source,/<mask[^>]*maskUnits="userSpaceOnUse"/);assert.match(source,/<image[^>]*mask=/);assert.match(source,/useId\(/);
+ assert.match(css,/@media\(min-width:1101px\) and \(prefers-reduced-motion:no-preference\)/);
+ assert.match(css,/animation:sceneFloat 12s ease-in-out infinite/);assert.match(css,/translateY\(-3px\)/);assert.doesNotMatch(css,/mix-blend-mode:lighten/);
+});

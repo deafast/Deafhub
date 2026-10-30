@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import {useId} from 'react';
 import Image from 'next/image';
 import {ArrowRight,Users,Gamepad2,TrendingUp,ShieldCheck} from 'lucide-react';
 import {useLanguageStore} from '@/store/useLanguageStore';
@@ -15,6 +16,7 @@ const games=[
 
 export default function BrandPreview(){
  const ru=useLanguageStore(s=>s.language==='ru');
+ const sceneId=useId();
  const text=(r:string,e:string)=>ru?r:e;
  const features=[
   {icon:Users,title:text('Инклюзивное сообщество','Inclusive community'),body:text('Играем. Общаемся. Развиваемся вместе.','Play, connect and grow together.')},
@@ -36,7 +38,19 @@ export default function BrandPreview(){
      </div>
     </div>
     <div className={styles.desktopGames}>
-     <svg viewBox="760 125 885 620" aria-hidden="true" className={styles.scene}><image href={artwork} width="1672" height="941"/></svg>
+     <svg viewBox="760 125 885 620" aria-hidden="true" className={styles.scene}>
+      <defs>
+       <filter id={sceneId+'-soft'} x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="18"/></filter>
+       <mask id={sceneId+'-mask'} maskUnits="userSpaceOnUse" x="760" y="125" width="885" height="620">
+        <g fill="white" filter={'url(#'+sceneId+'-soft)'}>
+         <path d="M878 145 L940 180 L1040 145 L1078 190 L985 648 L767 619 L760 350 L800 260 Z M1084 170 L1361 145 L1284 676 L1004 652 Z M1382 191 L1627 234 L1562 666 L1310 640 Z"/>
+         <path d="M740 210 C860 100 940 130 1080 185 S1430 240 1665 130 M740 615 C900 615 1000 740 1260 735 S1460 680 1665 750" fill="none" stroke="white" strokeWidth="95"/>
+        </g>
+        <path d="M878 145 L940 180 L1040 145 L1078 190 L985 648 L767 619 L760 350 L800 260 Z M1084 170 L1361 145 L1284 676 L1004 652 Z M1382 191 L1627 234 L1562 666 L1310 640 Z" fill="white"/>
+       </mask>
+      </defs>
+      <image href={artwork} width="1672" height="941" mask={'url(#'+sceneId+'-mask)'}/>
+     </svg>
      <nav aria-label={text('Игры','Games')} className={styles.desktopLinks}>
       {games.map(game=><Link key={game.id} href={`/tournaments?game=${game.id}`} className={`${styles.gameLink} ${styles[game.className]}`} aria-label={game.name}>
        <span className={styles.srOnly} lang="en">{game.name}</span>
