@@ -40,13 +40,8 @@ export default function BrandPreview(){
     <div className={styles.desktopGames}>
      <svg viewBox="760 125 885 620" aria-hidden="true" className={styles.scene}>
       <defs>
-       <filter id={sceneId+'-soft'} x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="18"/></filter>
        <mask id={sceneId+'-mask'} maskUnits="userSpaceOnUse" x="760" y="125" width="885" height="620">
-        <g fill="white" filter={'url(#'+sceneId+'-soft)'}>
-         <path d="M878 145 L940 180 L1040 145 L1078 190 L985 648 L767 619 L760 350 L800 260 Z M1084 170 L1361 145 L1284 676 L1004 652 Z M1382 191 L1627 234 L1562 666 L1310 640 Z"/>
-         <path d="M740 210 C860 100 940 130 1080 185 S1430 240 1665 130 M740 615 C900 615 1000 740 1260 735 S1460 680 1665 750" fill="none" stroke="white" strokeWidth="95"/>
-        </g>
-        <path d="M878 145 L940 180 L1040 145 L1078 190 L985 648 L767 619 L760 350 L800 260 Z M1084 170 L1361 145 L1284 676 L1004 652 Z M1382 191 L1627 234 L1562 666 L1310 640 Z" fill="white"/>
+        <path d="M861 202 L1068 195 L991 654 L761 625 Z M871 166 L858 200 L840 240 L857 227 L867 198 Z M1001 165 L1007 204 L1019 242 L1014 221 L1012 190 Z M1078 165 L1368 140 L1292 682 L998 658 Z M1376 185 L1635 230 L1568 672 L1304 646 Z" fill="white"/>
        </mask>
       </defs>
       <image href={artwork} width="1672" height="941" mask={'url(#'+sceneId+'-mask)'}/>

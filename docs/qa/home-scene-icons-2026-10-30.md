@@ -16,3 +16,6 @@
 
 ## Публикация
 Код f024a4f, отправленный вместе с документацией18747c6 в preview/deafhub-setup. Vercel для18747c6: success (deployment HReQGcUrhzc8jJ7EKV6o2RJ9TyVk). В Brave проверен опубликованный Preview: маска url(#_R_1brdb_-mask), длительность анимации12s, overflow=false, реальный снимок published-desktop-1920.png. URL: https://deafhub-git-preview-deafhub-setup-ionas-projects-019510f8.vercel.app/ .
+
+## Последующее уточнение: только карточки
+Владелец подтвердил удаление внешних волн вокруг игровой композиции. Удалены wave-path и blur маски; Dota-маска уточнена по рамке и выступающим деталям. Локальный Brave1920 проверен, снимок cards-only-desktop.png. Фоновая графика остальных частей страницы не переделывалась. Итоговая сборка/TypeScript PASS; ESLint и3целевых RU/EN/композиционных теста PASS. Это заменяет прежнее требование сохранять внешнюю волну вокруг карточек.
