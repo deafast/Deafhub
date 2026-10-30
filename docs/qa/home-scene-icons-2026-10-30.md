@@ -13,3 +13,6 @@
 Серверная разметка выдаёт новые PNG/ICO-ссылки. В автоматизированной вкладке Brave расширение подменяет rel=icon своей временной служебной накладкой (data-codex-favicon-badge), поэтому физический значок вкладки/домашнего экрана по этому DOM нельзя объявлять принятым. Файлы/размеры/контраст и исходящий HTML проверены; нужна проверка в обычной вкладке и на устройстве владельца. Supabase/Auth/миграции/финансы/Production не менялись. Посторонние Header/TextSizeControl не входят в пакет.
 
 Финальная собранная версия1920 сохранена отдельно: screenshots/2026-10-30-scene-icons/desktop-final-1920.png. После итоговой сборки HTTP200 для manifest, PNG16/192 и ICO подтверждены.
+
+## Публикация
+Код f024a4f, отправленный вместе с документацией18747c6 в preview/deafhub-setup. Vercel для18747c6: success (deployment HReQGcUrhzc8jJ7EKV6o2RJ9TyVk). В Brave проверен опубликованный Preview: маска url(#_R_1brdb_-mask), длительность анимации12s, overflow=false, реальный снимок published-desktop-1920.png. URL: https://deafhub-git-preview-deafhub-setup-ionas-projects-019510f8.vercel.app/ .
