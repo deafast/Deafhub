@@ -86,3 +86,32 @@ for(const ru of [true,false])test(`published match time stays UTC across player 
   assert.ok(labels[0].endsWith('18:30:00 UTC'));
  }finally{if(before===undefined)delete process.env.TZ;else process.env.TZ=before;}
 });
+
+for(const ru of [true,false])test('visible match notices persist, deduplicate, dismiss and clear on expiry RU='+ru,async t=>{
+ const f=await mountEngine(t,ru,async()=>{});
+ const dismiss=()=>f.view.root.findAllByType('button').find(b=>b.children.join('')===(ru?'Закрыть уведомление':'Dismiss notification'));
+ assert.equal(dismiss(),undefined);
+ const scheduled={revision:2,state:engine.transition(stored.state,{type:'schedule',match:'U1.0',scheduledAt:payload.command.scheduledAt,reason:'Notice test'})};
+ f.setResponse(scheduled);await f.refresh();assert.match(JSON.stringify(f.view.toJSON()),ru?/расписание матчей: 1/:/match schedules: 1/);
+ if(process.env.DEAFHUB_NOTICE_VISUAL&&ru){
+  const fs=require('node:fs');
+  const {renderToStaticMarkup}=require('react-dom/server');
+  const element=n=>typeof n==='string'||typeof n==='number'?n:n?React.createElement(n.type,Object.fromEntries(Object.entries(n.props||{}).filter(([k])=>!k.startsWith('on'))),...(n.children||[]).map(element)):null;
+  const tree=f.view.toJSON();const body=renderToStaticMarkup(React.createElement(React.Fragment,null,...(Array.isArray(tree)?tree:[tree]).map(element)));
+  const css=[];function walk(p){for(const e of fs.readdirSync(p,{withFileTypes:true})){const at=p+'/'+e.name;if(e.isDirectory())walk(at);else if(at.endsWith('.css'))css.push(fs.readFileSync(at,'utf8'));}}walk('.next/static');
+  fs.mkdirSync('node_modules/.cache/deafhub-notice-qa',{recursive:true});
+  fs.writeFileSync('node_modules/.cache/deafhub-notice-qa/index.html','<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DEAFHUB — локальная проверка уведомления</title><style>'+css.join('\n')+'</style><body style="background:#0A0F14;color:#EAFBFF;font-family:Arial,sans-serif"><main style="padding:16px;max-width:1000px;margin:auto"><p style="margin-bottom:24px">Локальный тест интерфейса — искусственное событие, без облачных записей</p>'+body+'</main></body></html>');
+ }
+ const live=f.view.root.findAll(n=>n.props['aria-live']==='polite');assert.equal(live.length,1);assert.equal(live[0].props['aria-atomic'],'true');
+ await Renderer.act(async()=>dismiss().props.onClick());assert.equal(dismiss(),undefined);
+ await f.refresh();assert.equal(dismiss(),undefined,'poll resurrected dismissed notice');
+ f.setResponse({revision:1,state:stored.state});await f.refresh();assert.equal(dismiss(),undefined);
+ f.setResponse({revision:3,state:stored.state});await f.refresh();assert.ok(dismiss(),'cancellation not announced');
+ f.expire();await f.refresh();assert.equal(dismiss(),undefined,'notice survived expiry');
+});
+for(const ru of [true,false])test('confirmed result publication has a visible notice RU='+ru,async t=>{
+ const f=await mountEngine(t,ru,async()=>{});
+ const state=engine.transition(stored.state,{type:'result',match:'U1.0',result:{kind:'played',a:1,b:0},invalidate:false,reason:'Confirmed result'});
+ f.setResponse({revision:2,state});await f.refresh();
+ assert.match(JSON.stringify(f.view.toJSON()),ru?/результаты матчей: 1/:/match results: 1/);
+});

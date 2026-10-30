@@ -13,12 +13,28 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
  const [state,setState]=useState<State|null>(initial?.state||null),[revision,setRevision]=useState(initial?.revision||0),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const text=(r:string,e:string)=>ru?r:e;
  const [updates,setUpdates]=useState<UpdateStatus>('connecting'),[signedOut,setSignedOut]=useState(false);
+ const [notice,setNotice]=useState<{schedule:number;results:number;ready:number}|null>(null);
+ const previousState=useRef(initial?.state||null);
  const canManage=owner&&!signedOut;
  const latestRevision=useRef(initial?.revision||0),catalogRevision=useRef(initial?.revision||0),request=useRef<AbortController|null>(null);
  const active=useRef(false),saving=useRef(false),sessionGeneration=useRef(0);
  useEffect(()=>{active.current=true;return()=>{active.current=false;request.current?.abort();};},[]);
- const clearSession=useCallback(()=>{sessionGeneration.current++;request.current?.abort();setSignedOut(true);setState(null);setRevision(0);latestRevision.current=0;catalogRevision.current=0;},[]);
- const accept=useCallback((data:{state:State|null;revision:number})=>{if(data.revision<latestRevision.current)return;latestRevision.current=data.revision;setState(data.state);setRevision(data.revision);},[]);
+ const clearSession=useCallback(()=>{sessionGeneration.current++;request.current?.abort();setSignedOut(true);setState(null);setNotice(null);previousState.current=null;setRevision(0);latestRevision.current=0;catalogRevision.current=0;},[]);
+ const accept=useCallback((data:{state:State|null;revision:number})=>{
+  if(data.revision<latestRevision.current)return;
+  if(data.revision>latestRevision.current&&previousState.current&&data.state){
+   const old=new Map(previousState.current.matches.map(m=>[m.id,m]));
+   const change={schedule:0,results:0,ready:0};
+   for(const match of data.state.matches){
+    const before=old.get(match.id);
+    if((before?.scheduledAt||null)!==(match.scheduledAt||null))change.schedule++;
+    if(JSON.stringify(before?.result??null)!==JSON.stringify(match.result??null))change.results++;
+    if(match.status==='ready'&&(!before||before.status!=='ready'||before.a!==match.a||before.b!==match.b))change.ready++;
+   }
+   if(change.schedule||change.results||change.ready)setNotice(change);
+  }
+  previousState.current=data.state;latestRevision.current=data.revision;setState(data.state);setRevision(data.revision);
+ },[]);
  const load=useCallback(async()=>{
   if(!active.current)return;
   request.current?.abort();const controller=new AbortController();request.current=controller;
@@ -62,7 +78,11 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
   }
   void save({type:'qualify',ties});
  }
- return <details open={demo||undefined} className="border-t border-white/10 pt-4"><summary className="cursor-pointer text-[#22D3EE]">{text('Этапы и турнирная сетка','Stages and bracket')}</summary>
+ return <>{!demo?<div role="status" aria-live="polite" aria-atomic="true">{notice?<div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#22D3EE]/40 p-4 text-sm leading-6"><p>{text('Изменения турнира:','Tournament changes:')} {[
+  notice.schedule?text('расписание матчей: '+notice.schedule,'match schedules: '+notice.schedule):'',
+  notice.results?text('результаты матчей: '+notice.results,'match results: '+notice.results):'',
+  notice.ready?text('готовые пары: '+notice.ready,'ready pairings: '+notice.ready):'',
+ ].filter(Boolean).join(' · ')}. {text('Откройте этапы и турнирную сетку для подробностей.','Open Stages and bracket for details.')}</p><button type="button" className="min-h-11 text-[#22D3EE] underline" onClick={()=>setNotice(null)}>{text('Закрыть уведомление','Dismiss notification')}</button></div>:null}</div>:null}<details open={demo||undefined} className="border-t border-white/10 pt-4"><summary className="cursor-pointer text-[#22D3EE]">{text('Этапы и турнирная сетка','Stages and bracket')}</summary>
  {error?<p role="alert" className="mt-3 text-red-300">{ru?({
  'Schedule reason required':'Укажите причину назначения времени.',
  'Use a valid UTC schedule':'Укажите корректное время UTC.',
@@ -112,5 +132,5 @@ export default function TournamentEngine({demo=false,id,game,owner,ru,approved,n
  <label className="block">{text('Основание / решение судьи','Evidence / referee decision')}<input name="reason" className={field} minLength={3} maxLength={500} required/></label>
  {m.result?<label className="flex gap-2 text-sm"><input name="invalidate" type="checkbox"/>{text('Разрешаю сброс зависимых результатов; исправление группы отменит весь плей-офф.','Allow dependent results to reset; correcting a group cancels the playoffs.')}</label>:null}
  <button className={button} disabled={busy}>{text('Сохранить решение','Save decision')}</button></form></details>:null}</article>)}</div></details>
- </div>:null}</details>;
+ </div>:null}</details></>;
 }
