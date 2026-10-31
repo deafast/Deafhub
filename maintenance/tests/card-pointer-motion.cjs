@@ -1,0 +1,17 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {motionAt}=require('../../public/branding/layered-cards-trial/card-motion.js');const rect={left:100,top:200,width:200,height:400};
+test('pointer directions move light and parallax with the cursor',()=>{const tl=motionAt(100,200,rect),br=motionAt(300,600,rect);assert.equal(tl.rx,4);assert.equal(tl.ry,-5);assert.equal(tl.px,-3);assert.equal(tl.ly,5);assert.equal(br.rx,-4);assert.equal(br.ry,5);assert.equal(br.py,3);assert.equal(br.lx,95);});
+test('center is neutral and movement stays bounded outside the card',()=>{assert.deepEqual(motionAt(200,400,rect),{rx:0,ry:0,px:0,py:0,lx:50,ly:50});const m=motionAt(1e6,-1e6,rect);assert.equal(m.ry,5);assert.equal(m.rx,4);assert.equal(m.px,3);assert.equal(m.py,-3);});
+test('degenerate geometry and invalid cursor coordinates remain neutral',()=>{const m=motionAt(NaN,Infinity,{left:0,top:0,width:0,height:0});assert.equal(m.px,0);assert.equal(m.py,0);assert.equal(m.lx,50);});
+
+const vm=require('node:vm'),fs=require('node:fs');
+function browserHarness(enabled=true){
+ const handlers={},windowHandlers={},styles=new Map(),classes=new Set(),raf=new Map();let next=1;
+ const query={matches:enabled,addEventListener:(_,fn)=>{query.changed=fn;}};
+ const card={style:{setProperty:(k,v)=>styles.set(k,v),removeProperty:k=>styles.delete(k)},classList:{add:k=>classes.add(k),remove:k=>classes.delete(k)},getBoundingClientRect:()=>rect,addEventListener:(key,fn)=>{handlers[key]=fn;}};
+ vm.runInNewContext(fs.readFileSync('public/branding/layered-cards-trial/card-motion.js','utf8'),{document:{querySelectorAll:()=>[card]},matchMedia:()=>query,window:{addEventListener:(k,fn)=>{windowHandlers[k]=fn;}},requestAnimationFrame:fn=>{const id=next++;raf.set(id,fn);return id;},cancelAnimationFrame:id=>raf.delete(id)});
+ return {styles,classes,query,raf,fire:(type,event={clientX:200,clientY:400,pointerType:'mouse'})=>handlers[type](event),flush:()=>{for(const [id,fn] of [...raf]){raf.delete(id);fn();}},blur:()=>windowHandlers.blur()};
+}
+test('pointer events coalesce into one frame and leaving cancels pending motion',()=>{const b=browserHarness();b.fire('pointerenter');b.fire('pointermove',{clientX:300,clientY:600,pointerType:'mouse'});b.fire('pointermove',{clientX:100,clientY:200,pointerType:'mouse'});assert.equal(b.raf.size,1);b.flush();assert.equal(b.styles.get('--ry'),'-5deg');assert.equal(b.styles.get('--ly'),'5%');assert.ok(b.classes.has('pointer-live'));b.fire('pointermove');b.fire('pointerleave');assert.equal(b.raf.size,0);assert.equal(b.styles.size,0);assert.equal(b.classes.size,0);});
+test('reduced motion and touch never activate pointer effects',()=>{for(const reduced of [true,false]){const b=browserHarness(!reduced);b.fire('pointerenter',{pointerType:reduced?'mouse':'touch'});b.fire('pointermove',{clientX:300,clientY:600,pointerType:reduced?'mouse':'touch'});assert.equal(b.raf.size,0);assert.equal(b.classes.size,0);assert.equal(b.styles.size,0);}});
+test('changing reduced-motion preference or leaving the window clears active state',()=>{const b=browserHarness();b.fire('pointerenter');b.fire('pointermove');b.flush();b.query.matches=false;b.query.changed();assert.equal(b.styles.size,0);assert.equal(b.classes.size,0);b.query.matches=true;b.fire('pointerenter');b.fire('pointermove');b.flush();b.blur();assert.equal(b.styles.size,0);assert.equal(b.classes.size,0);});
