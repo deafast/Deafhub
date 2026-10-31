@@ -1,8 +1,8 @@
 {
   "source": "../home-approved/artwork.webp",
   "sourceSha256": "786bf662eca17f72aa2e7f185a52ca526ae3c23fed9ae6e96fa38d83f3a327f7",
-  "backdropRemoved": 1138,
-  "method": "Cool low-confidence exterior backdrop and detached traces between horns removed only outside the card; original RGB retained wherever alpha>0; transparent outside each card, cleared hidden RGB. No redraw, resize, font/logo replacement or invented detail. Added 16px transparent safety margin. Descriptive phrases remain editable HTML on the site; clean PNGs contain original game logos only.",
+  "backdropRemoved": 1370,
+  "method": "Cool low-confidence exterior backdrop, detached traces between horns, thin stray stroke above the right Dota corner and isolated exterior specks removed only outside the card; original RGB retained wherever alpha>0; transparent outside each card, cleared hidden RGB. No redraw, resize, font/logo replacement or invented detail. Added 16px transparent safety margin. Descriptive phrases remain editable HTML on the site; clean PNGs contain original game logos only.",
   "canvas": {
     "left": 680,
     "top": 125,
@@ -14,14 +14,14 @@
       "id": "dota2",
       "name": "Shadow Fiend · Dota 2",
       "file": "dota2-sf.png",
-      "width": 409,
+      "width": 402,
       "height": 519,
       "padding": 16,
       "sourceOffset": {
-        "x": 686,
+        "x": 693,
         "y": 153
       },
-      "sha256": "a442c465ea9399f68fa1aa73816bc62fdd1ee831531c26be2dfcbd01f3bc20ff"
+      "sha256": "bc0a14de7ff4db703b1576c3b7dae2cd7b4e1149c41f0d8507cfd0616f1927cd"
     },
     {
       "id": "cs2",
@@ -34,7 +34,7 @@
         "x": 981,
         "y": 121
       },
-      "sha256": "ff56726c4a5cf07e0f6fec4aa1e4c0dbe142a4db5fc566c42815afa5078e7b05"
+      "sha256": "40b04d7b8f1e1381a40fdc1bea98493251ae1f2d4607e31d1ca45d4d2928428b"
     },
     {
       "id": "fc",

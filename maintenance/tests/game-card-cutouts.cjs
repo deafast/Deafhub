@@ -15,3 +15,10 @@ test('three separate cutouts have transparent safety margins and preserve every 
 test('exported visible artwork retains approved source RGB without a background replacement',async()=>{
  const source=await sharp('public/branding/home-approved/artwork.webp').extract({left:680,top:125,width:965,height:620}).ensureAlpha().raw().toBuffer();const image=await sharp(base+'all-cards.png').ensureAlpha().raw().toBuffer();for(let i=0;i<image.length;i+=4)if(image[i+3])for(let c=0;c<3;c++)assert.equal(image[i+c],source[i+c]);
 });
+
+test('stray stroke above Dota right corner is transparent while the frame remains intact',async()=>{
+ const data=await sharp(base+'all-cards.png').ensureAlpha().raw().toBuffer();
+ const alpha=(x,y)=>data[((y-125)*965+x-680)*4+3];
+ for(let y=169;y<190;y++)for(let x=1022;x<=1075;x++)assert.equal(alpha(x,y),0,'stray stroke remains');
+ assert.equal(alpha(1060,200),255,'top frame was clipped');
+});

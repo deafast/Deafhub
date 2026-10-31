@@ -7,8 +7,17 @@ async function main(){
  const frame=[[861,202],[1068,195],[985,648],[767,619]];
  const nearFrame=(x,y)=>frame.every((a,i)=>{const b=frame[(i+1)%4],dx=b[0]-a[0],dy=b[1]-a[1];return dx*(y-a[1])-dy*(x-a[0])>=-8*Math.hypot(dx,dy);});
  let backdropRemoved=0;
- for(let y=0;y<620;y++)for(let x=0;x<965;x++){const i=y*965+x,gx=x+680,gy=y+125;if(!alpha[i]||gx>1080||nearFrame(gx,gy))continue;const r=original[i*4],g=original[i*4+1],b=original[i*4+2];
-  if((gx>885&&gx<995&&gy<192)||(alpha[i]<170&&g>r*1.25&&b>r*1.25)){alpha[i]=0;backdropRemoved++;}
+ for(let y=0;y<620;y++)for(let x=0;x<965;x++){const i=y*965+x,gx=x+680,gy=y+125;if(alpha[i]&&gx>=1022&&gx<=1075&&gy<190){alpha[i]=0;backdropRemoved++;}if(!alpha[i]||gx>1080||nearFrame(gx,gy))continue;const r=original[i*4],g=original[i*4+1],b=original[i*4+2];
+  if((gx>=1022&&gx<=1075&&gy<190)||(gx>885&&gx<995&&gy<192)||(alpha[i]<170&&g>r*1.25&&b>r*1.25)){alpha[i]=0;backdropRemoved++;}
+ }
+ // Remove isolated exterior specks, retaining the connected character/card silhouette.
+ const seen=new Uint8Array(alpha.length);
+ for(let seed=0;seed<alpha.length;seed++){
+  if(seen[seed]||!alpha[seed])continue;const queue=[seed];seen[seed]=1;
+  for(let at=0;at<queue.length;at++){const p=queue[at],x=p%965,y=Math.floor(p/965);
+   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy,n=ny*965+nx;if(nx>=0&&nx<965&&ny>=0&&ny<620&&!seen[n]&&alpha[n]){seen[n]=1;queue.push(n);}}
+  }
+  if(queue.length<32)for(const i of queue){alpha[i]=0;backdropRemoved++;}
  }
  const group=Buffer.from(original);for(let i=0;i<alpha.length;i++){group[i*4+3]=alpha[i];if(!alpha[i])group.fill(0,i*4,i*4+3);}
  await sharp(group,{raw:{width:965,height:620,channels:4}}).png().toFile(path.join(root,'all-cards.png'));
@@ -22,7 +31,7 @@ async function main(){
   const bytes=await sharp(out,{raw:{width,height,channels:4}}).png().toBuffer();fs.writeFileSync(path.join(root,defs[card].file),bytes);
   records.push({...defs[card],width,height,padding:pad,sourceOffset:{x:x0+680-pad,y:y0+125-pad},sha256:crypto.createHash('sha256').update(bytes).digest('hex')});
  }
- fs.writeFileSync(path.join(root,'manifest.json'),JSON.stringify({source:'../home-approved/artwork.webp',sourceSha256:crypto.createHash('sha256').update(fs.readFileSync('public/branding/home-approved/artwork.webp')).digest('hex'),backdropRemoved,method:'Cool low-confidence exterior backdrop and detached traces between horns removed only outside the card; original RGB retained wherever alpha>0; transparent outside each card, cleared hidden RGB. No redraw, resize, font/logo replacement or invented detail. Added 16px transparent safety margin. Descriptive phrases remain editable HTML on the site; clean PNGs contain original game logos only.',canvas,cards:records},null,2)+'\n');
+ fs.writeFileSync(path.join(root,'manifest.json'),JSON.stringify({source:'../home-approved/artwork.webp',sourceSha256:crypto.createHash('sha256').update(fs.readFileSync('public/branding/home-approved/artwork.webp')).digest('hex'),backdropRemoved,method:'Cool low-confidence exterior backdrop, detached traces between horns, thin stray stroke above the right Dota corner and isolated exterior specks removed only outside the card; original RGB retained wherever alpha>0; transparent outside each card, cleared hidden RGB. No redraw, resize, font/logo replacement or invented detail. Added 16px transparent safety margin. Descriptive phrases remain editable HTML on the site; clean PNGs contain original game logos only.',canvas,cards:records},null,2)+'\n');
  console.log(records.map(x=>({file:x.file,width:x.width,height:x.height})));
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
