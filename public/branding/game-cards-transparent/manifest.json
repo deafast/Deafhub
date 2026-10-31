@@ -1,0 +1,53 @@
+{
+  "source": "../home-approved/artwork.webp",
+  "sourceSha256": "786bf662eca17f72aa2e7f185a52ca526ae3c23fed9ae6e96fa38d83f3a327f7",
+  "backdropRemoved": 1138,
+  "method": "Cool low-confidence exterior backdrop and detached traces between horns removed only outside the card; original RGB retained wherever alpha>0; transparent outside each card, cleared hidden RGB. No redraw, resize, font/logo replacement or invented detail. Added 16px transparent safety margin. Descriptive phrases remain editable HTML on the site; clean PNGs contain original game logos only.",
+  "canvas": {
+    "left": 680,
+    "top": 125,
+    "width": 965,
+    "height": 620
+  },
+  "cards": [
+    {
+      "id": "dota2",
+      "name": "Shadow Fiend · Dota 2",
+      "file": "dota2-sf.png",
+      "width": 409,
+      "height": 519,
+      "padding": 16,
+      "sourceOffset": {
+        "x": 686,
+        "y": 153
+      },
+      "sha256": "a442c465ea9399f68fa1aa73816bc62fdd1ee831531c26be2dfcbd01f3bc20ff"
+    },
+    {
+      "id": "cs2",
+      "name": "Counter-Strike 2",
+      "file": "cs2.png",
+      "width": 404,
+      "height": 579,
+      "padding": 16,
+      "sourceOffset": {
+        "x": 981,
+        "y": 121
+      },
+      "sha256": "ff56726c4a5cf07e0f6fec4aa1e4c0dbe142a4db5fc566c42815afa5078e7b05"
+    },
+    {
+      "id": "fc",
+      "name": "EA SPORTS FC",
+      "file": "ea-sports-fc.png",
+      "width": 365,
+      "height": 523,
+      "padding": 16,
+      "sourceOffset": {
+        "x": 1286,
+        "y": 167
+      },
+      "sha256": "226b5941d175ada29adbea8e666d816c11e03c06e3594b981bfdff68711a223f"
+    }
+  ]
+}

@@ -16,8 +16,8 @@
 .desktopLinks{position:absolute;inset:0}
 .gameLink{position:absolute;top:4%;height:84%;width:27%;border-radius:14px;text-decoration:none;color:#eafbff}
 .dota{left:3.5%}.cs2{left:31.7%}.fc{left:63%;top:12%;height:75%}
-.cardCopy{position:absolute;top:75.7%;left:2%;width:100%;display:flex;flex-direction:column;gap:2px;font-size:clamp(14px,2.15cqw,20px);line-height:1.25;background:transparent}
-.cs2 .cardCopy{top:77.4%}.fc .cardCopy{top:78.4%}
+.cardCopy{position:absolute;top:77.23%;left:2.5%;width:90%;display:flex;flex-direction:column;gap:0;font-size:2cqw;line-height:1.25;font-weight:400;color:#f5fbfd;text-shadow:0 1px 2px #000b;background:transparent;white-space:nowrap}
+.cs2 .cardCopy{left:-1%}.fc .cardCopy{top:75.83%;left:10%}
 .cardCopy span{display:block}
 .mobileGames{display:none}
 .features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;padding:28px 0 22px;border-top:1px solid #22d3ee18}
