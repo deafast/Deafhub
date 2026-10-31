@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-31",
+  "source": "public/branding/home-approved/artwork.webp",
+  "sourceSha256": "786bf662eca17f72aa2e7f185a52ca526ae3c23fed9ae6e96fa38d83f3a327f7",
+  "localAlphaSource": "docs/design/cards-subject-alpha.png",
+  "localAlphaSha256": "5d00b35a1086788fc906cbe3372fe9c4cf3310b9122477164e5221684ea1c023",
+  "mask": "public/branding/home-approved/cards-silhouette-mask.png",
+  "maskSha256": "ede74c2055332a4e8af978c4b8bf624f3a4d41c24f93bdda8d41e2e9d7f10d48",
+  "canvas": {
+    "x": 680,
+    "y": 125,
+    "width": 965,
+    "height": 620
+  },
+  "method": "Local offline subject alpha plus complete opaque card interiors and border margin; original RGB never rewritten. SVG canvas widened without changing displayed source-pixel scale or HTML caption coordinates.",
+  "localTool": "@imgly/background-removal-node 1.4.5; only offline QA tool in ignored node_modules cache, not an application dependency.",
+  "generator": "node maintenance/export-home-card-mask.cjs",
+  "acceptance": "Implementation tested locally; owner visual acceptance pending."
+}

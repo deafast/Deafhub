@@ -38,10 +38,10 @@ export default function BrandPreview(){
      </div>
     </div>
     <div className={styles.desktopGames}>
-     <svg viewBox="760 125 885 620" aria-hidden="true" className={styles.scene}>
+     <svg viewBox="680 125 965 620" aria-hidden="true" className={styles.scene}>
       <defs>
-       <mask id={sceneId+'-mask'} maskUnits="userSpaceOnUse" x="760" y="125" width="885" height="620">
-        <path d="M861 202 L1068 195 L991 654 L761 625 Z M871 166 L858 200 L840 240 L857 227 L867 198 Z M1001 165 L1007 204 L1019 242 L1014 221 L1012 190 Z M1078 165 L1368 140 L1292 682 L998 658 Z M1376 185 L1635 230 L1568 672 L1304 646 Z" fill="white"/>
+       <mask id={sceneId+'-mask'} maskUnits="userSpaceOnUse" x="680" y="125" width="965" height="620">
+        <image href="/branding/home-approved/cards-silhouette-mask.png" x="680" y="125" width="965" height="620"/>
        </mask>
       </defs>
       <image href={artwork} width="1672" height="941" mask={'url(#'+sceneId+'-mask)'}/>

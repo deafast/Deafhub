@@ -12,7 +12,7 @@
 .primary,.secondary{min-height:54px;padding:14px 26px;border:1px solid #00cbe4;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;gap:18px;font-size:16px;font-weight:600;text-decoration:none}
 .primary{color:#031015;background:#00cbe4}.secondary{color:#eafbff;background:transparent}
 .desktopGames{position:relative;aspect-ratio:885/620;container-type:inline-size;min-width:0}
-.scene{display:block;width:100%;height:auto;overflow:hidden;mask-image:linear-gradient(to right,transparent,#000 2%,#000 98%,transparent),linear-gradient(to bottom,transparent,#000 2%,#000 98%,transparent);mask-composite:intersect}
+.scene{display:block;width:calc(100% * 965 / 885);max-width:none;height:auto;margin-left:calc(-100% * 80 / 885);overflow:visible}
 .desktopLinks{position:absolute;inset:0}
 .gameLink{position:absolute;top:4%;height:84%;width:27%;border-radius:14px;text-decoration:none;color:#eafbff}
 .dota{left:3.5%}.cs2{left:31.7%}.fc{left:63%;top:12%;height:75%}
