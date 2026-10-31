@@ -3,7 +3,7 @@
  function motionAt(x,y,rect){
   const unit=(value,start,size)=>size>0&&Number.isFinite(value)?Math.max(-1,Math.min(1,((value-start)/size-.5)*2)):0;
   const nx=unit(x,rect.left,rect.width),ny=unit(y,rect.top,rect.height);
-  return {rx:-ny*2||0,ry:nx*2.5,px:nx*1.2,py:ny*1.2,lx:50+nx*30,ly:50+ny*30};
+  return {rx:-ny*4||0,ry:nx*6,px:nx*2.5,py:ny*2.5,lx:50+nx*30,ly:50+ny*30};
  }
  if(typeof module==='object'&&module.exports)module.exports={motionAt};
  if(typeof document==='undefined')return;
