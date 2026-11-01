@@ -216,3 +216,7 @@ for(const ru of [true,false])test(`Dota duel banner retains approved brand, seas
  const html=renderToStaticMarkup(React.createElement(DotaBanner,{title:'DEAFHUB TEST · Dota 2 1×1 · Сезон 1',startsAt:'2026-11-02T17:00:00Z',ru}));
  assert.match(html,/wordmark-tagline.png/);assert.match(html,ru?/1 сезон/:/Season 1/);assert.match(html,/20:00/);assert.match(html,/UTC\+3/);assert.match(html,/1×1/);assert.match(html,/TEST/);assert.match(html,ru?/без призовых/:/no prizes/);
 });
+for(const ru of [true,false])test(`banner game switch contains three games without all-games option RU=${ru}`,()=>{
+ const html=renderToStaticMarkup(React.createElement(GameFilter,{value:'cs2',onChange:()=>{},ru,hideAll:true}));
+ assert.equal((html.match(/type="button"/g)||[]).length,3);assert.doesNotMatch(html,/Все игры|All games/);assert.match(html,/aria-pressed="true"[^>]*>.*CS2/);
+});
