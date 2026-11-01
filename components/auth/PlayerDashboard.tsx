@@ -2,11 +2,10 @@
 import {useState} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {LayoutDashboard,ChartNoAxesCombined,History,Users,Trophy,Wallet,Settings,ArrowUpRight} from 'lucide-react';
+import {LayoutDashboard,ChartNoAxesCombined,History,Users,Trophy,Wallet,Settings,ArrowUpRight,UserRound} from 'lucide-react';
 import MatchHistory from '@/components/hub/MatchHistory';
 import HubPanel from '@/components/hub/HubPanel';
 import AuthPanel from './AuthPanel';
-import AvatarView from '@/components/r3f/AvatarView';
 import SteamProfile from './SteamProfile';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import type {PlayerProfile} from '@/lib/profile';
@@ -23,7 +22,7 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
  <p className={styles.kicker}>DEAFHUB / PLAYER SPACE</p>
  <header className={styles.profileHero}>
   <div className={styles.identity}>
-   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.avatar}><AvatarView className="h-full w-full !rounded-full pointer-events-none"/></div>
+   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.avatar}>{profile.nickname.trim()?<span aria-hidden="true">{Array.from(profile.nickname.trim())[0].toLocaleUpperCase(ru?'ru':'en')}</span>:<UserRound size={34} aria-hidden="true"/>}</div>
    <div><p className={styles.kicker}>{t('Личный кабинет','Player account')}</p><h1 translate="no">{profile.nickname||t('Игрок','Player')}</h1><p>{region}</p></div>
   </div>
   <Link href="/profile/settings" className={styles.settings}><Settings size={16} aria-hidden="true"/>{t('Настройки профиля','Profile settings')}</Link>
