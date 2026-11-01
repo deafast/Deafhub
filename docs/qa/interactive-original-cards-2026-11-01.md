@@ -9,3 +9,4 @@
 12целевых тестов PASS: в том числе реальная растеризацияSVG на отсутствие внутренних пустых полос/подреза руки, исходныеPNG/пружины/RU-EN. Итоговый build/TypeScript PASS. Физические240Hz/Brave не проверены. Снимкиdesktop/mobile и JSON в screenshots/2026-11-01-interaction. Визуальную приёмку владельцем не закрывать автоматически.
 
 Веткаpreview/deafhub-setup. main/Production/финансы/Supabase и чужиеHeader/TextSizeControl не изменены. Источник данных толькоoriginal-games.ts; сейчас3карточки, дополнительные ряды только в плане.
+- [x]b17e302 опубликован: Vercel success/Preview4ZbAsti5bAcvReBQNyynMpj8TC53. На основном сайте реально выполнен dragCS2,pathname=/,tx/ty0.00px после отпускания; все9наклонённых строкinside=true,min5.8sourcepx на1920,overflow=false,browser errors[]. Опубликованный снимок published-detail.png. Предварительный интерактивный результат готов для оценки владельцем; приёмка не заявлена.
