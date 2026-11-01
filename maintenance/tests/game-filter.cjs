@@ -26,7 +26,7 @@ for(const ru of [true,false])test(`game controls are accessible, all games suppo
 const Renderer=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
 const none={default:()=>null};
 function panel(ru,engine=none,teams=none){return load('components/hub/HubPanel.tsx',{
- 'next/link':{default:props=>React.createElement('a',props)},'./ProfileHonors':none,'./TournamentOverview':none,'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
+ 'next/link':{default:props=>React.createElement('a',props)},'./DotaDuelBanner':none,'./ProfileHonors':none,'./TournamentOverview':none,'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
  './TournamentOperations':{default:props=>React.createElement('button',{onClick:()=>void props.onSaved()},'QA refresh'),ProfileAwards:()=>null},
  './GameFilter':{default:GameFilter,useGameFilter:()=>React.useState('all')},'@/lib/tournament-filters':filters,
  '@/lib/tournament/fc-levels':{fcLevelLabel:value=>value},'@/lib/hub-history':load('lib/hub-history.ts'),
@@ -210,4 +210,9 @@ for(const ru of [true,false])for(const phase of ['response','json'])test(`catalo
  assert.doesNotMatch(JSON.stringify(view.toJSON()),/PRIVATE TOURNAMENT|PRIVATE PLAYER|Сохранено\.|Saved\./);
  assert.equal(view.root.findAllByType('form').length,0);
  await Renderer.act(async()=>view.unmount());
+});
+const DotaBanner=load('components/hub/DotaDuelBanner.tsx',{'next/image':{default:p=>React.createElement('img',p)}}).default;
+for(const ru of [true,false])test(`Dota duel banner retains approved brand, season and Minsk date RU=${ru}`,()=>{
+ const html=renderToStaticMarkup(React.createElement(DotaBanner,{title:'DEAFHUB TEST · Dota 2 1×1 · Сезон 1',startsAt:'2026-11-02T17:00:00Z',ru}));
+ assert.match(html,/wordmark-tagline.png/);assert.match(html,ru?/1 сезон/:/Season 1/);assert.match(html,/20:00/);assert.match(html,/UTC\+3/);assert.match(html,/1×1/);assert.match(html,/TEST/);assert.match(html,ru?/без призовых/:/no prizes/);
 });
