@@ -11,5 +11,3 @@
 .card[data-original-card="cs2"] .copy{font-style:oblique 10deg}
 .card:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.card{transform:none}}
-
-
