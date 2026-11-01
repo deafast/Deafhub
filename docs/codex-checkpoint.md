@@ -102,3 +102,5 @@
 - 01.11: компактные строки39d9185 Preview визуально PASS desktop/mobile,78PASS/buildPASS. Productioncreate отклонёнautoreview из-за scopeкода; не обходить, ждать конкретного разрешения. qa/compact-match-rows-2026-11-01.md.
 
 - 01.11: владелец отдельно разрешил Production39d9185; опубликованоREADY dpl_78bM4rxZaMhEZ6UTnYMPRrwktDu6, проверен actualwin66px. Прежний approvalблокер снят; не запрашивать повторно для этой публикации. Дополнительные Dotahero/KDA/items пока отсутствуют.
+
+- Последний порядок владельца01.11: история/окно97fe936→Dotaкрасныйбаннер→CS2толькопосленовогосообщения. ДиалогPreviewсреальнымиитогамиPASS/80tests/build; productionзаблокированautoreviewточныйкоммит97fe936требуетсогласия. de4ab20CS2подготовленвPreview,непубликовать. qa/match-results-dialog-2026-11-01.md.

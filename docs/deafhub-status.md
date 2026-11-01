@@ -158,3 +158,7 @@
 
 - [x] Компактные строки матчей39d9185 проверены в Preview desktop/mobile,78PASS/build/ESLintPASS. Данные Dotaгероев/предметов не импортируются. Доказательства: qa/compact-match-rows-2026-11-01.md.
 - [x] Публикация39d9185 на основном сайте отдельно разрешена владельцем и выполнена: dpl_78bM4rxZaMhEZ6UTnYMPRrwktDu6 READY, aliases www.deafhub.cc/deafhub.cc; реальная строка победы высотой66px проверена в Production.
+
+- [x] Окно итогов97fe936 вместо навигации: Preview/browser desktop390,80PASS/build/ESLint PASS; данные сохранены. См. qa/match-results-dialog-2026-11-01.md.
+- [ ] Production97fe936: автоматическая проверка требует отдельного согласия на новый коммит.
+- [ ] Красный Dotaбаннер следующий после окна. CS2de4ab20 отложен владельцем, не публиковать в Production.
