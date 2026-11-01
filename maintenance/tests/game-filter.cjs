@@ -70,7 +70,7 @@ for(const ru of [true,false])test(`embedded profile panel retains its secondary 
 for(const ru of [true,false])test(`catalog tournament date states UTC independent of device timezone RU=${ru}`,async t=>{
  const original=global.fetch;t.after(()=>{global.fetch=original;});global.fetch=async()=>Response.json(hubFixture());
  let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(panel(ru),{section:'tournaments'}));});
- const date=view.root.findAllByType('p').map(n=>n.children.join('')).find(text=>text.includes('2027'));
+ const date=view.root.findAll(n=>n.props['data-event-date']!==undefined).map(n=>n.children.join('')).find(text=>text.includes('2027'));
  assert.match(date,/12:00:00 UTC/,'tournament start must name its UTC timezone and preserve the saved instant');
  await Renderer.act(async()=>view.unmount());
 });
