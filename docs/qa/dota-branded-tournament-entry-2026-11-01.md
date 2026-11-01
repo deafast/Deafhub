@@ -9,3 +9,5 @@
 Окно итогов97fe936 отдельно разрешено, опубликовано READY и проверено на www.deafhub.cc: диалог открывается в /profile без навигации в турнир. Код5cd3bb4 с новым Dota-баннером пока только Preview.
 
 Официальная регистрация любительской лиги Valve: https://www.dota2.com/league/0/overview — Create League, Tier Amateur, регион, сайт, описание, даты. Заявка Valve автоматически не подавалась.
+
+Уточнение01.11: владелец требует общий фон, а не отдельную карточку баннера. 5a5e416 убирает img-баннер из Overview, использует точный красный арт фоном всей ширины раздела Dota2 с градиентом вниз и бордовыми оттенками панелей. CUP comfort-v4 не используется. Preview dpl_6SurafHUH4bBrYRC6M9ppL5JAFD2 проверен в IAB1280/390: арт виден, текст читается, overflow=false, переключатели справа; мобильные кнопки44px.64tests/ESLint/build/TypeScript PASS. Снимки full-background-desktop/mobile.jpg сохранены локально в outputs/dota-league текущего чата. Production не публиковался.
