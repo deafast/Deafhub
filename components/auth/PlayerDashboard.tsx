@@ -25,7 +25,7 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
    <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.avatar}>{profile.nickname.trim()?<span aria-hidden="true">{Array.from(profile.nickname.trim())[0].toLocaleUpperCase(ru?'ru':'en')}</span>:<UserRound size={34} aria-hidden="true"/>}</div>
    <div><p className={styles.kicker}>{t('Личный кабинет','Player account')}</p><h1 translate="no">{profile.nickname||t('Игрок','Player')}</h1><p>{region}</p></div>
   </div>
-  <Link href="/profile/settings" className={styles.settings}><Settings size={16} aria-hidden="true"/>{t('Настройки профиля','Profile settings')}</Link>
+  <Link href="/profile/settings" className={styles.settings}><Settings size={16} aria-hidden="true"/>{t('Настройки','Settings')}</Link>
  </header>
  <div className={styles.profileGrid}>
   <aside className={styles.sidebar}>
@@ -34,7 +34,7 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
   </aside>
   <div className={styles.main} id="player-content" role="region" aria-label={labels[sections.indexOf(active)]}>
   {active==='overview'?<div className={styles.overviewGrid}>
-   <section className={styles.accounts}><h2>{t('Игровые аккаунты','Gaming accounts')}</h2><p className={styles.accountStatus}>{t('Подключения и доступные игровые сервисы вашего профиля.','Your profile connections and available gaming services.')}</p><div className={styles.connections}>
+   <section className={styles.accounts}><h2>{t('Игровые аккаунты','Gaming accounts')}</h2><div className={styles.connections}>
     {steamId?<SteamProfile key={steamId} steamId={steamId} ru={ru}/>:<AuthPanel steamOnly/>}
     <span role="img" aria-label={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} title={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02]"><Image src="/auth/faceit.svg" width={34} height={34} alt="" className="opacity-35"/></span>
     {googleConnected?<span role="img" aria-label={t('Google — подключён','Google — connected')} title={t('Google — подключён','Google — connected')} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04]"><Image src="/auth/google.svg" width={30} height={30} alt=""/></span>:null}
