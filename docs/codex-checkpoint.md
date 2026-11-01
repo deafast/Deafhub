@@ -100,3 +100,5 @@
 - 01.11: владелец разрешил постоянную organizerроль своему аккаунту и transfer TEST27be3772; SQL/readback и UI PASS,2pending заявки сохранены, действий допуска/матчей не было. qa/owner-organizer-transfer-2026-11-01.md. Задержка Steam у друга отдельно открыта:3анонимных старта209–313мс, предложение убрать лишний клиентский getUser ещё не реализовано; не объявлять исправленным.
 
 - 01.11: компактные строки39d9185 Preview визуально PASS desktop/mobile,78PASS/buildPASS. Productioncreate отклонёнautoreview из-за scopeкода; не обходить, ждать конкретного разрешения. qa/compact-match-rows-2026-11-01.md.
+
+- 01.11: владелец отдельно разрешил Production39d9185; опубликованоREADY dpl_78bM4rxZaMhEZ6UTnYMPRrwktDu6, проверен actualwin66px. Прежний approvalблокер снят; не запрашивать повторно для этой публикации. Дополнительные Dotahero/KDA/items пока отсутствуют.
