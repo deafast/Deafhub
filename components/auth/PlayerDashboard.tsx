@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import {openProviderWindow} from '@/lib/provider-window';
 import {LayoutDashboard,ChartNoAxesCombined,History,Users,Trophy,Wallet,Settings,ArrowUpRight,UserRound} from 'lucide-react';
 import MatchHistory from '@/components/hub/MatchHistory';
 import HubPanel from '@/components/hub/HubPanel';
@@ -25,12 +26,10 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
    <Link href="/profile/settings" className={styles.coverSettings}><Settings size={15} aria-hidden="true"/>{t('Настройки','Settings')}</Link>
   </div>
   <div className={styles.accountStrip} role="group" aria-label={t('Аккаунты и контакты','Accounts and contacts')}>
-   <span className={styles.stripLabel}>{t('Аккаунты','Accounts')}</span>
-   {steamId?<div className={styles.stripProvider}><SteamProfile key={steamId} steamId={steamId} ru={ru}/><span translate="no">Steam</span></div>:null}
-   {googleConnected?<div className={styles.stripProvider} role="img" aria-label={t('Google — подключён','Google — connected')}><Image src="/auth/google.svg" width={28} height={28} alt=""/><span translate="no">Google</span></div>:null}
-   {profile.vk?<a href={'https://vk.com/'+profile.vk} target="_blank" rel="noopener noreferrer" className={styles.stripProvider} aria-label={t('VK — контакт, владение не подтверждено','VK — contact, ownership not verified')}><span className={styles.vkText} translate="no">VK</span><span>VK<small>{t('Контакт','Contact')}</small></span></a>:null}
-   <div className={styles.stripProvider} role="img" aria-label={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} title={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')}><Image src="/auth/faceit.svg" width={28} height={28} alt=""/><span translate="no">FACEIT<small>{t('Не подключён','Not connected')}</small></span></div>
-   {!steamId&&!googleConnected&&!profile.vk?<span className={styles.stripEmpty}>{t('Подключите Steam в обзоре профиля.','Link Steam in the profile overview.')}</span>:null}
+   {steamId?<div className={styles.stripProvider}><SteamProfile key={steamId} steamId={steamId} ru={ru}/></div>:<a href="https://store.steampowered.com/" target="_blank" rel="noopener noreferrer" onClick={openProviderWindow} className={styles.stripProvider} aria-label={t('Steam — не привязан. Открыть сайт в отдельном окне.','Steam — not connected. Open website in a separate window.')} title={t('Steam — не привязан','Steam — not connected')}><Image src="/auth/steam-mark.svg" width={32} height={32} alt=""/></a>}
+   {googleConnected?<div className={styles.stripProvider} role="img" aria-label={t('Google — подключён','Google — connected')}><Image src="/auth/google.svg" width={28} height={28} alt=""/></div>:null}
+   <a href={profile.vk?'https://vk.com/'+profile.vk:'https://vk.com/'} target="_blank" rel="noopener noreferrer" onClick={openProviderWindow} className={styles.stripProvider} aria-label={profile.vk?t('VK — контакт, владение не подтверждено. Открыть в отдельном окне.','VK — contact, ownership not verified. Open in a separate window.'):t('VK — контакт не указан. Открыть сайт в отдельном окне.','VK — no contact provided. Open website in a separate window.')} title={profile.vk?t('VK — контакт','VK — contact'):t('VK — не подключён','VK — not connected')}><Image src="/auth/vk.svg" width={32} height={32} alt=""/></a>
+   <a href="https://www.faceit.com/" target="_blank" rel="noopener noreferrer" onClick={openProviderWindow} className={styles.stripProvider} aria-label={t('FACEIT — подключение пока недоступно. Открыть сайт в отдельном окне.','FACEIT — linking is not available yet. Open website in a separate window.')} title={t('FACEIT — не подключён','FACEIT — not connected')}><Image src="/auth/faceit.svg" width={32} height={32} alt=""/></a>
   </div>
  </header>
  <div className={styles.profileGrid}>

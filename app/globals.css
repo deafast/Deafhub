@@ -96,4 +96,7 @@
     body {
         @apply bg-background text-foreground;
     }
-}
+}/* Header actions share the same size, surface and border; native flag colors stay intact. */
+header [role="group"][aria-label="Language / Язык"]{height:calc(3rem + 2px);width:calc(5.75rem + 3px);padding:.125rem;border:1px solid rgb(34 211 238 / .3);border-radius:.75rem;background:rgb(34 211 238 / .05);transform:none}
+header [role="group"][aria-label="Language / Язык"]>button{width:2.75rem;height:2.75rem;padding:0;border-radius:.5rem}
+header [role="group"][aria-label="Language / Язык"]>span{top:.125rem;bottom:.125rem;left:.125rem;border-radius:.5rem;border-color:rgb(34 211 238 / .3);box-shadow:none;background:rgb(34 211 238 / .05)}

@@ -14,6 +14,7 @@ function component(send){
  const source=readFileSync(resolve(__dirname,'../../components/auth/SteamProfile.tsx'),'utf8');
  const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
  const scope={exports:{},AbortController,fetch:send,require:name=>({
+  '@/lib/provider-window':{openProviderWindow:()=>{}},
   'next/image':{__esModule:true,default:props=>React.createElement('img',props)},
   '@/lib/steam/profile':{steamProfileUrl:value=>'https://steamcommunity.com/profiles/'+value},
  }[name]||require(name))};
