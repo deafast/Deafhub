@@ -1,0 +1,51 @@
+{
+  "lines": [
+    {
+      "inside": true,
+      "margin": 7.8,
+      "text": "Стратегия"
+    },
+    {
+      "inside": true,
+      "margin": 12.6,
+      "text": "Командная игра"
+    },
+    {
+      "inside": true,
+      "margin": 6,
+      "text": "Большие возможности"
+    },
+    {
+      "inside": true,
+      "margin": 10.7,
+      "text": "Тактика"
+    },
+    {
+      "inside": true,
+      "margin": 14.2,
+      "text": "Реакция"
+    },
+    {
+      "inside": true,
+      "margin": 17.7,
+      "text": "Командный дух"
+    },
+    {
+      "inside": true,
+      "margin": 9.9,
+      "text": "Футбол"
+    },
+    {
+      "inside": true,
+      "margin": 13.4,
+      "text": "Сообщество"
+    },
+    {
+      "inside": true,
+      "margin": 16.8,
+      "text": "Игра для каждого"
+    }
+  ],
+  "overflow": false,
+  "width": 1280
+}

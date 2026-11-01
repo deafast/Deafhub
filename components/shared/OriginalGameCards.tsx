@@ -11,16 +11,15 @@ function OriginalCard({game,ru}:{game:Game;ru:boolean}){
  return <a ref={ref} href={'/tournaments?game='+game.id} data-card-root="" data-original-card={game.id} className={styles.card} style={css} onClick={click} aria-label={game.name} draggable={false}>
   <svg className={styles.art} viewBox={`${layout.x} ${layout.y} ${layout.width} ${layout.height}`} aria-hidden="true" data-clean-frame="true">
    <defs>
-    <clipPath id={id+'-inside'}><path d={layout.outline}/></clipPath>
-    <mask id={id+'-edge-removal'} maskUnits="userSpaceOnUse" x={layout.x} y={layout.y} width={layout.width} height={layout.height}>
-     <rect x={layout.x} y={layout.y} width={layout.width} height={layout.height} fill="white"/>
-     <path d={edge} fill="none" stroke="black" strokeWidth={game.id==='dota2'?13:22} strokeLinejoin="round"/>
-    </mask>
+    <clipPath id={id+'-inside'}>
+     <path d={layout.outline}/>
+     {game.id==='dota2'&&<><path d="M693 153H885L873 208L791 538L772 575H693Z"/><path d="M992 153H1030V235H992Z"/></>}
+    </clipPath>
     <linearGradient id={id+'-rim'} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#b6f5ff"/><stop offset=".3" stopColor="#22d3ee"/><stop offset=".7" stopColor="#1d6071"/><stop offset="1" stopColor="#00d4e9"/></linearGradient>
    </defs>
-   <path d={layout.outline} fill="#06131a"/>
-   <g clipPath={game.id==='dota2'?undefined:'url(#'+id+'-inside)'}>
-    <image href={'/branding/game-cards-transparent/'+layout.file} x={layout.x} y={layout.y} width={layout.width} height={layout.height} mask={'url(#'+id+'-edge-removal)'}/>
+
+   <g clipPath={'url(#'+id+'-inside)'}>
+    <image href={'/branding/game-cards-transparent/'+layout.file} x={layout.x} y={layout.y} width={layout.width} height={layout.height}/>
    </g>
    <path d={edge} fill="none" stroke={'url(#'+id+'-rim)'} strokeWidth="1.8" strokeLinejoin="round"/>
   </svg>
