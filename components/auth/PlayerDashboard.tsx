@@ -16,20 +16,22 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
  const ru=useLanguageStore(s=>s.language==='ru');
  const [active,setActive]=useState<typeof sections[number]>('overview');
  const t=(r:string,e:string)=>ru?r:e;
- const region=ru?{europe:'Европа',cis:'СНГ',other:'Другой регион'}[profile.region]:{europe:'Europe',cis:'CIS',other:'Other region'}[profile.region];
  const labels=ru?['Обзор','Статистика','История игр','Команда','Турниры','Кошелёк']:['Overview','Statistics','Match history','Team','Tournaments','Wallet'];
- return <section className={styles.surface}>
- <p className={styles.kicker}>DEAFHUB / PLAYER SPACE</p>
- <header className={styles.profileHero}>
-  <div className={styles.identity}>
-   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.avatar}>{profile.nickname.trim()?<span aria-hidden="true">{Array.from(profile.nickname.trim())[0].toLocaleUpperCase(ru?'ru':'en')}</span>:<UserRound size={34} aria-hidden="true"/>}</div>
-   <div><p className={styles.kicker}>{t('Личный кабинет','Player account')}</p><div className={styles.playerName}><h1 translate="no">{profile.nickname||t('Игрок','Player')}</h1><div className={styles.connections} role="group" aria-label={t('Игровые сервисы','Gaming services')}>
-    {steamId?<SteamProfile key={steamId} steamId={steamId} ru={ru}/>:null}
-    <span role="img" aria-label={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} title={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} className={styles.providerMark}><Image src="/auth/faceit.svg" width={34} height={34} alt=""/></span>
-    {googleConnected?<span role="img" aria-label={t('Google — подключён','Google — connected')} title={t('Google — подключён','Google — connected')} className={styles.providerMark}><Image src="/auth/google.svg" width={30} height={30} alt=""/></span>:null}
-   </div></div><p>{region}</p></div>
+ return <section className={styles.surface+' '+styles.bannerLayout}>
+ <header className={styles.profileBanner}>
+  <div className={styles.profileCover}>
+   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.coverAvatar}>{profile.nickname.trim()?<span aria-hidden="true">{Array.from(profile.nickname.trim())[0].toLocaleUpperCase(ru?'ru':'en')}</span>:<UserRound size={38} aria-hidden="true"/>}</div>
+   <h1 translate="no">{profile.nickname||t('Игрок','Player')}</h1>
+   <Link href="/profile/settings" className={styles.coverSettings}><Settings size={15} aria-hidden="true"/>{t('Настройки','Settings')}</Link>
   </div>
-  <Link href="/profile/settings" className={styles.settings}><Settings size={16} aria-hidden="true"/>{t('Настройки','Settings')}</Link>
+  <div className={styles.accountStrip} role="group" aria-label={t('Аккаунты и контакты','Accounts and contacts')}>
+   <span className={styles.stripLabel}>{t('Аккаунты','Accounts')}</span>
+   {steamId?<div className={styles.stripProvider}><SteamProfile key={steamId} steamId={steamId} ru={ru}/><span translate="no">Steam</span></div>:null}
+   {googleConnected?<div className={styles.stripProvider} role="img" aria-label={t('Google — подключён','Google — connected')}><Image src="/auth/google.svg" width={28} height={28} alt=""/><span translate="no">Google</span></div>:null}
+   {profile.vk?<a href={'https://vk.com/'+profile.vk} target="_blank" rel="noopener noreferrer" className={styles.stripProvider} aria-label={t('VK — контакт, владение не подтверждено','VK — contact, ownership not verified')}><span className={styles.vkText} translate="no">VK</span><span>VK<small>{t('Контакт','Contact')}</small></span></a>:null}
+   <div className={styles.stripProvider} role="img" aria-label={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} title={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')}><Image src="/auth/faceit.svg" width={28} height={28} alt=""/><span translate="no">FACEIT<small>{t('Не подключён','Not connected')}</small></span></div>
+   {!steamId&&!googleConnected&&!profile.vk?<span className={styles.stripEmpty}>{t('Подключите Steam в обзоре профиля.','Link Steam in the profile overview.')}</span>:null}
+  </div>
  </header>
  <div className={styles.profileGrid}>
   <aside className={styles.sidebar}>
@@ -38,7 +40,7 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
   </aside>
   <div className={styles.main} id="player-content" role="region" aria-label={labels[sections.indexOf(active)]}>
   {active==='overview'?<div className={styles.overviewGrid}>
-   {!steamId?<AuthPanel steamOnly/>:null}<HubPanel section="stats" own/>
+   {!steamId?<AuthPanel steamOnly/>:null}<HubPanel section="stats" own profileShowcase/>
   </div>:null}
   {active==='stats'?<HubPanel section="stats" own/>:null}
   {active==='history'?<MatchHistory/>:null}

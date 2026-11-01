@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link';
 import TournamentEngine from './TournamentEngine';
 import TournamentOverview from './TournamentOverview';
+import ProfileHonors from './ProfileHonors';
 import TeamsDirectory from './TeamsDirectory';
 import FcRegistrationForm from './FcRegistrationForm';
 import SeasonRankingStatus from './SeasonRankingStatus';
@@ -17,7 +18,7 @@ const field='mt-2 block w-full rounded-xl border border-white/15 bg-[#0A0F14] p-
 const card='rounded-2xl border border-white/10 bg-[#0D131A] p-5';
 const button='rounded-xl bg-[#22D3EE] px-4 py-3 font-bold text-[#0A0F14] disabled:opacity-40';
 type Section='teams'|'tournaments'|'matches'|'stats';
-export default function HubPanel({section,own=false,headingLevel=2}:{section:Section;own?:boolean;headingLevel?:1|2}) {
+export default function HubPanel({section,own=false,headingLevel=2,profileShowcase=false}:{section:Section;own?:boolean;headingLevel?:1|2;profileShowcase?:boolean}) {
  const Heading=headingLevel===1?'h1':'h2';
  const ru=useLanguageStore(s=>s.language==='ru');
  const [data,setData]=useState<HubData|null>(null);
@@ -81,7 +82,7 @@ export default function HubPanel({section,own=false,headingLevel=2}:{section:Sec
  {!visibleTournaments.length?<p role="status" className={card}>{data.tournaments.length?text('По выбранным условиям турниров нет. Измените или сбросьте фильтры.','No tournaments match. Change or reset the filters.'):text('Турниров пока нет. Организатор опубликует событие с регламентом.','No tournaments yet. An organizer will publish an event with its rules.')}</p>:null}
  <div className="flex flex-wrap items-center gap-4 text-sm"><p role="status">{text('Найдено турниров: ','Tournaments found: ')}{visibleTournaments.length}</p>{game!=='all'||query?<button type="button" className="min-h-11 text-[#22D3EE] underline focus-visible:outline-2 focus-visible:outline-[#22D3EE]" onClick={()=>{setQuery('');setGame('all');}}>{text('Сбросить фильтры','Reset filters')}</button>:null}</div></>:null}
  {section==='matches'?<>{own?<p className="text-sm leading-6 text-slate-300">{text('История подтверждённых матчей DEAF|HUB с вашим составом на момент регистрации. Дата начала турнира не является временем окончания матча.','Confirmed DEAF|HUB matches with your registered roster. Tournament start is not the match completion time.')}</p>:null}{matchList(own?ownMatchHistory(data.matches,data.ownEntryIds):data.matches)}</>:null}
- {section==='stats'?<><div data-profile-tools="" className="grid gap-3 sm:grid-cols-2"><SeasonRankingStatus ru={ru}/><ProfileAwards ru={ru}/></div><dl data-stat-metrics="">{[[text('Матчи','Matches'),data.stats.matches],[text('Победы','Wins'),data.stats.wins],[text('Поражения','Losses'),data.stats.matches-data.stats.wins-(data.stats.draws||0)],['WIN',data.stats.matches?Math.round(data.stats.wins/data.stats.matches*100)+'%':'—']].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl><p className="text-sm leading-6 text-white/50">{text('Учитываются только подтверждённые организатором матчи DeafHub с вашим составом на момент заявки. Внешняя история Steam/Dota/CS2 пока не импортируется.','Only organizer-confirmed DeafHub matches with your registered roster are counted. External Steam/Dota/CS2 history is not imported yet.')}</p>{matchList(data.matches.filter(m=>m.status==='finished'&&(ownIds.has(m.entry_a)||ownIds.has(m.entry_b))))}</>:null}
+ {section==='stats'?<>{!profileShowcase?<div data-profile-tools="" className="grid gap-3 sm:grid-cols-2"><SeasonRankingStatus ru={ru}/><ProfileAwards ru={ru}/></div>:null}<dl data-stat-metrics="">{[[text('Матчи','Matches'),data.stats.matches],[text('Победы','Wins'),data.stats.wins],[text('Поражения','Losses'),data.stats.matches-data.stats.wins-(data.stats.draws||0)],['WIN',data.stats.matches?Math.round(data.stats.wins/data.stats.matches*100)+'%':'—']].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl><p className="text-sm leading-6 text-white/50">{text('Учитываются только подтверждённые организатором матчи DeafHub с вашим составом на момент заявки. Внешняя история Steam/Dota/CS2 пока не импортируется.','Only organizer-confirmed DeafHub matches with your registered roster are counted. External Steam/Dota/CS2 history is not imported yet.')}</p>{matchList(data.matches.filter(m=>m.status==='finished'&&(ownIds.has(m.entry_a)||ownIds.has(m.entry_b))))}{profileShowcase?<ProfileHonors data={data} ru={ru}/>:null}</>:null}
  </div>;
 }
 

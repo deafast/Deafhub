@@ -26,7 +26,7 @@ for(const ru of [true,false])test(`game controls are accessible, all games suppo
 const Renderer=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
 const none={default:()=>null};
 function panel(ru,engine=none,teams=none){return load('components/hub/HubPanel.tsx',{
- 'next/link':{default:props=>React.createElement('a',props)},'./TournamentOverview':none,'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
+ 'next/link':{default:props=>React.createElement('a',props)},'./ProfileHonors':none,'./TournamentOverview':none,'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
  './TournamentOperations':{default:props=>React.createElement('button',{onClick:()=>void props.onSaved()},'QA refresh'),ProfileAwards:()=>null},
  './GameFilter':{default:GameFilter,useGameFilter:()=>React.useState('all')},'@/lib/tournament-filters':filters,
  '@/lib/tournament/fc-levels':{fcLevelLabel:value=>value},'@/lib/hub-history':load('lib/hub-history.ts'),
