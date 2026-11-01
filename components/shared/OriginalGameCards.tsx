@@ -11,6 +11,7 @@ function OriginalCard({game,ru}:{game:Game;ru:boolean}){
  return <a ref={ref} href={'/tournaments?game='+game.id} data-card-root="" data-original-card={game.id} className={styles.card} style={css} onClick={click} aria-label={game.name} draggable={false}>
   <svg className={styles.art} viewBox={`${layout.x} ${layout.y} ${layout.width} ${layout.height}`} aria-hidden="true" data-clean-frame="true">
    <defs>
+    <clipPath id={id+'-divider'}><path d={layout.divider}/></clipPath>
     <clipPath id={id+'-inside'}>
      <path d={layout.outline}/>
      {game.id==='dota2'&&<><path d="M693 153H885L873 208L791 538L772 575H693Z"/><path d="M992 153H1030V235H992Z"/></>}
@@ -20,6 +21,9 @@ function OriginalCard({game,ru}:{game:Game;ru:boolean}){
 
    <g clipPath={'url(#'+id+'-inside)'}>
     <image href={'/branding/game-cards-transparent/'+layout.file} x={layout.x} y={layout.y} width={layout.width} height={layout.height}/>
+    <g clipPath={'url(#'+id+'-divider)'} data-divider-erased="true">
+     <image href={'/branding/game-cards-transparent/'+layout.file} x={layout.x} y={layout.y-18} width={layout.width} height={layout.height}/>
+    </g>
    </g>
    <path d={edge} fill="none" stroke={'url(#'+id+'-rim)'} strokeWidth="1.8" strokeLinejoin="round"/>
   </svg>

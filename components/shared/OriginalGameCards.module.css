@@ -1,9 +1,10 @@
+@font-face{font-family:DeafHubCardCopy;src:url('/branding/fonts/exo2-600.ttf') format('truetype');font-style:normal;font-weight:600;font-display:swap}
 .stage{position:absolute;inset:0;perspective:1200px}
 .card{position:absolute;display:block;--rx:0deg;--ry:0deg;--tx:0px;--ty:0px;--s:1;transform:translate3d(var(--tx),var(--ty),0) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--s));transform-style:preserve-3d;transform-origin:50% 50%;color:#f5fbfd;text-decoration:none;touch-action:pan-x pan-y;user-select:none;cursor:grab}
 .card[data-state="hover"],.card[data-state="drag"]{z-index:3}
 .card[data-state="drag"]{cursor:grabbing}
 .art{display:block;width:100%;height:100%;pointer-events:none}
-.copy{position:absolute;left:var(--copy-left);top:var(--copy-top);font:400 1.9cqw/1.3 Arial,Helvetica,sans-serif;white-space:nowrap;color:#f5fbfd;text-shadow:0 1px 2px #000b;pointer-events:none}
+.copy{position:absolute;left:var(--copy-left);top:var(--copy-top);font:600 1.9cqw/1.3 DeafHubCardCopy,Arial,sans-serif;letter-spacing:0;white-space:nowrap;color:#f5fbfd;text-shadow:0 1px 2px #000b;pointer-events:none}
 .copy{transform:rotate(var(--copy-angle));transform-origin:top left}.copy span{display:block}
 .card:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.card{transform:none}}
