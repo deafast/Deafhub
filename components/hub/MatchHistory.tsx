@@ -1,8 +1,9 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
+import MatchResultRow from './MatchResultRow';
 import {useLanguageStore} from '@/store/useLanguageStore';
-import {historyDate,historyScore,historyTournamentUrl,type HistoryPage} from '@/lib/match-history';
+import {historyDate,historyScore,type HistoryPage} from '@/lib/match-history';
 async function fetchPage(cursor:string|null,signal:AbortSignal):Promise<HistoryPage>{
  const response=await fetch('/api/match-history'+(cursor?'?cursor='+encodeURIComponent(cursor):''),{cache:'no-store',signal});
  if(!response.ok)throw Error(response.status===401?'auth':'unavailable');
@@ -27,7 +28,7 @@ export default function MatchHistory(){
  return <section className="space-y-5"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold">{text('История матчей DEAF|HUB','DEAF|HUB match history')}</h2><button type="button" disabled={loading} onClick={()=>void load(null)} className="min-h-11 rounded-xl border border-white/15 px-4 py-3 text-sm disabled:opacity-40">{text('Обновить','Refresh')}</button></div>
  <p className="text-sm leading-6 text-white/60">{text('Только подтверждённые матчи с вашим составом на момент регистрации. Время подтверждения результата не является точным временем окончания игры. Для старых матчей неизвестная дата не выдумывается.','Only confirmed matches with your registered roster. Result confirmation time is not the exact game end time. Unknown dates for older matches are not invented.')}</p>
  {error?<div role="alert" className="space-y-3 rounded-2xl border border-white/10 p-5"><p>{error==='auth'?text('Войдите, чтобы посмотреть свою историю.','Sign in to view your history.'):text('Не удалось загрузить историю. Попробуйте ещё раз.','Could not load history. Please try again.')}</p>{error==='auth'?<Link href="/sign-in" className="inline-flex min-h-11 items-center text-[#22D3EE]">{text('Войти','Sign in')}</Link>:<button type="button" disabled={loading} onClick={()=>void load(retryCursor.current)} className="min-h-11 text-[#22D3EE]">{text('Повторить','Retry')}</button>}</div>:null}
- {page.items.map(match=><article key={match.match_id} data-match-row=""><span data-match-logo="" data-game={match.game} role="img" aria-label={match.game==='dota2'?'Dota 2':match.game==='fc'?'EA Sports FC':'CS2'}/><span data-match-outcome="">{text('Подтверждён','Confirmed')}</span><div data-match-identity=""><h3>{match.player_a} — {match.player_b}</h3><Link href={historyTournamentUrl(match.tournament_id)}>{match.tournament_title}</Link></div><strong data-match-score="">{historyScore(match,ru)}</strong><span data-match-date="" title={historyDate(match,ru)}>{historyDate(match,ru)}</span></article>)}
+ {page.items.map(match=><MatchResultRow key={match.match_id} game={match.game} ru={ru} tournament={match.tournament_title} playerA={match.player_a} playerB={match.player_b} score={historyScore(match,ru)} date={historyDate(match,ru)} label={text('Подтверждён','Confirmed')}/>)}
 
  {loading?<p role="status" className="text-sm text-white/60">{text('Загрузка истории…','Loading history…')}</p>:!error&&!page.items.length?<p role="status" className="rounded-2xl border border-white/10 p-5 text-white/60">{text('Подтверждённых матчей пока нет.','No confirmed matches yet.')}</p>:null}
  {page.nextCursor?<button type="button" disabled={loading} onClick={()=>void load(page.nextCursor)} className="min-h-11 rounded-xl bg-[#22D3EE] px-4 py-3 font-bold text-[#0A0F14] disabled:opacity-40">{text('Загрузить ещё','Load more')}</button>:null}

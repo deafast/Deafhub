@@ -9,7 +9,7 @@ const {create,act}=require('react-test-renderer');
 global.IS_REACT_ACT_ENVIRONMENT=true;
 function component(fetch,ru=true){
  const code=ts.transpileModule(readFileSync(resolve(__dirname,'../../components/hub/MatchHistory.tsx'),'utf8'),{fileName:'MatchHistory.tsx',compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
- const scope={exports:{},AbortController,fetch,require:name=>({
+ const scope={exports:{},AbortController,fetch,require:name=>name==='./MatchResultRow'?require('../test-support/match-result-row.cjs'):({
   'next/link':{__esModule:true,default:props=>React.createElement('a',props)},
   '@/store/useLanguageStore':{useLanguageStore:select=>select({language:ru?'ru':'en'})},
   '@/lib/match-history':{historyDate:()=>'',historyScore:()=>'',historyTournamentUrl:id=>'/tournaments?tournament='+id},
