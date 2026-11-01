@@ -9,3 +9,4 @@
 8целевых тестов PASS: RU/EN, исходные мобильные логотипы, отсутствие артаClaude на главной, попиксельная сохранность исходных экспортов/руки/рамок, геометрия прозрачных полей, пружина60/144/240Hz. Итоговый webpack build/TypeScript PASS. IAB1920RU: старые PNG,overflow=false; реальный hover SF со scale1.018. IAB390: desktop скрыт,3мобильные эмблемы loaded=true,overflow=false. Снимки desktop/mobile. Физический Brave/240Hz не проверен. Приёмка владельцем открыта.
 
 Работа только preview/deafhub-setup. Посторонние Header/TextSizeControl/shell-navigation/claude-full-project документ не изменялись этим пакетом. main/Production/Supabase/финансы не менялись.
+- [x]46a71cf опубликован: Vercel success GzCPoUn39JCy3oTUT5beuqnjbfCQ. Основной Preview/ проверенIAB1920: ровно3data-original-card, исходные PNG loaded=true,overflow=false. Реальный снимок published.png. Из Claude только физика; визуальное принятие владельцем ещё открыто.
