@@ -8,3 +8,4 @@
 
 Веткаpreview/deafhub-setup; main/Production/Supabase/финансы/посторонниеHeader/TextSizeControl не менялись.
 
+`nПубликация: 40804ce850c24d5544f9a00bc6d30f231c98781b отправлен в preview/deafhub-setup; Vercel success. Проверка опубликованного / в IAB1920: font=true,3области удаления,overflow=false,9строк внутри рамок; скриншот published-cards.png осмотрен. Бирюзовые разделители отсутствуют. Владелец новую типографику ещё не оценивал.
