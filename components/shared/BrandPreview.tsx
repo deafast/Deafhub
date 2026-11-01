@@ -6,20 +6,15 @@ import {ArrowRight,Users,Gamepad2,TrendingUp,ShieldCheck} from 'lucide-react';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import styles from './BrandPreview.module.css';
 import LivingWaves from './LivingWaves';
-import {GameCards,defaultGameCards} from '../game-cards';
+import OriginalGameCards from './OriginalGameCards';
 
 
-const games=[
- {id:'dota2',name:'Dota 2',logo:'/branding/game-logos/dota2.png',width:386,height:76,className:'dota',ru:['Стратегия','Командная игра','Большие возможности'],en:['Strategy','Team play','More opportunities']},
- {id:'cs2',name:'CS2',logo:'/branding/game-logos/cs2.svg',width:801,height:165,className:'cs2',ru:['Тактика','Реакция','Командный дух'],en:['Tactics','Reaction','Team spirit']},
- {id:'fc',name:'EA Sports FC',logo:'/branding/game-logos/ea-sports-fc.svg',width:512,height:254,className:'fc',ru:['Футбол','Сообщество','Игра для каждого'],en:['Football','Community','A game for everyone']},
-];
+import {originalGames as games} from './original-games';
 
 export default function BrandPreview(){
  const ru=useLanguageStore(s=>s.language==='ru');
 
  const text=(r:string,e:string)=>ru?r:e;
- const desktopCards=defaultGameCards.map(card=>{const game=games.find(g=>g.id===card.id)!;return {...card,tags:ru?game.ru:game.en};});
  const features=[
   {icon:Users,title:text('Инклюзивное сообщество','Inclusive community'),body:text('Играем. Общаемся. Развиваемся вместе.','Play, connect and grow together.')},
   {icon:Gamepad2,title:text('Любимые игры','Favourite games'),body:text('Популярные дисциплины и комфортная среда.','Popular games and a welcoming environment.')},
@@ -40,7 +35,7 @@ export default function BrandPreview(){
      </div>
     </div>
     <div className={styles.desktopGames}>
-     <GameCards cards={desktopCards} ariaLabel={text('Игры','Games')}/>
+     <OriginalGameCards games={games} ru={ru}/>
     </div>
    </section>
    <nav aria-label={text('Игры','Games')} className={styles.mobileGames}>
