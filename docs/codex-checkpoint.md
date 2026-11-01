@@ -94,3 +94,5 @@
 - 01.11: 2385ea6/a450fba отправлены, Vercel READY. Новый баннер TEST Dota 1×1 и фикс прямой регистрации проверены; см. docs/qa/dota-duel-verification-2026-11-01.md. Временная QA-роль НЕ снята: connector confirmation expired дважды, read=true. Не повторять создание TEST-набора; продолжить только точечную очистку роли после успешного подтверждения, затем свежий friend E2E.
 
 - Production разрешён владельцем01.11: cc2064e опубликован READY на deafhub.cc/www.deafhub.cc; dpl_K7q4Aa6nLHmafGqDPNBKHCSDtd84. Четыре env production+preview, для двух серверных секретов branch=null явно разрешено. Документ qa/production-release-2026-11-01.md. main не менялся. Не откатывать на старый main автоматически. Следующая проверка: свежий Steam login пользователем на www.deafhub.cc, реальные заявки/матч.
+
+- 01.11: после ошибки владельца добавлен d3d8e4b (только безопасный stage-log callback,27PASS), опубликован READY. Прямой Steamlogin в IAB реально завершён /profile, прежние профиль/команда сохранены. Исходный modal-сбой не воспроизведён: не утверждать, что его причина исправлена. QAрольочистка и friend-flow всё ещё открыты.
