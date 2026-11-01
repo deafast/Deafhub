@@ -3,7 +3,7 @@
 .card[data-state="hover"],.card[data-state="drag"]{z-index:3}
 .card[data-state="drag"]{cursor:grabbing}
 .art{display:block;width:100%;height:100%;pointer-events:none}
-.copy{position:absolute;left:var(--copy-left);top:var(--copy-top);font:400 2cqw/1.25 Arial,Helvetica,sans-serif;white-space:nowrap;color:#f5fbfd;text-shadow:0 1px 2px #000b;pointer-events:none}
+.copy{position:absolute;left:var(--copy-left);top:var(--copy-top);font:400 2cqw/1.35 Arial,Helvetica,sans-serif;white-space:nowrap;color:#f5fbfd;text-shadow:0 1px 2px #000b;pointer-events:none}
 .copy span{display:block}
 .card:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.card{transform:none}}
