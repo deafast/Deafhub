@@ -1,13 +1,14 @@
 'use client';
 import Link from 'next/link';
-import {useId} from 'react';
+
 import Image from 'next/image';
 import {ArrowRight,Users,Gamepad2,TrendingUp,ShieldCheck} from 'lucide-react';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import styles from './BrandPreview.module.css';
 import LivingWaves from './LivingWaves';
+import {GameCards,defaultGameCards} from '../game-cards';
 
-const artwork='/branding/home-approved/artwork.webp';
+
 const games=[
  {id:'dota2',name:'Dota 2',logo:'/branding/game-logos/dota2.png',width:386,height:76,className:'dota',ru:['Стратегия','Командная игра','Большие возможности'],en:['Strategy','Team play','More opportunities']},
  {id:'cs2',name:'CS2',logo:'/branding/game-logos/cs2.svg',width:801,height:165,className:'cs2',ru:['Тактика','Реакция','Командный дух'],en:['Tactics','Reaction','Team spirit']},
@@ -16,8 +17,9 @@ const games=[
 
 export default function BrandPreview(){
  const ru=useLanguageStore(s=>s.language==='ru');
- const sceneId=useId();
+
  const text=(r:string,e:string)=>ru?r:e;
+ const desktopCards=defaultGameCards.map(card=>{const game=games.find(g=>g.id===card.id)!;return {...card,tags:ru?game.ru:game.en};});
  const features=[
   {icon:Users,title:text('Инклюзивное сообщество','Inclusive community'),body:text('Играем. Общаемся. Развиваемся вместе.','Play, connect and grow together.')},
   {icon:Gamepad2,title:text('Любимые игры','Favourite games'),body:text('Популярные дисциплины и комфортная среда.','Popular games and a welcoming environment.')},
@@ -38,20 +40,7 @@ export default function BrandPreview(){
      </div>
     </div>
     <div className={styles.desktopGames}>
-     <svg viewBox="680 125 965 620" aria-hidden="true" className={styles.scene}>
-      <defs>
-       <mask id={sceneId+'-mask'} maskUnits="userSpaceOnUse" x="680" y="125" width="965" height="620">
-        <image href="/branding/home-approved/cards-silhouette-mask.png" x="680" y="125" width="965" height="620"/>
-       </mask>
-      </defs>
-      <image href={artwork} width="1672" height="941" mask={'url(#'+sceneId+'-mask)'}/>
-     </svg>
-     <nav aria-label={text('Игры','Games')} className={styles.desktopLinks}>
-      {games.map(game=><Link key={game.id} href={`/tournaments?game=${game.id}`} className={`${styles.gameLink} ${styles[game.className]}`} aria-label={game.name}>
-       <span className={styles.srOnly} lang="en">{game.name}</span>
-       <span className={styles.cardCopy}>{(ru?game.ru:game.en).map(line=><span key={line}>{line}</span>)}</span>
-      </Link>)}
-     </nav>
+     <GameCards cards={desktopCards} ariaLabel={text('Игры','Games')}/>
     </div>
    </section>
    <nav aria-label={text('Игры','Games')} className={styles.mobileGames}>
