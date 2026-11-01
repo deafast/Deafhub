@@ -332,6 +332,16 @@ export function useCardPhysics<T extends HTMLElement>(
       if (pendingTouch || touchArmed) e.preventDefault();
     };
     const onResize = () => refreshRect();
+    const onBlur = () => {
+      window.clearTimeout(holdTimer);
+      if (pointerId !== null) { try { el.releasePointerCapture(pointerId); } catch {} }
+      pointerId = null;
+      pendingTouch = false;
+      touchArmed = false;
+      setState("idle");
+      toRest();
+      kick();
+    };
 
     el.addEventListener("pointerenter", onEnter);
     el.addEventListener("pointermove", onMove);
@@ -342,6 +352,7 @@ export function useCardPhysics<T extends HTMLElement>(
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("contextmenu", onContext);
     window.addEventListener("resize", onResize);
+    window.addEventListener("blur", onBlur);
     window.addEventListener("scroll", onResize, { passive: true });
     setState("idle");
     write();
@@ -358,6 +369,7 @@ export function useCardPhysics<T extends HTMLElement>(
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("contextmenu", onContext);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("blur", onBlur);
       window.removeEventListener("scroll", onResize);
     };
   }, []);

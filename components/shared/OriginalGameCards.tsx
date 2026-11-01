@@ -6,7 +6,7 @@ import type {OriginalGame as Game} from './original-games';
 function OriginalCard({game,ru}:{game:Game;ru:boolean}){
  const layout=game.art;const id=useId();const edge=layout.rim||layout.outline;
  const {ref,draggedRef}=useCardPhysics<HTMLAnchorElement>({maxTilt:8,hoverScale:1.018,dragScale:1.03});
- const css={left:`${(layout.x-760)/885*100}%`,top:`${(layout.y-125)/620*100}%`,width:`${layout.width/885*100}%`,height:`${layout.height/620*100}%`,'--copy-left':`${(layout.copyX-layout.x)/layout.width*100}%`,'--copy-top':`${(layout.copyY-layout.y)/layout.height*100}%`} as CSSProperties;
+ const css={left:`${(layout.x-760)/885*100}%`,top:`${(layout.y-125)/620*100}%`,width:`${layout.width/885*100}%`,height:`${layout.height/620*100}%`,'--copy-left':`${(layout.copyX-layout.x)/layout.width*100}%`,'--copy-angle':layout.copyAngle+'deg','--copy-top':`${(layout.copyY-layout.y)/layout.height*100}%`} as CSSProperties;
  const click=(e:MouseEvent)=>{if(draggedRef.current){e.preventDefault();draggedRef.current=false;}};
  return <a ref={ref} href={'/tournaments?game='+game.id} data-card-root="" data-original-card={game.id} className={styles.card} style={css} onClick={click} aria-label={game.name} draggable={false}>
   <svg className={styles.art} viewBox={`${layout.x} ${layout.y} ${layout.width} ${layout.height}`} aria-hidden="true" data-clean-frame="true">
