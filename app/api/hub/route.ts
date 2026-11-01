@@ -49,9 +49,13 @@ export async function GET(request:NextRequest) {
  const selected=request?.nextUrl.searchParams.get('tournament')||null;
  if(selected&&!uuid.safeParse(selected).success)return NextResponse.json({error:'Invalid tournament'},{status:400,headers});
  // A history link loads its exact tournament instead of relying on the first 500 events.
- const selectedEntries=selected?await client.from('hub_entries').select('*').eq('tournament_id',selected).limit(5000):null;
- if(selectedEntries?.error)return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
- const selectedTeams=[...new Set((selectedEntries?.data||[]).map(e=>e.team_id).filter((id):id is string=>Boolean(id)))];
+ const [selectedEntries,ownCaptainTeams]=selected?await Promise.all([
+  client.from('hub_entries').select('*').eq('tournament_id',selected).limit(5000),
+  client.from('hub_teams').select('id').eq('captain_id',user.id).limit(500),
+ ]):[null,null];
+ if(selectedEntries?.error||ownCaptainTeams?.error)return NextResponse.json({error:'Competition setup is not complete'},{status:503,headers});
+ // Include an unregistered captain's team when opening a direct tournament link.
+ const selectedTeams=[...new Set([...(selectedEntries?.data||[]).map(e=>e.team_id).filter((id):id is string=>Boolean(id)),...(ownCaptainTeams?.data||[]).map(team=>team.id)])];
  const teamsQuery=client.from('hub_teams').select('*').order('created_at',{ascending:false});
  const tournamentQuery=client.from('hub_tournaments').select('*').order('starts_at');
  const matchesQuery=client.from('hub_matches').select('*').order('starts_at',{ascending:false});

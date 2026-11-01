@@ -12,7 +12,7 @@ function fixture(count,{cap=1000,guest=false,failAt=Infinity,repeat=false,select
      const rows=f.in?members.filter(m=>f.in[1].includes(m.team_id)):members;
      const offset=repeat?0:f.offset;return {data:rows.slice(offset,offset+Math.min(f.size,cap)),error:null};
     }
-    if(table==='hub_teams'&&f.in&&ownerInData)return ownTeamFails?{data:null,error:{message:'PRIVATE TEAM ERROR'}}:{data:[{id:team,name:'Own team',game:'cs2',captain_id:uuid(10000)}],error:null};
+    if(table==='hub_teams'&&(f.in||f.eq?.[0]==='captain_id')&&ownerInData)return ownTeamFails?{data:null,error:{message:'PRIVATE TEAM ERROR'}}:{data:[{id:team,name:'Own team',game:'cs2',captain_id:uuid(10000)}],error:null};
     return {data:table==='hub_entries'&&selected&&!emptySelected?[{id:uuid(3),team_id:team,tournament_id:tid}]:[],error:null};
    }).then(resolve,reject);
   }};return q;
@@ -33,3 +33,6 @@ test('more than the catalog membership bound is an explicit error instead of sil
 test('guest has no data queries and an empty authorized catalog has no memberships',async()=>{const guest=fixture(200,{guest:true});assert.equal((await guest.get()).status,401);assert.equal(guest.calls.length,0);const response=await fixture(0).get();assert.equal(response.status,200);assert.deepEqual((await response.json()).members,[]);});
 test('a member still sees their older team when it is outside the global catalog page',async()=>{const f=fixture(30,{ownerInData:true}),response=await f.get(),body=await response.json();assert.equal(response.status,200);assert.equal(body.teams.length,1);assert.equal(body.teams[0].id,team);assert.equal(f.calls.filter(c=>c.table==='hub_teams').length,2);});
 test('a failed missing-own-team lookup returns an error instead of a misleading partial catalog',async()=>{const f=fixture(30,{ownerInData:true,ownTeamFails:true}),response=await f.get();assert.equal(response.status,503);assert.doesNotMatch(JSON.stringify(await response.json()),/PRIVATE TEAM ERROR/);});
+
+ test('direct tournament registration includes the captains unregistered team without global rosters',async()=>{const f=fixture(30,{selected:true,emptySelected:true,ownerInData:true}),response=await f.get(),body=await response.json();assert.equal(response.status,200);assert.ok(body.teams.some(t=>t.id===team));assert.ok(body.members.some(m=>m.team_id===team&&m.user_id===uuid(10000)));assert.ok(body.members.every(m=>m.team_id===team));assert.ok(f.calls.some(c=>c.table==='hub_teams'&&c.eq?.[0]==='captain_id'));assert.ok(f.calls.filter(c=>c.table==='hub_members').every(c=>c.in?.[1].includes(team)));});
+ test('failed captain team lookup on direct tournament is an explicit safe error',async()=>{const response=await fixture(30,{selected:true,emptySelected:true,ownerInData:true,ownTeamFails:true}).get();assert.equal(response.status,503);assert.doesNotMatch(JSON.stringify(await response.json()),/PRIVATE TEAM ERROR/);});
