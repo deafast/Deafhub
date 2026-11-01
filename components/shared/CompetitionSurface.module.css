@@ -62,3 +62,7 @@
 @keyframes gameAtmosphere{from{transform:translate3d(0,0,0);opacity:.28}to{transform:translate3d(0,-48px,0);opacity:.58}}
 @media(max-width:600px){.surface:has([data-game-banner=cs2])::before,.surface:has([data-game-banner=fc])::before{height:340px;background-size:auto 340px;mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%)}.gameHeader .overview{margin-top:150px;gap:12px;padding:14px}.gameHeader .gameLogo{width:54px;height:30px}.surface:has([data-game-banner=cs2])::after,.surface:has([data-game-banner=fc])::after{animation-duration:13s;background-size:280px 540px,400px 720px,auto 900px}}
 @media(prefers-reduced-motion:reduce){.surface:has([data-game-banner=cs2])::after,.surface:has([data-game-banner=fc])::after{animation:none;transform:none;will-change:auto;opacity:.35}}
+/* Keep the supplied FC27 wordmark clear above the tournament summary. */
+.surface:has([data-game-banner=fc])::before{mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%)}
+.surface:has([data-game-banner=fc]) .gameHeader .overview{margin-top:clamp(160px,23vw,350px)}
+@media(max-width:600px){.surface:has([data-game-banner=fc]) .gameHeader .overview{margin-top:215px}}
