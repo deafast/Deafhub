@@ -4,14 +4,14 @@ import type {HubData,HubTournament} from '@/lib/hub-types';
 import type {GameFilter} from '@/lib/tournament-filters';
 import styles from '@/components/shared/CompetitionSurface.module.css';
 const identities={all:{name:'DEAFHUB',logo:'/branding/approved-2026-10-28/dh.png'},dota2:{name:'Dota 2',logo:'/branding/game-logos/dota2.png'},cs2:{name:'CS2',logo:'/branding/game-logos/cs2.svg'},fc:{name:'EA Sports FC',logo:'/branding/game-logos/ea-sports-fc.svg'}};
-export default function TournamentOverview({game,data,tournaments,ru,controls,createAction}:{game:GameFilter;data:HubData|null;tournaments:HubTournament[];ru:boolean;controls?:ReactNode;createAction?:ReactNode}){
+export default function TournamentOverview({game,data,tournaments,ru,controls}:{game:GameFilter;data:HubData|null;tournaments:HubTournament[];ru:boolean;controls?:ReactNode}){
  const t=(r:string,e:string)=>ru?r:e,identity=identities[game];
  const ids=new Set(tournaments.map(event=>event.id));
  const open=tournaments.filter(event=>event.status==='open').length;
  const approved=data?.entries.filter(entry=>ids.has(entry.tournament_id)&&entry.status==='approved').length;
  const scheduled=data?.matches.filter(match=>ids.has(match.tournament_id)&&match.status==='scheduled').length;
 
- return <><section data-game-banner={game==='dota2'?'dota2':undefined} className={game==='dota2'?styles.dotaHeader:undefined}>{game==='dota2'?<><div className={styles.gameBannerTools}>{createAction}{controls}</div>
+ return <><section data-game-banner={game==='dota2'?'dota2':undefined} className={game==='dota2'?styles.dotaHeader:undefined}>{game==='dota2'?<><div className={styles.gameBannerTools}>{controls}</div>
 {/* eslint-disable-next-line @next/next/no-img-element */}
 <img className={styles.gameBannerImage} src="/branding/tournaments/dota2-deafhub-header-approved.png" width={2048} height={682} alt="DEAFHUB — Dota 2"/></>:null}<section className={styles.overview} aria-label={t('Обзор соревнований','Competition overview')}>
  <div className={styles.gameIdentity}>
