@@ -26,6 +26,6 @@ for(const ru of [true,false]){
 }
 for(const ru of [true,false])test(`Dota branded header accepts the upper-right game switch RU=${ru}`,()=>{
  const html=renderToStaticMarkup(React.createElement(Overview,{game:'dota2',data:null,tournaments:[],ru,controls:React.createElement('button',null,'CS2')}));
- assert.match(html,/season-01.png/);assert.match(html,/DEAFHUB Cup — Dota 2/);assert.doesNotMatch(html,/Create amateur|Создать любительский/);assert.match(html,/CS2/);
- const cs=renderToStaticMarkup(React.createElement(Overview,{game:'cs2',data:null,tournaments:[],ru}));assert.doesNotMatch(cs,/approved-comfort|cs2-header-approved/);
+ assert.match(html,/dota2-deafhub-header-approved.png/);assert.match(html,/DEAFHUB — Dota 2/);assert.doesNotMatch(html,/Create amateur|Создать любительский/);assert.match(html,/CS2/);
+ const cs=renderToStaticMarkup(React.createElement(Overview,{game:'cs2',data:null,tournaments:[],ru}));assert.doesNotMatch(cs,/dota2-deafhub-header-approved|cs2-header-approved/);
 });

@@ -13,7 +13,7 @@ export default function TournamentOverview({game,data,tournaments,ru,controls}:{
 
  return <><section data-game-banner={game==='dota2'?'dota2':undefined} className={game==='dota2'?styles.dotaHeader:undefined}>{game==='dota2'?<><div className={styles.gameBannerTools}>{controls}</div>
 {/* eslint-disable-next-line @next/next/no-img-element */}
-<img className={styles.gameBannerImage} src="/branding/dota-league/approved-comfort/season-01.png" width={1983} height={793} alt="DEAFHUB Cup — Dota 2 · Season 1"/></>:null}<section className={styles.overview} aria-label={t('Обзор соревнований','Competition overview')}>
+<img className={styles.gameBannerImage} src="/branding/tournaments/dota2-deafhub-header-approved.png" width={2048} height={682} alt="DEAFHUB — Dota 2"/></>:null}<section className={styles.overview} aria-label={t('Обзор соревнований','Competition overview')}>
  <div className={styles.gameIdentity}>
  {/* eslint-disable-next-line @next/next/no-img-element */}
  <img src={identity.logo} width={112} height={70} alt="" className={styles.gameLogo+(game==='fc'?' '+styles.fcLogo:'')}/>
