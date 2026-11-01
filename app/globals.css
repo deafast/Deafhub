@@ -111,7 +111,7 @@ header [role="group"][aria-label="Language / Язык"]>span{top:.125rem;bottom:
 /* Tournament header colors follow the selected game's artwork. */
 body:has([data-game-banner=dota2]){--tournament-header:#25131deF;--tournament-accent:#ffb38e;--tournament-line:#a9585266;--tournament-control:#3b1e2c}
 body:has([data-game-banner=cs2]){--tournament-header:#261c10ef;--tournament-accent:#ffc26b;--tournament-line:#c9833866;--tournament-control:#3a2917}
-body:has([data-game-banner=fc]){--tournament-header:#11241bef;--tournament-accent:#a2ecad;--tournament-line:#5aab7466;--tournament-control:#193b2b}
+body:has([data-game-banner=fc]){--tournament-header:#071c2aef;--tournament-accent:#7cecff;--tournament-line:#36a7cd66;--tournament-control:#0b3042}
 body:has([data-game-banner]) header.sticky{background:var(--tournament-header);border-color:var(--tournament-line)}
 body:has([data-game-banner]) header.sticky [role=group]{background:var(--tournament-control);border-color:var(--tournament-line)}
 body:has([data-game-banner]) header.sticky button,body:has([data-game-banner]) header.sticky a:hover{color:var(--tournament-accent);border-color:var(--tournament-line)}

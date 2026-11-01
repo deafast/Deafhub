@@ -29,3 +29,9 @@ for(const ru of [true,false])test(`Dota branded header accepts the upper-right g
  assert.match(html,/data-game-banner="dota2"/);assert.doesNotMatch(html,/dota2-deafhub-header-approved.png|season-01.png/);assert.doesNotMatch(html,/Create amateur|Создать любительский/);assert.match(html,/CS2/);
  const cs=renderToStaticMarkup(React.createElement(Overview,{game:'cs2',data:null,tournaments:[],ru}));assert.doesNotMatch(cs,/dota2-deafhub-header-approved|cs2-header-approved/);
 });
+
+for(const game of ['cs2','fc'])for(const ru of [true,false])test(`game backdrop preserves controls and honest empty data ${game} RU=${ru}`,()=>{
+ const html=renderToStaticMarkup(React.createElement(Overview,{game,data:null,tournaments:[],ru,controls:React.createElement('button',null,'Dota 2')}));
+ assert.match(html,new RegExp('data-game-banner="'+game+'"'));assert.match(html,/gameHeader/);assert.match(html,/<button>Dota 2<\/button>/);assert.equal((html.match(/<strong>—<\/strong>/g)||[]).length,3);assert.doesNotMatch(html,/<table|season-01|dota2-deafhub-header/);
+ if(game==='fc')assert.match(html,/EA Sports FC 27/);
+});
