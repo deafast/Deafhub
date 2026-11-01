@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import {LayoutDashboard,ChartNoAxesCombined,History,Users,Trophy,Wallet,Settings,ArrowUpRight} from 'lucide-react';
 import MatchHistory from '@/components/hub/MatchHistory';
 import HubPanel from '@/components/hub/HubPanel';
 import AuthPanel from './AuthPanel';
@@ -9,17 +10,43 @@ import AvatarView from '@/components/r3f/AvatarView';
 import SteamProfile from './SteamProfile';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import type {PlayerProfile} from '@/lib/profile';
+import styles from '@/components/shared/CompetitionSurface.module.css';
 const sections=['overview','stats','history','team','tournaments','wallet'] as const;
+const icons=[LayoutDashboard,ChartNoAxesCombined,History,Users,Trophy,Wallet];
 export default function PlayerDashboard({profile,googleConnected,steamId}:{profile:PlayerProfile;googleConnected:boolean;steamId:string|null}){
- const ru=useLanguageStore(s=>s.language==='ru'); const [active,setActive]=useState<typeof sections[number]>('overview');
+ const ru=useLanguageStore(s=>s.language==='ru');
+ const [active,setActive]=useState<typeof sections[number]>('overview');
+ const t=(r:string,e:string)=>ru?r:e;
  const region=ru?{europe:'Европа',cis:'СНГ',other:'Другой регион'}[profile.region]:{europe:'Europe',cis:'CIS',other:'Other region'}[profile.region];
  const labels=ru?['Обзор','Статистика','История игр','Команда','Турниры','Кошелёк']:['Overview','Statistics','Match history','Team','Tournaments','Wallet'];
- return <section className="font-sans mx-auto max-w-6xl px-5 py-12"><header className="flex flex-wrap items-center justify-between gap-5"><div className="flex w-full min-w-0 items-center gap-4 sm:w-auto sm:flex-1 sm:gap-6"><div role="img" aria-label={ru?'Аватар игрока':'Player avatar'} className="h-20 w-20 shrink-0 overflow-hidden rounded-full sm:h-28 sm:w-28"><AvatarView className="h-full w-full !rounded-full pointer-events-none"/></div><div className="min-w-0"><p className="text-xs tracking-widest text-[#22D3EE]">{ru?'ЛИЧНЫЙ КАБИНЕТ':'PLAYER ACCOUNT'}</p><h1 className="mt-3 break-words text-2xl font-black sm:text-4xl" translate="no">{profile.nickname||(ru?'Игрок':'Player')}</h1><p className="mt-2 text-sm text-white/60">{region}</p></div></div><Link href="/profile/settings" className="rounded-2xl border border-white/15 px-5 py-3">{ru?'Настройки профиля':'Profile settings'}</Link></header><nav aria-label={ru?'Разделы кабинета':'Account sections'} className="my-8 flex flex-wrap gap-2">{sections.map((s,i)=><button key={s} onClick={()=>setActive(s)} aria-current={active===s?'page':undefined} className={'rounded-xl px-4 py-3 text-sm '+(active===s?'bg-[#22D3EE] font-bold text-[#0A0F14]':'bg-white/5 text-white/60')}>{labels[i]}</button>)}</nav>
- {active==='overview'?<div className="space-y-6"><div className="rounded-3xl border border-white/10 bg-[#0D131A] p-6"><h2 className="text-xl font-bold">{ru?'Игровые аккаунты':'Gaming accounts'}</h2><div className="mt-5 flex flex-wrap items-center gap-3">{steamId?<SteamProfile key={steamId} steamId={steamId} ru={ru}/>:<AuthPanel steamOnly/>}<span role="img" aria-label={ru?'FACEIT — подключение пока недоступно':'FACEIT — linking is not available yet'} title={ru?'FACEIT — подключение пока недоступно':'FACEIT — linking is not available yet'} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02]"><Image src="/auth/faceit.svg" width={34} height={34} alt="" className="opacity-35"/></span>{googleConnected?<span role="img" aria-label={ru?'Google — подключён':'Google — connected'} title={ru?'Google — подключён':'Google — connected'} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04]"><Image src="/auth/google.svg" width={30} height={30} alt=""/></span>:null}</div></div><HubPanel section="stats" own/></div>:null}
- {active==='stats'?<HubPanel section="stats" own/>:null}
- {active==='history'?<MatchHistory/>:null}
- {active==='team'?<HubPanel section="teams" own/>:null}
- {active==='tournaments'?<HubPanel section="tournaments" own/>:null}
- {active==='wallet'?<div className="rounded-3xl border border-white/10 p-8"><h2 className="text-2xl font-bold">{ru?'Кошелёк':'Wallet'}</h2><p className="mt-4 text-white/50">{ru?'Платежи подключим последними. Баланс, взносы и вывод пока недоступны.':'Payments will be connected last. Balance, fees and withdrawals are unavailable.'}</p></div>:null}
+ return <section className={styles.surface}>
+ <p className={styles.kicker}>DEAFHUB / PLAYER SPACE</p>
+ <header className={styles.profileHero}>
+  <div className={styles.identity}>
+   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.avatar}><AvatarView className="h-full w-full !rounded-full pointer-events-none"/></div>
+   <div><p className={styles.kicker}>{t('Личный кабинет','Player account')}</p><h1 translate="no">{profile.nickname||t('Игрок','Player')}</h1><p>{region}</p></div>
+  </div>
+  <Link href="/profile/settings" className={styles.settings}><Settings size={16} aria-hidden="true"/>{t('Настройки профиля','Profile settings')}</Link>
+ </header>
+ <div className={styles.profileGrid}>
+  <aside className={styles.sidebar}>
+   <nav aria-label={t('Разделы кабинета','Account sections')}>{sections.map((section,i)=>{const Icon=icons[i];return <button key={section} type="button" onClick={()=>setActive(section)} aria-controls="player-content" aria-current={active===section?'page':undefined}><Icon size={18} aria-hidden="true"/>{labels[i]}</button>;})}</nav>
+   <div className={styles.shortcuts}><p>{t('Турниры по играм','Browse competitions')}</p>{[['dota2','Dota 2'],['cs2','CS2'],['fc','EA Sports FC']].map(([id,name])=><Link key={id} href={'/tournaments?game='+id}><span translate="no">{name}</span><ArrowUpRight size={13} aria-hidden="true"/></Link>)}</div>
+  </aside>
+  <div className={styles.main} id="player-content" role="region" aria-label={labels[sections.indexOf(active)]}>
+  {active==='overview'?<div className={styles.overviewGrid}>
+   <section className={styles.accounts}><h2>{t('Игровые аккаунты','Gaming accounts')}</h2><p className={styles.accountStatus}>{t('Подключения и доступные игровые сервисы вашего профиля.','Your profile connections and available gaming services.')}</p><div className={styles.connections}>
+    {steamId?<SteamProfile key={steamId} steamId={steamId} ru={ru}/>:<AuthPanel steamOnly/>}
+    <span role="img" aria-label={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} title={t('FACEIT — подключение пока недоступно','FACEIT — linking is not available yet')} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02]"><Image src="/auth/faceit.svg" width={34} height={34} alt="" className="opacity-35"/></span>
+    {googleConnected?<span role="img" aria-label={t('Google — подключён','Google — connected')} title={t('Google — подключён','Google — connected')} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04]"><Image src="/auth/google.svg" width={30} height={30} alt=""/></span>:null}
+   </div></section><HubPanel section="stats" own/>
+  </div>:null}
+  {active==='stats'?<HubPanel section="stats" own/>:null}
+  {active==='history'?<MatchHistory/>:null}
+  {active==='team'?<HubPanel section="teams" own/>:null}
+  {active==='tournaments'?<HubPanel section="tournaments" own/>:null}
+  {active==='wallet'?<div className="rounded-3xl border border-white/10 p-8"><h2 className="text-2xl font-bold">{t('Кошелёк','Wallet')}</h2><p className="mt-4 text-white/50">{t('Платежи подключим последними. Баланс, взносы и вывод пока недоступны.','Payments will be connected last. Balance, fees and withdrawals are unavailable.')}</p></div>:null}
+  </div>
+ </div>
  </section>;
 }

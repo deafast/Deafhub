@@ -1,2 +1,4 @@
+'use client';
 import HubPanel from '@/components/hub/HubPanel';
-export default function TournamentHub(){return <section className="mx-auto max-w-6xl px-5 py-12"><HubPanel section="tournaments" headingLevel={1}/></section>;}
+import styles from '@/components/shared/CompetitionSurface.module.css';
+export default function TournamentHub(){return <section className={styles.surface}><p className={styles.kicker}>DEAFHUB / COMPETITION</p><div className={styles.catalog}><HubPanel section="tournaments" headingLevel={1}/></div></section>;}

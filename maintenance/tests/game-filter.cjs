@@ -9,7 +9,7 @@ const {renderToStaticMarkup}=require('react-dom/server');
 function load(file,imports={}) {
  const source=readFileSync(resolve(__dirname,'../..',file),'utf8');
  const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
- const scope={exports:{},AbortController,URLSearchParams,window:{location:{search:''}},fetch:(...args)=>global.fetch(...args),require:name=>imports[name]||require(name)};
+ const scope={exports:{},AbortController,URLSearchParams,window:{location:{search:''}},fetch:(...args)=>global.fetch(...args),require:name=>imports[name]||(name.endsWith('.css')?{default:new Proxy({},{get:(_,key)=>key})}:require(name))};
  vm.runInNewContext(compiled,scope);return scope.exports;
 }
 const filters=load('lib/tournament-filters.ts');
@@ -26,7 +26,7 @@ for(const ru of [true,false])test(`game controls are accessible, all games suppo
 const Renderer=require('react-test-renderer');global.IS_REACT_ACT_ENVIRONMENT=true;
 const none={default:()=>null};
 function panel(ru,engine=none,teams=none){return load('components/hub/HubPanel.tsx',{
- 'next/link':{default:props=>React.createElement('a',props)},'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
+ 'next/link':{default:props=>React.createElement('a',props)},'./TournamentOverview':none,'./TournamentEngine':engine,'./TeamsDirectory':teams,'./FcRegistrationForm':none,'./SeasonRankingStatus':none,
  './TournamentOperations':{default:props=>React.createElement('button',{onClick:()=>void props.onSaved()},'QA refresh'),ProfileAwards:()=>null},
  './GameFilter':{default:GameFilter,useGameFilter:()=>React.useState('all')},'@/lib/tournament-filters':filters,
  '@/lib/tournament/fc-levels':{fcLevelLabel:value=>value},'@/lib/hub-history':load('lib/hub-history.ts'),

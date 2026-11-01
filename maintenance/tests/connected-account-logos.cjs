@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
 const test=require('node:test'),assert=require('node:assert/strict');
 const React=require('react'),{create,act}=require('react-test-renderer');
 global.IS_REACT_ACT_ENVIRONMENT=true;
-function load(file,imports={}){const scope={exports:{},AbortController,fetch:async()=>Response.json({linked:true,steamId:'76561198000000001',status:'private'}),require:name=>imports[name]||require(name)};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,scope);return scope.exports;}
+function load(file,imports={}){const scope={exports:{},AbortController,fetch:async()=>Response.json({linked:true,steamId:'76561198000000001',status:'private'}),require:name=>imports[name]||(name.endsWith('.css')?{default:new Proxy({},{get:(_,key)=>key})}:require(name))};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,scope);return scope.exports;}
 const empty={__esModule:true,default:()=>null},image={__esModule:true,default:p=>React.createElement('img',p)};
 const Steam=load('components/auth/SteamProfile.tsx',{'next/image':image,'@/lib/steam/profile':{steamProfileUrl:id=>'https://steamcommunity.com/profiles/'+id}});
 const visibleText=node=>typeof node==='string'?node:!node?'':Array.isArray(node)?node.map(visibleText).join(''):node.props?.className==='sr-only'?'':visibleText(node.children);
