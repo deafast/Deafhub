@@ -11,9 +11,7 @@ export default function TournamentOverview({game,data,tournaments,ru,controls}:{
  const approved=data?.entries.filter(entry=>ids.has(entry.tournament_id)&&entry.status==='approved').length;
  const scheduled=data?.matches.filter(match=>ids.has(match.tournament_id)&&match.status==='scheduled').length;
 
- return <><section data-game-banner={game==='dota2'?'dota2':undefined} className={game==='dota2'?styles.dotaHeader:undefined}>{game==='dota2'?<><div className={styles.gameBannerTools}>{controls}</div>
-{/* eslint-disable-next-line @next/next/no-img-element */}
-<img className={styles.gameBannerImage} src="/branding/tournaments/dota2-deafhub-header-approved.png" width={2048} height={682} alt="DEAFHUB — Dota 2"/></>:null}<section className={styles.overview} aria-label={t('Обзор соревнований','Competition overview')}>
+ return <><section data-game-banner={game==='dota2'?'dota2':undefined} className={game==='dota2'?styles.dotaHeader:undefined}>{game==='dota2'?<div className={styles.gameBannerTools}>{controls}</div>:null}<section className={styles.overview} aria-label={t('Обзор соревнований','Competition overview')}>
  <div className={styles.gameIdentity}>
  {/* eslint-disable-next-line @next/next/no-img-element */}
  <img src={identity.logo} width={112} height={70} alt="" className={styles.gameLogo+(game==='fc'?' '+styles.fcLogo:'')}/>
