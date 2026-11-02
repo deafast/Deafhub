@@ -67,15 +67,25 @@
 .surface:has([data-game-banner=fc]) .gameHeader .overview{margin-top:clamp(160px,23vw,350px)}
 @media(max-width:600px){.surface:has([data-game-banner=fc]) .gameHeader .overview{margin-top:215px}}
 
-/* Mobile: show the complete approved artwork, including the DeafHub brand. */
-.mobileGameArtwork{display:none}
+/* Mobile: one continuous game backdrop, with the complete brand in view. */
+.gameBannerTools [data-game-switch-icon]{display:none}
 @media(max-width:800px){
- .surface:has([data-game-banner])::before{display:none}
- .mobileGameArtwork{display:block;margin:16px -18px 0}
- .mobileGameArtwork img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
- .surface:has([data-game-banner]) .dotaHeader .overview,
- .surface:has([data-game-banner]) .gameHeader .overview{margin-top:16px}
-}
-@media(max-width:600px){
- .mobileGameArtwork{margin-left:-16px;margin-right:-16px}
+ .surface:has([data-game-banner=dota2]){--mobile-hero-height:calc(100vw * 682 / 2048)}
+ .surface:has([data-game-banner=cs2]),.surface:has([data-game-banner=fc]){--mobile-hero-height:calc(100vw * 725 / 2170)}
+ .surface:has([data-game-banner]){padding-top:calc(var(--mobile-hero-height) + 16px);background-position:center,center var(--mobile-hero-height)}
+ .surface:has([data-game-banner])::before{display:block;height:var(--mobile-hero-height);background-size:100% auto;background-position:center top;background-repeat:no-repeat;mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%)}
+ .surface:has([data-game-banner=dota2])::before{background-image:url('/branding/tournaments/dota2-deafhub-header-approved.png')}
+ .surface:has([data-game-banner=cs2])::before,.surface:has([data-game-banner=fc])::before{background-image:var(--game-hero)}
+ .surface:has([data-game-banner])::after{mask-image:linear-gradient(180deg,transparent calc(var(--mobile-hero-height) * .72),#000 calc(var(--mobile-hero-height) + 72px));background-position:0 0,0 0,center var(--mobile-hero-height)}
+ .surface:has([data-game-banner=dota2])::after{background-position:0 0,0 0,0 0,0 0,center var(--mobile-hero-height)}
+ .surface:has([data-game-banner]) .dotaHeader .overview,.surface:has([data-game-banner]) .gameHeader .overview{margin-top:16px}
+ .gameBannerTools [role=group]{gap:8px;flex-wrap:nowrap}
+ .gameBannerTools [role=group]>button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 64px!important;width:64px;min-width:64px;min-height:44px!important;padding:8px!important;border-radius:10px!important;background:#07111be8!important;border-color:#9fd6e63b!important;box-shadow:none}
+ .gameBannerTools [role=group]>button[aria-pressed=true]{background:#11333de8!important;border-color:#5bd8ed!important;box-shadow:inset 0 -2px #5bd8ed}
+ .gameBannerTools [data-game-switch-label]{display:none}
+ .gameBannerTools [data-game-switch-icon]{display:flex;align-items:center;justify-content:center;width:44px;height:26px;overflow:hidden}
+ .gameBannerTools [data-game-switch-icon] img{display:block;width:44px;height:26px;max-width:none;object-fit:contain}
+ .gameBannerTools [data-game-switch-icon=dota2]{width:26px;justify-content:flex-start}
+ .gameBannerTools [data-game-switch-icon=dota2] img{width:auto;height:26px;object-fit:initial}
+ .gameBannerTools [data-game-switch-icon=fc] img{filter:invert(1)}
 }
