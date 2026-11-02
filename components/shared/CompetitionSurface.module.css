@@ -72,12 +72,12 @@
 @media(max-width:800px){
  .surface:has([data-game-banner=dota2]){--mobile-hero-height:calc(100vw * 682 / 2048)}
  .surface:has([data-game-banner=cs2]),.surface:has([data-game-banner=fc]){--mobile-hero-height:calc(100vw * 725 / 2170)}
- .surface:has([data-game-banner]){padding-top:calc(var(--mobile-hero-height) + 16px);background-position:center,center var(--mobile-hero-height)}
+ .surface:has([data-game-banner]){padding-top:calc(var(--mobile-hero-height) + 16px);background-position:center,center top;background-size:auto,100% 100%;background-repeat:no-repeat}
  .surface:has([data-game-banner])::before{display:block;height:var(--mobile-hero-height);background-size:100% auto;background-position:center top;background-repeat:no-repeat;mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%)}
  .surface:has([data-game-banner=dota2])::before{background-image:url('/branding/tournaments/dota2-deafhub-header-approved.png')}
  .surface:has([data-game-banner=cs2])::before,.surface:has([data-game-banner=fc])::before{background-image:var(--game-hero)}
- .surface:has([data-game-banner])::after{mask-image:linear-gradient(180deg,transparent calc(var(--mobile-hero-height) * .72),#000 calc(var(--mobile-hero-height) + 72px));background-position:0 0,0 0,center var(--mobile-hero-height)}
- .surface:has([data-game-banner=dota2])::after{background-position:0 0,0 0,0 0,0 0,center var(--mobile-hero-height)}
+ .surface:has([data-game-banner])::after{mask-image:linear-gradient(180deg,transparent calc(var(--mobile-hero-height) * .72),#000 calc(var(--mobile-hero-height) + 72px),#000 calc(100% - 80px),transparent 100%);background-position:0 0,0 0,center top;background-size:340px 540px,500px 720px,100% 100%;background-repeat:repeat,repeat,no-repeat}
+ .surface:has([data-game-banner=dota2])::after{background-position:0 0,0 0,0 0,0 0,center top;background-size:260px 420px,340px 540px,410px 650px,500px 720px,100% 100%;background-repeat:repeat,repeat,repeat,repeat,no-repeat}
  .surface:has([data-game-banner]) .dotaHeader .overview,.surface:has([data-game-banner]) .gameHeader .overview{margin-top:16px}
  .gameBannerTools [role=group]{gap:8px;flex-wrap:nowrap}
  .gameBannerTools [role=group]>button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 64px!important;width:64px;min-width:64px;min-height:44px!important;padding:8px!important;border-radius:10px!important;background:#07111be8!important;border-color:#9fd6e63b!important;box-shadow:none}
@@ -88,4 +88,9 @@
  .gameBannerTools [data-game-switch-icon=dota2]{width:26px;justify-content:flex-start}
  .gameBannerTools [data-game-switch-icon=dota2] img{width:auto;height:26px;object-fit:initial}
  .gameBannerTools [data-game-switch-icon=fc] img{filter:invert(1)}
+}
+/* Keep the existing mobile particle scale while the texture covers the whole page. */
+@media(max-width:600px){
+ .surface:has([data-game-banner=dota2])::after{background-size:220px 420px,280px 540px,340px 650px,400px 720px,100% 100%}
+ .surface:has([data-game-banner=cs2])::after,.surface:has([data-game-banner=fc])::after{background-size:280px 540px,400px 720px,100% 100%}
 }
