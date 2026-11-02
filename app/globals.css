@@ -116,3 +116,10 @@ body:has([data-game-banner]) header.sticky{background:var(--tournament-header);b
 body:has([data-game-banner]) header.sticky [role=group]{background:var(--tournament-control);border-color:var(--tournament-line)}
 body:has([data-game-banner]) header.sticky button,body:has([data-game-banner]) header.sticky a:hover{color:var(--tournament-accent);border-color:var(--tournament-line)}
 body:has([data-game-banner]) header.sticky [aria-label="Language / Язык"]>span{background:var(--tournament-control);border-color:var(--tournament-line)}
+/* Stable mobile header surface; the original DeafHub image keeps its own colors. */
+@media(max-width:800px){
+ body:has([data-game-banner=dota2]){--tournament-header:#180d18}
+ body:has([data-game-banner=cs2]){--tournament-header:#171411}
+ body:has([data-game-banner=fc]){--tournament-header:#071622}
+ body:has([data-game-banner]) header.sticky{border-color:transparent}
+}
