@@ -1,14 +1,14 @@
 .profile {
-    --profile-accent: #22d3ee;
+    --profile-accent: #00f0fc;
     --profile-text: #eafbff;
-    --profile-muted: #a6bac9;
-    --profile-line: #eafbff18;
-    --line: #253541;
+    --profile-muted: #a8b6d0;
+    --profile-line: #74bde324;
+    --line: #183349;
     position: relative;
     isolation: isolate;
     min-height: calc(100svh - 64px);
     color: var(--profile-text);
-    background: #0a0f14;
+    background: linear-gradient(135deg, #06111b, #050e18 48%, #061523);
 }
 
 /* One borderless cover on desktop; the same artwork fills the mobile page. */
@@ -18,7 +18,7 @@
     inset: 0 0 auto;
     height: 380px;
     pointer-events: none;
-    background: linear-gradient(180deg, #0a0f1426 0%, #0a0f1440 42%, #0a0f14 100%),
+    background: linear-gradient(180deg, #050e1826 0%, #050e1840 42%, #050e18 100%),
         url('/branding/deafhub-background-approved.png') center 45% / cover no-repeat;
 }
 
@@ -31,13 +31,13 @@
 .subtitle { margin: 8px 0 0; color: var(--profile-muted); font-size: 15px; }
 .coverAvatar {
     display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
-    width: 112px; height: 112px; border-radius: 50%; border: 1px solid var(--profile-accent);
-    background: linear-gradient(145deg, #132e3ce6, #0b1724f2); color: #c5f7ff;
-    box-shadow: 0 0 0 5px #0a0f14b3, 0 0 28px #22d3ee1a, inset 0 0 22px #22d3ee0d;
+    width: 112px; height: 112px; border-radius: 50%; border: 1px solid #65d7f5;
+    background: linear-gradient(145deg, #0a2a40e6, #050f1cf2); color: #c5f7ff;
+    box-shadow: 0 0 0 5px #050e18b3, 0 0 0 6px #0583c359, 0 0 24px #00d9ff24, inset 0 0 22px #0095ff12;
     font-size: 48px; font-weight: 650;
 }
 .edit { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #bacdda; border-radius: 12px; }
-.edit:hover { color: var(--profile-accent); background: #22d3ee0a; }
+.edit:hover { color: var(--profile-accent); background: #00f0fc0d; }
 .accountStrip { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; margin-top: 8px; }
 .stripProvider { display: flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; font-size: 12px; }
 .stripProvider img, .stripProvider a img { width: 20px; height: 20px; object-fit: contain; opacity: 1; filter: none; }
@@ -47,9 +47,10 @@
 .profileGrid { min-width: 0; }
 .sidebar nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .sidebar button { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 58px; padding: 12px 8px; border: 0; border-radius: 0; background: transparent; color: var(--profile-muted); cursor: pointer; font-size: 14px; line-height: 1.4; }
-.sidebar button[aria-current] { color: var(--profile-accent); }
-.sidebar button[aria-current]::after { content: ''; position: absolute; bottom: -1px; inset-inline: 8px; height: 2px; border-radius: 2px; background: var(--profile-accent); box-shadow: 0 0 12px #22d3ee66; }
-.sidebar button:hover { color: var(--profile-text); }
+.sidebar button[aria-current] { color: var(--profile-accent); text-shadow: 0 0 12px #00f0fc33; }
+.sidebar button[aria-current]::before { content: ''; position: absolute; right: 8px; bottom: -3px; width: 5px; height: 5px; border-radius: 50%; background: var(--profile-accent); }
+.sidebar button[aria-current]::after { content: ''; position: absolute; bottom: -1px; inset-inline: 8px; height: 2px; border-radius: 2px; background: var(--profile-accent); box-shadow: 0 0 12px #00f0fc80; }
+.sidebar button:not([aria-current]):hover { color: var(--profile-text); }
 .content { padding-top: 32px; }
 .overviewGrid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 48px; }
 .about h2, .team h2 { margin: 0 0 24px; font-size: 22px; font-weight: 650; letter-spacing: -.025em; }
@@ -71,7 +72,7 @@
 }
 
 @media (max-width: 600px) {
-    .backdrop { inset: 0; height: auto; background: linear-gradient(180deg, #0a0f141a 0%, #0a0f1470 35%, #0a0f14ed 100%), url('/branding/deafhub-background-approved.png') 60% top / auto 100% no-repeat; }
+    .backdrop { inset: 0; height: auto; background: linear-gradient(180deg, #050e181a 0%, #050e1870 35%, #050e18ed 100%), url('/branding/deafhub-background-approved.png') 60% top / auto 100% no-repeat; }
     .inner { padding: 0 20px 32px; }
     .profileBanner { min-height: 264px; padding: 64px 0 26px; }
     .identity { gap: 16px; width: 100%; }
@@ -82,6 +83,7 @@
     .sidebar nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 4px; padding: 4px 0 12px; }
     .sidebar button { flex-direction: column; gap: 8px; min-height: 64px; padding: 8px 2px; font-size: 12px; }
     .sidebar button[aria-current]::after { bottom: 0; inset-inline: calc(50% - 12px); }
+    .sidebar button[aria-current]::before { right: calc(50% - 14px); bottom: -1px; }
     .content { padding-top: 24px; }
     .overviewGrid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
     .about h2, .team h2 { margin-bottom: 18px; font-size: 20px; }
