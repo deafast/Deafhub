@@ -41,7 +41,7 @@ export default function PlayerDashboard({profile,googleConnected,steamId}:{profi
  </header>
  <div className={styles.profileGrid}>
   <div className={styles.sidebar}>
-   <nav aria-label={t('Разделы кабинета','Account sections')}>{sections.map((section,i)=>{const Icon=icons[i];return <button key={section} type="button" onClick={()=>setActive(section)} aria-controls="player-content" aria-current={active===section?'page':undefined}><Icon size={18} aria-hidden="true"/>{labels[i]}</button>;})}</nav>
+   <nav aria-label={t('Разделы кабинета','Account sections')}>{sections.map((section,i)=>{const Icon=icons[i];return <button key={section} type="button" onClick={()=>setActive(section)} aria-controls="player-content" aria-current={active===section?'page':undefined}><Icon size={20} aria-hidden="true"/>{labels[i]}</button>;})}</nav>
   </div>
   <div className={shared.main+' '+styles.content} id="player-content" role="region" aria-label={labels[sections.indexOf(active)]}>
   {active==='overview'?<div className={styles.overviewGrid}>

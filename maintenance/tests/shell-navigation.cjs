@@ -15,5 +15,15 @@ for(const ru of [true,false])for(const file of ['Header','BottomNav'])test(`${fi
   assert.equal(marked.length,href?1:0,`${path}: wrong number of current navigation links`);
   if(href){assert.ok(marked[0].includes(`href="${href}"`),`${path}: wrong section marked current`);assert.ok(marked[0].includes(`aria-current="${current}"`));}
   assert.match(html,ru?/aria-label="Основная навигация"/:/aria-label="Main navigation"/);
+  if(file==='Header'){
+   if(path==='/profile'||path==='/profile/settings'){
+    assert.match(html,/data-profile-shell="true"/);
+    assert.match(html,/>РУ<\/span>/);assert.match(html,/>EN<\/span>/);
+    assert.equal((html.match(/class="lucide /g)||[]).length,5,'profile header needs the five real navigation icons');
+    assert.doesNotMatch(html,/#0039a6|#d52b1e/,'profile language control uses labels instead of flags');
+   }else{
+    assert.doesNotMatch(html,/data-profile-shell/);assert.match(html,/#0039a6/,'other pages retain their approved flags');
+   }
+  }
  }
 });

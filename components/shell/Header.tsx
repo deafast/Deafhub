@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import AccountButton from '@/components/auth/AccountButton';
+import { Home, Play, Trophy, Users, UserRound } from 'lucide-react';
 
 
 const GB_FLAG = (
@@ -28,17 +29,18 @@ const RU_FLAG = (
 export default function Header() {
     const { t, language, setLanguage } = useLanguageStore();
     const pathname = usePathname();
+    const profilePage = pathname === '/profile' || Boolean(pathname?.startsWith('/profile/'));
 
     const navItems = [
-        { label: t.nav.home, href: '/' },
-        { label: t.nav.live, href: '/live' },
-        { label: t.nav.tournaments, href: '/tournaments' },
-        { label: t.nav.team, href: '/team' },
-        { label: t.nav.profile, href: '/profile' },
+        { label: t.nav.home, href: '/', icon: Home },
+        { label: t.nav.live, href: '/live', icon: Play },
+        { label: t.nav.tournaments, href: '/tournaments', icon: Trophy },
+        { label: t.nav.team, href: '/team', icon: Users },
+        { label: t.nav.profile, href: '/profile', icon: UserRound },
     ];
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-none transition-all duration-300">
+        <header data-profile-shell={profilePage || undefined} className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-none transition-all duration-300">
             <div className="container mx-auto flex h-16 items-center justify-between px-3 sm:px-4">
                 {/* Left: Logo */}
                 <div className="flex items-center gap-4">
@@ -60,10 +62,12 @@ export default function Header() {
                         <Link
                             key={item.href}
                             href={item.href}
+                            aria-label={profilePage ? item.label : undefined}
                             aria-current={pathname === item.href ? 'page' : item.href !== '/' && pathname?.startsWith(item.href + '/') ? 'location' : undefined}
                             className="text-sm font-medium text-foreground/70 transition-colors hover:text-[#22D3EE]"
                         >
-                            {item.label}
+                            {profilePage ? <item.icon size={20} aria-hidden="true" /> : null}
+                            <span data-nav-label="">{item.label}</span>
                         </Link>
                     ))}
                 </nav>
@@ -85,7 +89,7 @@ export default function Header() {
                             className="relative z-10 flex items-center justify-center rounded-full px-4 py-1.5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
                         >
                             <span className={`transition-opacity duration-300 ${language === 'ru' ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
-                                {RU_FLAG}
+                                {profilePage ? 'РУ' : RU_FLAG}
                             </span>
                         </button>
                         <button
@@ -97,7 +101,7 @@ export default function Header() {
                             className="relative z-10 flex items-center justify-center rounded-full px-4 py-1.5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE]"
                         >
                             <span className={`transition-opacity duration-300 ${language === 'en' ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
-                                {GB_FLAG}
+                                {profilePage ? 'EN' : GB_FLAG}
                             </span>
                         </button>
                     </div>

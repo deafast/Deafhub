@@ -157,3 +157,51 @@ body:has([data-player-profile]) header.sticky [aria-label="Account"] a,
 body:has([data-player-profile]) header.sticky [aria-label="Account"] button {
  color:var(--profile-shell-accent);
 }
+
+/* The profile shell follows the approved layout rather than the compact site header. */
+header[data-profile-shell]>div {
+ max-width:1640px;
+ height:76px;
+ padding-inline:clamp(24px,4vw,64px);
+ gap:24px;
+}
+header[data-profile-shell] a[href="/"] img { width:205px; }
+header[data-profile-shell] nav { gap:clamp(16px,2vw,32px); }
+header[data-profile-shell] nav a { display:inline-flex; align-items:center; gap:10px; font-size:14px; white-space:nowrap; }
+header[data-profile-shell] nav a svg { flex-shrink:0; color:#a8b6d0; }
+header[data-profile-shell] nav a[aria-current] svg { color:#00f0fc; }
+header[data-profile-shell] [role="group"][aria-label="Language / Язык"] { width:132px; height:52px; padding:4px; border-radius:999px; flex-shrink:0; }
+header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>button { width:62px; height:44px; border-radius:999px; font-size:14px; font-weight:650; }
+header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>span { left:4px; top:4px; bottom:4px; border-radius:999px; }
+body:has([data-player-profile]) header[data-profile-shell] [aria-label="Аккаунт"],
+body:has([data-player-profile]) header[data-profile-shell] [aria-label="Account"] { border:0; background:transparent; padding:0; gap:8px; }
+body:has([data-player-profile]) header[data-profile-shell] [aria-label="Аккаунт"]>a,
+body:has([data-player-profile]) header[data-profile-shell] [aria-label="Account"]>a { border-radius:50%; border:1px solid #247fa1; background:radial-gradient(circle at 35% 25%,#123a54,#061522 75%); box-shadow:inset 0 0 12px #008ad322; }
+header[data-profile-shell] [aria-label="Аккаунт"]>span,
+header[data-profile-shell] [aria-label="Account"]>span { display:none; }
+@media(max-width:1150px) {
+ header[data-profile-shell]>div { gap:16px; }
+ header[data-profile-shell] a[href="/"] img { width:180px; }
+ header[data-profile-shell] nav { gap:12px; }
+ header[data-profile-shell] nav [data-nav-label] { display:none; }
+ header[data-profile-shell] nav a { width:32px; min-height:44px; justify-content:center; }
+}
+@media(max-width:767px) {
+ header[data-profile-shell]>div { height:64px; padding-inline:16px; gap:8px; }
+ header[data-profile-shell] a[href="/"] img { width:128px; }
+ header[data-profile-shell] [role="group"][aria-label="Language / Язык"] { width:108px; }
+ header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>button { width:50px; }
+ header[data-profile-shell]>div>div:last-child { gap:6px; }
+ body:has([data-player-profile]) header[data-profile-shell] [aria-label="Аккаунт"],
+ body:has([data-player-profile]) header[data-profile-shell] [aria-label="Account"] { gap:0; }
+}
+@media(max-width:360px) {
+ header[data-profile-shell]>div { padding-inline:12px; }
+ header[data-profile-shell] a[href="/"] img { width:112px; }
+}
+@media(max-width:340px) {
+ header[data-profile-shell]>div { gap:4px; }
+ header[data-profile-shell] a[href="/"] img { width:96px; }
+ header[data-profile-shell] [role="group"][aria-label="Language / Язык"] { width:92px; }
+ header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>button { width:42px; }
+}
