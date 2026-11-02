@@ -66,3 +66,16 @@
 .surface:has([data-game-banner=fc])::before{mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%)}
 .surface:has([data-game-banner=fc]) .gameHeader .overview{margin-top:clamp(160px,23vw,350px)}
 @media(max-width:600px){.surface:has([data-game-banner=fc]) .gameHeader .overview{margin-top:215px}}
+
+/* Mobile: show the complete approved artwork, including the DeafHub brand. */
+.mobileGameArtwork{display:none}
+@media(max-width:800px){
+ .surface:has([data-game-banner])::before{display:none}
+ .mobileGameArtwork{display:block;margin:16px -18px 0}
+ .mobileGameArtwork img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
+ .surface:has([data-game-banner]) .dotaHeader .overview,
+ .surface:has([data-game-banner]) .gameHeader .overview{margin-top:16px}
+}
+@media(max-width:600px){
+ .mobileGameArtwork{margin-left:-16px;margin-right:-16px}
+}
