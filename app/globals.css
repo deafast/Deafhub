@@ -123,3 +123,22 @@ body:has([data-game-banner]) header.sticky [aria-label="Language / Язык"]>sp
  body:has([data-game-banner=fc]){--tournament-header:#071622}
  body:has([data-game-banner]) header.sticky{border-color:transparent}
 }
+
+/* Profile-only accents: the approved logo and other sections keep their styling. */
+body:has([data-player-profile]) header.sticky {
+ background:#0a0f14;
+ border-bottom-color:#eafbff12;
+}
+body:has([data-player-profile]) header.sticky nav a[aria-current],
+body:has([data-player-profile]) nav[aria-label] a[aria-current="page"] {
+ color:#22d3ee;
+}
+body:has([data-player-profile]) header.sticky [aria-label="Language / Язык"] {
+ border-color:#22d3ee40;
+ background:#0d1a24;
+}
+body:has([data-player-profile]) header.sticky [aria-label="Language / Язык"]>span {
+ border-color:#22d3ee80;
+ background:#22d3ee14;
+ box-shadow:inset 0 0 12px #22d3ee0d,0 0 14px #22d3ee1a;
+}

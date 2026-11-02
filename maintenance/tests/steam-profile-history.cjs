@@ -92,7 +92,7 @@ test('profile API requires auth, queries own link and never accepts arbitrary St
  dbError={code:'unavailable'};assert.equal((await route.GET()).status,503);assert.equal(calls,1);
 });
 const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');
-const SteamProfile=load('components/auth/SteamProfile.tsx',{'@/lib/steam/profile':profile}).default;
+const SteamProfile=load('components/auth/SteamProfile.tsx',{'@/lib/steam/profile':profile,'@/lib/provider-window':{openProviderWindow:()=>{}},'next/image':{__esModule:true,default:props=>React.createElement('img',props)}}).default;
 for(const ru of [true,false])test(`Steam profile initial screen RU=${ru}`,()=>{
  const html=renderToStaticMarkup(React.createElement(SteamProfile,{steamId:id,ru}));assert.match(html,/steam-mark\.svg/);assert.match(html,ru?/привязан/:/connected/);assert.doesNotMatch(html,/SteamID подтверждён|SteamID verified/);assert.match(html,/role="status"/);assert.match(html,/noopener noreferrer/);assert.ok(!html.includes('MMR'));
 });
