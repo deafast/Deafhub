@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import AuthPanel from './AuthPanel';
 
-const accountControlClass = 'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-0 bg-transparent p-0 text-[#22D3EE] shadow-none transition-colors hover:bg-[#22D3EE]/10 hover:text-[#22D3EE] dark:bg-transparent dark:hover:bg-[#22D3EE]/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#22D3EE] motion-reduce:transition-none';
+const accountControlClass = 'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-0 text-muted-foreground shadow-none transition-colors hover:bg-white/5 hover:text-primary dark:bg-transparent dark:hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary motion-reduce:transition-none';
 
 export default function AccountButton() {
     const ru = useLanguageStore((state) => state.language === 'ru');
@@ -82,22 +82,21 @@ export default function AccountButton() {
     }
 
     if (signedIn) return <div className="relative shrink-0">
-        <div role="group" aria-label={ru ? 'Аккаунт' : 'Account'} className="inline-flex items-center rounded-xl border border-[#22D3EE]/30 bg-[#22D3EE]/5 p-0.5">
+        <div role="group" aria-label={ru ? 'Аккаунт' : 'Account'} className="inline-flex items-center gap-1">
             <Link href="/profile" aria-label={ru ? 'Мой профиль' : 'My profile'} title={ru ? 'Мой профиль' : 'My profile'} className={accountControlClass}>
                 <UserRound className="size-5" aria-hidden="true" />
             </Link>
-            <span aria-hidden="true" className="h-5 w-px shrink-0 bg-[#22D3EE]/20" />
             <Button type="button" variant="outline" size="icon" className={accountControlClass} disabled={busy} aria-busy={busy} aria-label={ru ? 'Выйти' : 'Sign out'} title={ru ? 'Выйти' : 'Sign out'} onClick={signOut}>
                 <LogOut className="size-5" aria-hidden="true" />
             </Button>
         </div>
-        {signOutFailed ? <p role="alert" className="absolute right-0 top-full z-10 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-white/10 bg-[#0D131A] p-3 text-xs text-red-300">{ru ? 'Не удалось выйти. Повторите попытку.' : 'Could not sign out. Please try again.'}</p> : null}
+        {signOutFailed ? <p role="alert" className="absolute right-0 top-full z-10 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-white/10 bg-popover p-3 text-xs text-red-300">{ru ? 'Не удалось выйти. Повторите попытку.' : 'Could not sign out. Please try again.'}</p> : null}
     </div>;
 
     return <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild><Button variant="outline" className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl border-[#22D3EE]/30 bg-[#22D3EE]/5 text-[#22D3EE] hover:bg-[#22D3EE] hover:text-[#0A0F14] text-xs sm:text-sm">{ru ? 'Войти' : 'Sign In'}</Button></DialogTrigger>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[400px] rounded-3xl border-white/10 bg-[#0D131A] p-6 sm:p-7">
-            <DialogHeader><DialogTitle className="text-center text-2xl font-bold">{ru ? 'Вход в ' : 'Sign in to '}<span className="text-[#22D3EE]">DeafHub</span></DialogTitle><DialogDescription className="sr-only">{ru ? 'Вход через Steam или почту. Регистрация и восстановление пароля.' : 'Sign in with Steam or email. Create an account or reset your password.'}</DialogDescription></DialogHeader>
+        <DialogTrigger asChild><Button variant="outline" className="h-11 px-4 rounded-full border-primary/35 bg-transparent text-primary hover:bg-primary/10 hover:text-primary dark:bg-transparent dark:hover:bg-primary/10 text-sm">{ru ? 'Войти' : 'Sign In'}</Button></DialogTrigger>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[400px] rounded-3xl border-white/10 bg-popover p-6 sm:p-7">
+            <DialogHeader><DialogTitle className="text-center text-2xl font-bold">{ru ? 'Вход в ' : 'Sign in to '}<span className="text-primary">DeafHub</span></DialogTitle><DialogDescription className="sr-only">{ru ? 'Вход через Steam или почту. Регистрация и восстановление пароля.' : 'Sign in with Steam or email. Create an account or reset your password.'}</DialogDescription></DialogHeader>
             <AuthPanel />
         </DialogContent>
     </Dialog>;

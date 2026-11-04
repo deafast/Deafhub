@@ -16,7 +16,7 @@ export default function SteamProfile({steamId,ru}:{steamId:string;ru:boolean}){
  if(invalidLink)return <p role="status" className="text-sm leading-6 text-slate-300">{t('Не удалось подтвердить текущую привязку Steam. Обновите страницу.','Could not verify the current Steam link. Reload the page.')}</p>;
  const label=t('Steam — привязан. Открыть профиль.','Steam — connected. Open profile.');
  return <div className="inline-flex">
- <a href={steamProfileUrl(steamId)} onClick={openProviderWindow} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04] transition-colors hover:border-[#22D3EE]/60 hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#22D3EE]">
+ <a href={steamProfileUrl(steamId)} onClick={openProviderWindow} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04] transition-colors hover:border-primary/60 hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary">
  <Image src="/auth/steam-mark.svg" width={34} height={34} alt="" />
  </a>
  {failed?<span role="status" className="sr-only">{t('Не удалось загрузить сведения Steam. Привязка сохранена.','Could not load Steam details. Your link is preserved.')}</span>:!data?<span role="status" className="sr-only">{t('Проверка привязки Steam…','Checking the Steam connection…')}</span>:null}

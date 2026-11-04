@@ -70,7 +70,6 @@ import Providers from "@/components/shared/Providers";
 import Header from "@/components/shell/Header";
 import BottomNav from "@/components/shell/BottomNav";
 import Preloader from "@/components/shared/PreloaderV8";
-import SmoothScroll from "@/components/shared/SmoothScroll";
 
 export default function RootLayout({
   children,
@@ -78,7 +77,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" translate="no" className="dark notranslate scroll-pb-24 md:scroll-pb-0" suppressHydrationWarning>
+    <html data-scroll-behavior="smooth" lang="en" translate="no" className="dark notranslate scroll-pb-24 md:scroll-pb-0" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >

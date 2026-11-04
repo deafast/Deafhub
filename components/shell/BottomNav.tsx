@@ -27,10 +27,10 @@ export default function BottomNav() {
                         key={item.href}
                         href={item.href}
                         aria-current={pathname === item.href ? 'page' : isActive ? 'location' : undefined}
-                        className={`flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 transition-colors ${isActive ? 'text-[#22D3EE]' : 'text-foreground/50 hover:text-[#22D3EE]/80'
+                        className={`flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 transition-colors motion-reduce:transition-none ${isActive ? 'text-primary' : 'text-foreground/50 hover:text-primary/80'
                             }`}
                     >
-                        <Icon className={`h-5 w-5 ${isActive ? 'drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]' : ''}`} />
+                        <Icon className="h-5 w-5" aria-hidden="true" />
                         <span className="text-[10px] font-medium uppercase tracking-tight">{item.label}</span>
                     </Link>
                 );

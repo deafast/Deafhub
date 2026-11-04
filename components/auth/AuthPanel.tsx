@@ -107,7 +107,7 @@ export default function AuthPanel({ steamOnly = false }: { steamOnly?: boolean }
                 {steamOnly ? <span>{ru ? 'Привязать' : 'Link'}</span> : null}
             </Button>
         </div>
-        {busy ? <div role="status" className="flex items-center justify-between gap-2 text-xs text-white/60"><span>{ru ? 'Ожидание входа…' : 'Waiting for sign-in…'}</span><button type="button" onClick={() => { stopWaiting.current?.(); setBusy(false); }} className="text-[#22D3EE] hover:underline">{ru ? 'Отменить' : 'Cancel'}</button></div> : null}
+        {busy ? <div role="status" className="flex items-center justify-between gap-2 text-xs text-white/60"><span>{ru ? 'Ожидание входа…' : 'Waiting for sign-in…'}</span><button type="button" onClick={() => { stopWaiting.current?.(); setBusy(false); }} className="text-primary hover:underline">{ru ? 'Отменить' : 'Cancel'}</button></div> : null}
         {!steamEnabled ? <p className="text-xs text-white/50">{ru ? 'Вход через Steam пока настраивается.' : 'Steam sign-in is being configured.'}</p> : null}
         {error ? <p role="alert" className="text-sm text-red-300">{steamErrors[error][ru ? 0 : 1]}</p> : null}
         {!steamOnly ? <>

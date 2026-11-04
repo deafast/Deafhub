@@ -4,8 +4,8 @@ import type {State} from '@/lib/tournament/engine';
 type Report={is_current:boolean;id:string;match_id:string;result:{kind:'played';a:number;b:number;penalties?:{a:number;b:number}};evidence:string;decided_by:string|null;decision_reason:string|null};
 type Vote={report_id:string;entry_id:string;accepted:boolean;reason:string};
 type Data={rules:{require_confirmation:boolean}|null;referees:{user_id:string}[];reports:Report[];confirmations:Vote[];captainEntries:string[];userId:string};
-const field='mt-2 block w-full rounded-xl border border-white/15 bg-[#0A0F14] p-3 text-white';
-const button='min-h-11 rounded-xl border border-white/15 px-4 py-3 text-[#22D3EE] disabled:opacity-40';
+const field='mt-2 block w-full rounded-xl border border-white/15 bg-background p-3 text-white';
+const button='min-h-11 rounded-xl border border-white/15 px-4 py-3 text-primary disabled:opacity-40';
 export default function TournamentResults({id,owner,ru,locked,name,players}:{id:string;owner:boolean;ru:boolean;locked:boolean;name:(id:string)=>string;players:{user_id:string;nickname:string;entry_id:string}[]}){
  const [data,setData]=useState<Data|null>(null),[state,setState]=useState<State|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(false);
  const request=useRef<AbortController|null>(null);

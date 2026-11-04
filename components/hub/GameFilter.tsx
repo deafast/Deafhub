@@ -32,8 +32,8 @@ export default function GameFilter({ value, onChange, ru, hideAll = false }: { v
     return <div role="group" aria-label={ru ? 'Фильтр по игре' : 'Filter by game'} className="flex flex-wrap gap-2">
         {[...(hideAll ? [] : [{ id: 'all' as const, name: ru ? 'Все игры' : 'All games' }]), ...GAME_OPTIONS].map(game => <button
             key={game.id} type="button" aria-label={game.id==='fc'?'EA Sports FC 27':game.name} title={game.id==='fc'?'EA Sports FC 27':game.name} aria-pressed={value === game.id} onClick={() => onChange(game.id)}
-            className={'min-h-11 rounded-xl border px-4 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#22D3EE] '
-                + (value === game.id ? 'border-[#22D3EE] bg-[#22D3EE] text-[#0A0F14]' : 'border-white/15 bg-white/5 text-[#EAFBFF]')}
+            className={'min-h-11 rounded-xl border px-4 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary '
+                + (value === game.id ? 'border-primary bg-primary text-background' : 'border-white/15 bg-white/5 text-foreground')}
         >{hideAll&&game.id!=='all'?<span data-game-switch-icon={game.id} aria-hidden="true">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={gameLogos[game.id]} width={44} height={26} alt=""/>

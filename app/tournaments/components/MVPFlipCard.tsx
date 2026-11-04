@@ -127,7 +127,7 @@ export default function MVPFlipCard({ data }: { data: MVPData }) {
                 {/* BACK: Data & Intel */}
                 <div
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-2xl sm:rounded-[32px] p-6 sm:p-8 backface-hidden overflow-hidden bg-[#0D131A] border flex flex-col justify-between",
+                        "absolute inset-0 w-full h-full rounded-2xl sm:rounded-[32px] p-6 sm:p-8 backface-hidden overflow-hidden bg-popover border flex flex-col justify-between",
                         theme.border,
                         theme.glow
                     )}

@@ -33,16 +33,3 @@ for(const ru of [true,false])test(`admission initial response cannot restore a f
  assert.equal(view.root.findAllByType('form').length,0);assert.match(JSON.stringify(view.toJSON()),ru?/Войдите в аккаунт/:/Sign in to continue/);
  await Renderer.act(async()=>view.unmount());
 });
-for(const initial of [true,false])test(`smooth scroll follows live reduced-motion and preserves child state, initially ${initial}`,async t=>{
- const original=global.window;t.after(()=>{global.window=original;});let reduced=initial;const listeners=new Set();
- const media={get matches(){return reduced;},addEventListener:(name,fn)=>listeners.add(fn),removeEventListener:(name,fn)=>listeners.delete(fn)};
- global.window={matchMedia:query=>{assert.equal(query,'(prefers-reduced-motion: reduce)');return media;}};
- const Lenis=props=>props.children??null;
- const Component=load('components/shared/SmoothScroll.tsx',{'lenis/react':{ReactLenis:Lenis},'framer-motion':{useReducedMotion:()=>initial}});
- function Child(){const [value,setValue]=React.useState(0);return React.createElement('button',{onClick:()=>setValue(v=>v+1)},value);}
- let view;await Renderer.act(async()=>{view=Renderer.create(React.createElement(Component,null,React.createElement(Child)));});
- assert.equal(view.root.findAllByType(Lenis).length,initial?0:1);
- await Renderer.act(async()=>{view.root.findByType('button').props.onClick();});
- for(const next of [!initial,initial]){await Renderer.act(async()=>{reduced=next;listeners.forEach(fn=>fn());});assert.equal(view.root.findAllByType(Lenis).length,next?0:1);assert.equal(view.root.findByType('button').children.join(''),'1');}
- assert.equal(listeners.size,1);await Renderer.act(async()=>view.unmount());assert.equal(listeners.size,0);
-});

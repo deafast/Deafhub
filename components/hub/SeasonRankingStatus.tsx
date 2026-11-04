@@ -1,8 +1,8 @@
 'use client';
 
 export default function SeasonRankingStatus({ ru }: { ru: boolean }) {
-    return <details className="rounded-2xl border border-white/10 bg-[#0D131A] p-5">
-        <summary className="cursor-pointer font-bold focus-visible:outline-2 focus-visible:outline-[#22D3EE]">
+    return <details className="rounded-2xl border border-white/10 bg-popover p-5">
+        <summary className="cursor-pointer font-bold focus-visible:outline-2 focus-visible:outline-primary">
             {ru ? 'Сезонный рейтинг' : 'Season rankings'}
         </summary>
         <p role="status" className="mt-4 text-sm leading-6 text-white/70">

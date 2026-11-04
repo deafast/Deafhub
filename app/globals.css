@@ -55,26 +55,26 @@
 
 :root {
     --radius: 1rem;
-    --background: #0A0F14;
+    --background: #050e18;
     --foreground: #EAFBFF;
     --card: rgba(255, 255, 255, 0.04);
     --card-foreground: #EAFBFF;
-    --popover: #0D131A;
+    --popover: #081625;
     --popover-foreground: #EAFBFF;
-    --primary: #22D3EE;
-    --primary-foreground: #0A0F14;
+    --primary: #00f0fc;
+    --primary-foreground: #050e18;
     --secondary: rgba(255, 255, 255, 0.06);
     --secondary-foreground: #EAFBFF;
     --muted: rgba(255, 255, 255, 0.06);
-    --muted-foreground: #94A3B8;
-    --accent: #22D3EE;
-    --accent-foreground: #0A0F14;
+    --muted-foreground: #a8b6d0;
+    --accent: #00f0fc;
+    --accent-foreground: #050e18;
     --destructive: #EF4444;
     --destructive-foreground: #EAFBFF;
-    --border: rgba(255, 255, 255, 0.1);
+    --border: #183349;
     --input: rgba(255, 255, 255, 0.1);
-    --ring: #22D3EE;
-    --chart-1: #22D3EE;
+    --ring: #00f0fc;
+    --chart-1: #00f0fc;
     --chart-2: #3B82F6;
     --chart-3: #8B5CF6;
     --chart-4: #EC4899;
@@ -82,10 +82,10 @@
 }
 
 .dark {
-    --background: #0A0F14;
+    --background: #050e18;
     --foreground: #EAFBFF;
     --card: rgba(255, 255, 255, 0.05);
-    --border: rgba(255, 255, 255, 0.12);
+    --border: #183349;
 }
 
 @layer base {
@@ -96,112 +96,58 @@
     body {
         @apply bg-background text-foreground;
     }
-}/* Header actions share the same size, surface and border; native flag colors stay intact. */
-header [role="group"][aria-label="Language / Язык"]{height:calc(3rem + 2px);width:calc(5.75rem + 3px);padding:.125rem;border:1px solid rgb(34 211 238 / .3);border-radius:.75rem;background:rgb(34 211 238 / .05);transform:none}
-header [role="group"][aria-label="Language / Язык"]>button{width:2.75rem;height:2.75rem;padding:0;border-radius:.5rem}
-header [role="group"][aria-label="Language / Язык"]>span{top:.125rem;bottom:.125rem;left:.125rem;border-radius:.5rem;border-color:rgb(34 211 238 / .3);box-shadow:none;background:rgb(34 211 238 / .05)}
+}
 
 /* Compact confirmed match rows: no invented external match telemetry. */
 [data-match-row]{display:grid;grid-template-columns:44px 100px minmax(140px,1fr) 72px minmax(140px,210px);align-items:center;gap:14px;min-height:66px;padding:10px 14px;background:#111e28;border-bottom:1px solid #243540;border-radius:0;font-size:12px}
 [data-match-row]:nth-child(even){background:#14232d}[data-match-logo]{display:block;width:40px;height:32px;background:center/contain no-repeat}[data-match-logo][data-game=dota2]{background-image:url('/branding/game-logos/dota2.png')}[data-match-logo][data-game=cs2]{background-image:url('/branding/game-logos/cs2.svg')}[data-match-logo][data-game=fc]{background-image:url('/branding/game-logos/ea-sports-fc.svg')}
-[data-match-outcome]{font-size:12px;color:#92b5c3;font-weight:600}[data-outcome=win] [data-match-outcome]{color:#9ad86b}[data-outcome=loss] [data-match-outcome]{color:#ff9292}[data-match-identity]{min-width:0}[data-match-identity] h3{font-size:14px!important;line-height:1.4;font-weight:600;margin:0;overflow-wrap:anywhere}[data-match-identity] a{display:block;font-size:10px;color:#91b8c8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:24px;line-height:24px}[data-match-identity] a:hover{color:#22d3ee}[data-match-score]{font-size:17px;font-variant-numeric:tabular-nums;text-align:center}[data-match-date]{font-size:10px;line-height:1.5;color:#9ab0bd;overflow-wrap:anywhere}
+[data-match-outcome]{font-size:12px;color:#92b5c3;font-weight:600}[data-outcome=win] [data-match-outcome]{color:#9ad86b}[data-outcome=loss] [data-match-outcome]{color:#ff9292}[data-match-identity]{min-width:0}[data-match-identity] h3{font-size:14px!important;line-height:1.4;font-weight:600;margin:0;overflow-wrap:anywhere}[data-match-identity] a{display:block;font-size:10px;color:#91b8c8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:24px;line-height:24px}[data-match-identity] a:hover{color:#00f0fc}[data-match-score]{font-size:17px;font-variant-numeric:tabular-nums;text-align:center}[data-match-date]{font-size:10px;line-height:1.5;color:#9ab0bd;overflow-wrap:anywhere}
 @media(max-width:600px){[data-match-row]{grid-template-columns:34px minmax(0,1fr) auto;gap:5px 10px;padding:10px;min-height:86px}[data-match-logo]{width:30px;height:26px;grid-row:1/3}[data-match-outcome]{grid-column:2;grid-row:1;font-size:11px}[data-match-identity]{grid-column:2;grid-row:2}[data-match-identity] h3{font-size:12px!important}[data-match-score]{grid-column:3;grid-row:1/3;font-size:16px}[data-match-date]{grid-column:2/4;grid-row:3;font-size:9px}[data-match-identity] a{font-size:9px;min-height:24px}}
-[data-match-row]{width:100%;text-align:left;cursor:pointer;color:inherit;font-family:inherit}[data-match-row]:hover{background:#1a303e}[data-match-row]:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}[data-match-title]{display:block;font-size:14px;line-height:1.4;font-weight:600;overflow-wrap:anywhere}[data-match-subtitle]{display:block;font-size:10px;color:#91b8c8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:24px}@media(max-width:600px){[data-match-title]{font-size:12px}[data-match-subtitle]{font-size:9px}}
+[data-match-row]{width:100%;text-align:left;cursor:pointer;color:inherit;font-family:inherit}[data-match-row]:hover{background:#1a303e}[data-match-row]:focus-visible{outline:2px solid #00f0fc;outline-offset:2px}[data-match-title]{display:block;font-size:14px;line-height:1.4;font-weight:600;overflow-wrap:anywhere}[data-match-subtitle]{display:block;font-size:10px;color:#91b8c8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:24px}@media(max-width:600px){[data-match-title]{font-size:12px}[data-match-subtitle]{font-size:9px}}
 
-/* Tournament header colors follow the selected game's artwork. */
-body:has([data-game-banner=dota2]){--tournament-header:#25131deF;--tournament-accent:#ffb38e;--tournament-line:#a9585266;--tournament-control:#3b1e2c}
-body:has([data-game-banner=cs2]){--tournament-header:#261c10ef;--tournament-accent:#ffc26b;--tournament-line:#c9833866;--tournament-control:#3a2917}
-body:has([data-game-banner=fc]){--tournament-header:#071c2aef;--tournament-accent:#7cecff;--tournament-line:#36a7cd66;--tournament-control:#0b3042}
-body:has([data-game-banner]) header.sticky{background:var(--tournament-header);border-color:var(--tournament-line)}
-body:has([data-game-banner]) header.sticky [role=group]{background:var(--tournament-control);border-color:var(--tournament-line)}
-body:has([data-game-banner]) header.sticky button,body:has([data-game-banner]) header.sticky a:hover{color:var(--tournament-accent);border-color:var(--tournament-line)}
-body:has([data-game-banner]) header.sticky [aria-label="Language / Язык"]>span{background:var(--tournament-control);border-color:var(--tournament-line)}
-/* Stable mobile header surface; the original DeafHub image keeps its own colors. */
-@media(max-width:800px){
- body:has([data-game-banner=dota2]){--tournament-header:#180d18}
- body:has([data-game-banner=cs2]){--tournament-header:#171411}
- body:has([data-game-banner=fc]){--tournament-header:#071622}
- body:has([data-game-banner]) header.sticky{border-color:transparent}
-}
-
-/* Profile-only palette matched to the owner's approved visual reference. */
-body:has([data-player-profile]) {
- --background:#050e18;
- --profile-shell-accent:#00f0fc;
-}
-body:has([data-player-profile]) header.sticky {
- background:#050d15;
- border-bottom-color:#74bde324;
-}
-body:has([data-player-profile]) header.sticky nav a[aria-current],
-body:has([data-player-profile]) nav[aria-label] a[aria-current="page"] {
- color:var(--profile-shell-accent);
-}
-body:has([data-player-profile]) header.sticky [aria-label="Language / Язык"] {
- border-color:#1c5675;
- background:#061321;
-}
-body:has([data-player-profile]) header.sticky [aria-label="Language / Язык"]>span {
- border-color:#00c8f0;
- background:linear-gradient(145deg,#0a3855,#052039);
- box-shadow:inset 0 0 12px #00aaff26,0 0 14px #00d9ff24;
-}
-body:has([data-player-profile]) header.sticky [aria-label="Аккаунт"],
-body:has([data-player-profile]) header.sticky [aria-label="Account"] {
- border-color:#1b6684;
- background:#071c2b;
-}
-body:has([data-player-profile]) header.sticky [aria-label="Аккаунт"] a,
-body:has([data-player-profile]) header.sticky [aria-label="Аккаунт"] button,
-body:has([data-player-profile]) header.sticky [aria-label="Account"] a,
-body:has([data-player-profile]) header.sticky [aria-label="Account"] button {
- color:var(--profile-shell-accent);
-}
-
-/* The profile shell follows the approved layout rather than the compact site header. */
-header[data-profile-shell]>div {
- max-width:1640px;
- height:76px;
- padding-inline:clamp(24px,4vw,64px);
- gap:24px;
-}
-header[data-profile-shell] a[href="/"] img { width:205px; }
-header[data-profile-shell] nav { gap:clamp(16px,2vw,32px); }
-header[data-profile-shell] nav a { display:inline-flex; align-items:center; gap:10px; font-size:14px; white-space:nowrap; }
-header[data-profile-shell] nav a svg { flex-shrink:0; color:#a8b6d0; }
-header[data-profile-shell] nav a[aria-current] svg { color:#00f0fc; }
-header[data-profile-shell] [role="group"][aria-label="Language / Язык"] { width:132px; height:52px; padding:4px; border-radius:999px; flex-shrink:0; }
-header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>button { width:62px; height:44px; border-radius:999px; font-size:14px; font-weight:650; }
-header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>span { left:4px; top:4px; bottom:4px; border-radius:999px; }
-body:has([data-player-profile]) header[data-profile-shell] [aria-label="Аккаунт"],
-body:has([data-player-profile]) header[data-profile-shell] [aria-label="Account"] { border:0; background:transparent; padding:0; gap:8px; }
-body:has([data-player-profile]) header[data-profile-shell] [aria-label="Аккаунт"]>a,
-body:has([data-player-profile]) header[data-profile-shell] [aria-label="Account"]>a { border-radius:50%; border:1px solid #247fa1; background:radial-gradient(circle at 35% 25%,#123a54,#061522 75%); box-shadow:inset 0 0 12px #008ad322; }
-header[data-profile-shell] [aria-label="Аккаунт"]>span,
-header[data-profile-shell] [aria-label="Account"]>span { display:none; }
+/* Shared shell: open controls and one palette on every route. */
+html { scroll-behavior:smooth; scroll-padding-top:96px; }
+body { font-family:var(--font-geist-sans),Arial,Helvetica,sans-serif; }
+header[data-site-shell] { background:#050d15; border-bottom-color:#183349; }
+header[data-site-shell]>div { max-width:1640px; height:76px; padding-inline:clamp(24px,4vw,64px); gap:24px; }
+header[data-site-shell] a[href="/"] img { width:205px; }
+header[data-site-shell] nav { gap:clamp(16px,2vw,32px); }
+header[data-site-shell] nav a { display:inline-flex; align-items:center; gap:10px; min-height:44px; font-size:14px; white-space:nowrap; }
+header[data-site-shell] nav a[aria-current] { color:var(--primary); }
+header[data-site-shell] nav a:focus-visible { outline:2px solid var(--primary); outline-offset:4px; border-radius:4px; }
+header[data-site-shell] nav a svg { flex-shrink:0; }
+header[data-site-shell] .site-language { display:flex; align-items:center; gap:0; flex-shrink:0; }
+header[data-site-shell] .site-language button { position:relative; display:grid; place-items:center; width:44px; min-height:44px; padding:0; color:var(--muted-foreground); font-size:12px; font-weight:650; background:transparent; border:0; cursor:pointer; transition:color 150ms ease; }
+header[data-site-shell] .site-language button[aria-pressed="true"] { color:var(--primary); }
+header[data-site-shell] .site-language button[aria-pressed="true"]::after { content:""; position:absolute; left:17px; right:17px; bottom:4px; height:2px; border-radius:2px; background:var(--primary); }
+header[data-site-shell] .site-language button:hover { color:var(--foreground); }
+header[data-site-shell] .site-language button:focus-visible { outline:2px solid var(--primary); outline-offset:-2px; border-radius:8px; }
+.route-surface { animation:route-enter 180ms ease-out; }
+.route-loading { display:flex; min-height:40svh; align-items:center; justify-content:center; gap:16px; padding:32px 24px; color:var(--muted-foreground); font-size:14px; }
+.route-loading-track { display:block; width:64px; height:2px; overflow:hidden; background:var(--border); border-radius:2px; }
+.route-loading-track::after { content:""; display:block; width:50%; height:100%; background:var(--primary); animation:route-progress 1.1s ease-in-out infinite alternate; }
+@keyframes route-enter { from { opacity:.65; } to { opacity:1; } }
+@keyframes route-progress { from { transform:translateX(-100%); } to { transform:translateX(200%); } }
 @media(max-width:1150px) {
- header[data-profile-shell]>div { gap:16px; }
- header[data-profile-shell] a[href="/"] img { width:180px; }
- header[data-profile-shell] nav { gap:12px; }
- header[data-profile-shell] nav [data-nav-label] { display:none; }
- header[data-profile-shell] nav a { width:32px; min-height:44px; justify-content:center; }
+ header[data-site-shell]>div { gap:16px; }
+ header[data-site-shell] a[href="/"] img { width:180px; }
+ header[data-site-shell] nav { gap:12px; }
+ header[data-site-shell] nav [data-nav-label] { display:none; }
+ header[data-site-shell] nav a { width:44px; justify-content:center; }
 }
 @media(max-width:767px) {
- header[data-profile-shell]>div { height:64px; padding-inline:16px; gap:8px; }
- header[data-profile-shell] a[href="/"] img { width:128px; }
- header[data-profile-shell] [role="group"][aria-label="Language / Язык"] { width:108px; }
- header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>button { width:50px; }
- header[data-profile-shell]>div>div:last-child { gap:6px; }
- body:has([data-player-profile]) header[data-profile-shell] [aria-label="Аккаунт"],
- body:has([data-player-profile]) header[data-profile-shell] [aria-label="Account"] { gap:0; }
+ html { scroll-padding-top:80px; }
+ header[data-site-shell]>div { height:64px; padding-inline:16px; gap:8px; }
+ header[data-site-shell] a[href="/"] img { width:128px; }
+ header[data-site-shell]>div>div:last-child { gap:4px; }
+ header[data-site-shell] [aria-label="Аккаунт"],header[data-site-shell] [aria-label="Account"] { gap:0; }
 }
 @media(max-width:360px) {
- header[data-profile-shell]>div { padding-inline:12px; }
- header[data-profile-shell] a[href="/"] img { width:112px; }
+ header[data-site-shell]>div { padding-inline:12px; gap:4px; }
+ header[data-site-shell] a[href="/"] img { width:104px; }
 }
-@media(max-width:340px) {
- header[data-profile-shell]>div { gap:4px; }
- header[data-profile-shell] a[href="/"] img { width:96px; }
- header[data-profile-shell] [role="group"][aria-label="Language / Язык"] { width:92px; }
- header[data-profile-shell] [role="group"][aria-label="Language / Язык"]>button { width:42px; }
+@media(prefers-reduced-motion:reduce) {
+ html { scroll-behavior:auto; }
+ .route-surface,.route-loading-track::after { animation:none; }
+ header[data-site-shell] .site-language button { transition:none; }
 }
