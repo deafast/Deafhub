@@ -12,7 +12,7 @@ import AuthPanel from './AuthPanel';
 
 const accountControlClass = 'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-0 text-muted-foreground shadow-none transition-colors hover:bg-white/5 hover:text-primary dark:bg-transparent dark:hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary motion-reduce:transition-none';
 
-export default function AccountButton() {
+export default function AccountButton({ compact = false }: { compact?: boolean }) {
     const ru = useLanguageStore((state) => state.language === 'ru');
     const router = useRouter();
     const [signedIn, setSignedIn] = useState(false);
@@ -94,7 +94,7 @@ export default function AccountButton() {
     </div>;
 
     return <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild><Button variant="outline" className="h-11 px-4 rounded-full border-primary/35 bg-transparent text-primary hover:bg-primary/10 hover:text-primary dark:bg-transparent dark:hover:bg-primary/10 text-sm">{ru ? 'Войти' : 'Sign In'}</Button></DialogTrigger>
+        <DialogTrigger asChild><Button variant="outline" aria-label={ru ? 'Войти' : 'Sign in'} className={compact ? accountControlClass : 'h-11 px-4 rounded-full border-primary/35 bg-transparent text-primary hover:bg-primary/10 hover:text-primary dark:bg-transparent dark:hover:bg-primary/10 text-sm'}>{compact ? <UserRound className="size-5" aria-hidden="true" /> : ru ? 'Войти' : 'Sign In'}</Button></DialogTrigger>
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[400px] rounded-3xl border-white/10 bg-popover p-6 sm:p-7">
             <DialogHeader><DialogTitle className="text-center text-2xl font-bold">{ru ? 'Вход в ' : 'Sign in to '}<span className="text-primary">DeafHub</span></DialogTitle><DialogDescription className="sr-only">{ru ? 'Вход через Steam или почту. Регистрация и восстановление пароля.' : 'Sign in with Steam or email. Create an account or reset your password.'}</DialogDescription></DialogHeader>
             <AuthPanel />

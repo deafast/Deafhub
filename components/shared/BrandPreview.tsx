@@ -1,53 +1,44 @@
 'use client';
-import Link from 'next/link';
-
 import Image from 'next/image';
-import {ArrowRight,Users,Gamepad2,TrendingUp,ShieldCheck} from 'lucide-react';
-import {useLanguageStore} from '@/store/useLanguageStore';
+import Link from 'next/link';
+import type { CSSProperties } from 'react';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import styles from './BrandPreview.module.css';
-import LivingWaves from './LivingWaves';
-import OriginalGameCards from './OriginalGameCards';
 
+const games = [
+ {id:'lol',name:'League of Legends',logo:'league-of-legends.svg',width:736,height:287,x:'6%',active:false},
+ {id:'valorant',name:'Valorant',logo:'valorant.webp',width:736,height:138,x:'24%',active:false},
+ {id:'dota2',name:'Dota 2',logo:'dota2.png',width:386,height:76,x:'44%',active:true},
+ {id:'fc',name:'EA Sports FC 27',logo:'ea-sports-fc.svg',width:512,height:254,x:'64%',active:true},
+ {id:'cs2',name:'Counter-Strike 2',logo:'cs2.svg',width:801,height:165,x:'86%',active:true},
+] as const;
 
-import {originalGames as games} from './original-games';
-
-export default function BrandPreview(){
- const ru=useLanguageStore(s=>s.language==='ru');
-
- const text=(r:string,e:string)=>ru?r:e;
- const features=[
-  {icon:Users,title:text('Инклюзивное сообщество','Inclusive community'),body:text('Играем. Общаемся. Развиваемся вместе.','Play, connect and grow together.')},
-  {icon:Gamepad2,title:text('Любимые игры','Favourite games'),body:text('Популярные дисциплины и комфортная среда.','Popular games and a welcoming environment.')},
-  {icon:TrendingUp,title:text('Развитие и возможности','Growth and opportunities'),body:text('Навыки, опыт, новые горизонты в киберспорте.','Skills, experience and new esports opportunities.')},
-  {icon:ShieldCheck,title:text('Уважение и равные условия','Respect and equal opportunities'),body:text('Талант не зависит от слуха.','Talent does not depend on hearing.')},
- ];
- return <div className={styles.page}>
-  <div className={styles.waves}/><LivingWaves/>
-  <div className={styles.content}>
-   <section className={styles.hero} aria-labelledby="home-title">
-    <div className={styles.intro}>
-     <p className={styles.eyebrow}>{text('Игры · Люди · Без барьеров','Games · People · Without barriers')}</p>
-     <h1 id="home-title" className={styles.title}>{text('Киберспорт','Esports')}<br/><span>{text('без барьеров','without barriers')}</span></h1>
-     <p className={styles.description}>{text('DEAFHUB — платформа, которая объединяет игроков с нарушением слуха и всех, кто верит, что киберспорт доступен каждому.','DEAFHUB brings together Deaf and hard of hearing players and everyone who believes esports is for all.')}</p>
-     <div className={styles.actions}>
-      <Link href="/profile" className={styles.primary}>{text('Присоединиться','Join us')}<ArrowRight size={18} aria-hidden="true"/></Link>
-      <Link href="/about" className={styles.secondary}>{text('Узнать больше','Learn more')}</Link>
-     </div>
+export default function BrandPreview() {
+ const ru=useLanguageStore(state=>state.language==='ru');
+ return <div className={styles.page} data-home="five-games">
+  <section className={styles.hero} aria-labelledby="home-title">
+   <div className={styles.games} role="group" aria-label={ru?'Игровые дисциплины':'Game disciplines'}>
+    {games.map((game,index)=>{
+     const art=<><span className={styles.art} aria-hidden="true"/>
+      {game.id==='fc'?<span className={styles.footballPortrait} aria-hidden="true"/>:null}
+      <span className={styles.gameLogo}><Image src={'/branding/game-logos/'+game.logo} width={game.width} height={game.height} alt={game.name} unoptimized/></span></>;
+     const style={'--game-index':index,'--logo-x':game.x} as CSSProperties;
+     return game.active?
+      <Link key={game.id} href={'/tournaments?game='+game.id} prefetch={false} className={styles.game} style={style} data-game={game.id} aria-label={ru?'Турниры '+game.name:game.name+' tournaments'}>{art}</Link>:
+      <div key={game.id} className={styles.game} style={style} data-game={game.id} data-decorative="true">{art}</div>;
+    })}
+   </div>
+   <div className={styles.brand}>
+    <h1 id="home-title" className={styles.title}><Image src="/branding/approved-2026-10-28/wordmark-tagline.png" alt="DEAFHUB Esports Organization" width={610} height={115} preload className={styles.wordmark}/></h1>
+    <p className={styles.description}>{ru?'Турниры и сообщество игроков.':'Tournaments and a community of players.'}</p>
+    <div className={styles.actions}>
+     <Link href="/tournaments" className={styles.primary}>{ru?'Найти турнир':'Find a tournament'}</Link>
+     <Link href="/team" className={styles.secondary}>{ru?'Найти команду':'Find a team'}</Link>
     </div>
-    <div className={styles.desktopGames}>
-     <OriginalGameCards games={games} ru={ru}/>
-    </div>
-   </section>
-   <nav aria-label={text('Игры','Games')} className={styles.mobileGames}>
-    {games.map(game=><Link key={game.id} href={`/tournaments?game=${game.id}`} className={styles.mobileGame} aria-label={game.name}>
-     <Image src={game.logo} width={game.width} height={game.height} alt="" unoptimized className={styles.mobileArt}/>
-    </Link>)}
-   </nav>
-   <section className={styles.features} aria-label={text('О сообществе','Our community')}>
-    {features.map(({icon:Icon,title,body})=><article key={title} className={styles.feature}><Icon size={34} aria-hidden="true"/><div><h2>{title}</h2><p>{body}</p></div></article>)}
-   </section>
-   <details className={styles.projectStatus}><summary>{text('Что уже работает','Available now')}</summary><p>{text('Вход по почте и Steam, личный кабинет, команды, заявки и учёт результатов матчей. Подтверждённых турниров и трансляций пока нет.','Email and Steam sign-in, player accounts, teams, entries and match results. No confirmed tournaments or streams yet.')}</p><p>{text('Визуальные уведомления, субтитры трансляций и материалы на жестовом языке остаются в плане развития.','Visual notifications, stream captions and sign language materials remain on the roadmap.')}</p></details>
-   <nav className={styles.footer} aria-label={text('О проекте','Project information')}><Link href="/about">{text('О проекте','About')}</Link><Link href="/rules">{text('Правила и участие','Rules and participation')}</Link><Link href="/contact">{text('Контакты и спонсоры','Contact and sponsors')}</Link></nav>
-  </div>
+   </div>
+  </section>
+  <footer className={styles.footer}><nav aria-label={ru?'Информация о проекте':'Project information'}>
+   <Link href="/about">{ru?'О проекте':'About'}</Link><Link href="/rules">{ru?'Правила':'Rules'}</Link><Link href="/contact">{ru?'Контакты':'Contact'}</Link>
+  </nav></footer>
  </div>;
 }

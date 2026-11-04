@@ -1,45 +1,44 @@
-.page{font-family:var(--font-geist-sans),Arial,Helvetica,sans-serif;position:relative;isolation:isolate;min-height:calc(100svh - 76px);background:var(--background);overflow:hidden;color:#eafbff}
-.waves{position:absolute;inset:0;z-index:-1;pointer-events:none;background:url('/branding/deafhub-background-approved.png') center/cover no-repeat;opacity:.2}
-.flow{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;animation:wave-drift 28s ease-in-out infinite alternate}
-.content{max-width:1672px;margin:auto;padding:28px 56px 24px;position:relative}
-.hero{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:center;min-height:580px;gap:16px}
-.intro{position:relative;z-index:1;padding:20px 0}
-.eyebrow{font-size:13px;letter-spacing:.32em;text-transform:uppercase;margin:0 0 24px}
-.title{font-size:clamp(38px,4.25vw,72px);line-height:1.06;font-weight:900;text-transform:uppercase;letter-spacing:-.035em;margin:0}
-.title span{color:var(--primary)}
-.description{font-size:19px;line-height:1.5;max-width:535px;margin:22px 0 0;color:#eafbff}
-.actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:30px}
-.primary,.secondary{min-height:54px;padding:14px 26px;border:1px solid var(--primary);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:18px;font-size:16px;font-weight:600;text-decoration:none}
-.primary{color:#031015;background:var(--primary)}.secondary{color:#eafbff;background:transparent}
-.desktopGames{position:relative;aspect-ratio:885/620;container-type:inline-size;min-width:0}
-.scene{display:block;width:calc(100% * 965 / 885);max-width:none;height:auto;margin-left:calc(-100% * 80 / 885);overflow:visible}
-.desktopLinks{position:absolute;inset:0}
-.gameLink{position:absolute;top:4%;height:84%;width:27%;border-radius:14px;text-decoration:none;color:#eafbff}
-.dota{left:3.5%}.cs2{left:31.7%}.fc{left:63%;top:12%;height:75%}
-.cardCopy{position:absolute;top:77.23%;left:2.5%;width:90%;display:flex;flex-direction:column;gap:0;font-size:2cqw;line-height:1.25;font-weight:400;color:#f5fbfd;text-shadow:0 1px 2px #000b;background:transparent;white-space:nowrap}
-.cs2 .cardCopy{left:-1%}.fc .cardCopy{top:75.83%;left:10%}
-.cardCopy span{display:block}
-.mobileGames{display:none}
-.features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;padding:28px 0 22px;border-top:1px solid #00f0fc18}
-.feature{display:flex;gap:18px;align-items:flex-start;min-width:0}.feature:not(:last-child){border-right:1px solid #00f0fc30;padding-right:20px}
-.feature>div{min-width:0;overflow-wrap:anywhere}.feature svg{flex-shrink:0;color:var(--primary)}.feature h2{font-size:14px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin:0}.feature p{font-size:13px;line-height:1.5;color:#d4dfe3;margin:10px 0 0}
-.projectStatus{border-top:1px solid #00f0fc18;padding:14px 0;font-size:13px;color:#c3d1d7}.projectStatus summary{cursor:pointer;min-height:30px;color:var(--primary);line-height:30px}.projectStatus p{max-width:900px;line-height:1.6;margin:8px 0}
-.footer{display:flex;flex-wrap:wrap;gap:20px;font-size:12px;color:var(--primary);padding-top:8px}
-.srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.gameLink:focus-visible,.mobileGame:focus-visible,.primary:focus-visible,.secondary:focus-visible,.footer a:focus-visible{outline:2px solid #eafbff;outline-offset:4px}
-@media(max-width:1100px){.content{padding:20px 24px}.hero{min-height:0;grid-template-columns:1fr}.desktopGames{display:none}.intro{padding:4px 0 0}.eyebrow{font-size:11px;margin-bottom:12px}.title{font-size:clamp(30px,5.3vw,50px)}.description{font-size:15px;max-width:620px;margin-top:14px}.actions{margin-top:18px;gap:10px}.primary,.secondary{min-height:44px;padding:10px 18px;font-size:14px}.mobileGames{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0}.mobileGame{aspect-ratio:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid #00f0fc55;border-radius:12px;background:#051117;text-decoration:none;color:#eafbff;overflow:hidden;padding:6px}.mobileArt{display:block;width:100%;height:calc(100% - 22px);min-height:0;flex:1;object-fit:contain;padding:8px}.mobileGame>span{font-size:13px;font-weight:700;line-height:16px;text-align:center;flex-shrink:0}.features{gap:18px;padding:18px 0}.feature{gap:10px}.feature>div{min-width:0;overflow-wrap:anywhere}.feature svg{width:26px;height:26px}.feature h2{font-size:11px}.feature p{font-size:12px;margin-top:6px}.feature:not(:last-child){padding-right:8px}}
-@media(max-width:600px){.content{padding:16px 16px 18px}.eyebrow{font-size:9px;letter-spacing:.24em;margin-bottom:12px}.title{font-size:clamp(27px,8vw,38px);line-height:1.05}.description{font-size:13px;line-height:1.5;margin-top:12px}.actions{gap:8px;margin-top:16px}.primary,.secondary{font-size:12px;gap:8px;padding:9px 12px;min-height:42px}.mobileGames{gap:8px;margin:18px 0}.mobileGame{padding:4px;border-radius:10px}.mobileGame>span{font-size:12px;line-height:16px}.features{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px;padding:18px 0}.feature{gap:9px}.feature:not(:last-child){border:0;padding-right:0}.feature>div{min-width:0;overflow-wrap:anywhere}.feature svg{width:24px;height:24px}.feature h2{font-size:10px;letter-spacing:.04em;line-height:1.4}.feature p{font-size:11px;line-height:1.45}.projectStatus{font-size:12px;padding:8px 0}.footer{gap:14px;font-size:11px}.projectStatus summary{min-height:36px;line-height:36px}}
-@media(prefers-reduced-motion:reduce){.page *{scroll-behavior:auto}}
-
-.mobileArt[src$='ea-sports-fc.svg']{filter:invert(1)}
-
-
-
-.primary,.secondary { transition:background-color 150ms ease,color 150ms ease,border-color 150ms ease; }
-.primary:hover { background:#74f7ff; border-color:#74f7ff; }
-.secondary:hover { background:#00f0fc0d; border-color:#74f7ff; }
-.flow[data-motion="light"] { animation-duration:42s; }
-.flow[data-motion="still"] { animation:none; }
-@keyframes wave-drift { from { transform:translateY(-8px); } to { transform:translateY(8px); } }
-@media(max-width:767px) { .page { min-height:calc(100svh - 64px); } }
-@media(prefers-reduced-motion:reduce) { .flow { animation:none; } .primary,.secondary { transition:none; } }
+.page{background:#030d14;color:#eafbff;isolation:isolate}
+.hero{position:relative;isolation:isolate;min-height:650px;height:calc(100svh - 140px);overflow:hidden;background:#030d14}
+.games{position:absolute;inset:0;isolation:isolate}
+.game{position:absolute;inset:0;display:block;color:inherit;text-decoration:none;clip-path:polygon(calc(28.5% + (var(--game-index) - 1)*20%) 0,calc(48.5% + (var(--game-index) - 1)*20%) 0,calc(29.2% + (var(--game-index) - 1)*20%) 100%,calc(9.2% + (var(--game-index) - 1)*20%) 100%)}
+.game:first-child{clip-path:polygon(0 0,28.5% 0,9.2% 100%,0 100%)}
+.game:last-child{clip-path:polygon(88.5% 0,100% 0,100% 100%,69.2% 100%)}
+.art{position:absolute;inset:0;background:url('/branding/home-five-games/scene.webp') center top/cover no-repeat;pointer-events:none}
+.art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#030d1412 0%,#030d1426 40%,#030d1473 72%,#030d1426 100%);transition:opacity 180ms ease}
+.game[data-game=fc] .art{background:linear-gradient(180deg,#030d146b,#030d14e6 75%),url('/branding/tournaments/approved-cs2-fc27/fc27-atmosphere.webp') center/cover no-repeat}
+.footballPortrait{position:absolute;inset:0;pointer-events:none;background:url('/branding/home-five-games/mbappe.webp') 78% 32%/auto 65% no-repeat;filter:brightness(.73) saturate(.72);mask-image:linear-gradient(180deg,#000 0%,#000 43%,transparent 72%)}
+.gameLogo{position:absolute;top:86%;left:var(--logo-x);transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:clamp(110px,12vw,205px);height:64px;opacity:.76;transition:opacity 180ms ease}
+.gameLogo img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.game[data-game=lol] .gameLogo{width:clamp(76px,8vw,140px)}
+.game[data-game=fc] .gameLogo{width:clamp(105px,11vw,180px);height:58px}
+.game[data-game=fc] .gameLogo img{filter:invert(1)}
+.game:focus-visible{outline:none}.game:focus-visible .gameLogo{outline:2px solid #00f0fc;outline-offset:10px;border-radius:3px;opacity:1}
+.brand{position:absolute;z-index:2;top:53%;left:50%;transform:translateX(-50%);width:min(48vw,740px);text-align:center;pointer-events:auto}
+.title{margin:0;font-size:inherit;line-height:1}.wordmark{display:block;width:100%;height:auto}
+.description{margin:24px 0 0;font-size:clamp(16px,1.65vw,25px);line-height:1.5;color:#e2e8ef;text-wrap:balance}
+.actions{display:flex;justify-content:center;gap:clamp(16px,2vw,30px);margin-top:22px;pointer-events:auto}
+.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:12px 30px;border:1px solid #00f0fc;border-radius:10px;font-size:clamp(14px,1.2vw,19px);line-height:1.3;font-weight:600;text-decoration:none;transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
+.primary{background:#00f0fc;color:#030d14}.secondary{color:#eafbff;background:#030d14a3}
+.primary:focus-visible,.secondary:focus-visible,.footer a:focus-visible{outline:2px solid #eafbff;outline-offset:5px}
+.footer{position:relative;min-height:64px;display:flex;align-items:center;justify-content:center;border-top:1px solid #00f0fc20;background:#030d14}
+.footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(24px,4vw,60px);padding:16px 24px}
+.footer a{font-size:14px;color:#c5d0df;text-decoration:none;transition:color 160ms ease}
+@media(hover:hover) and (pointer:fine){.game[href]:hover .gameLogo{opacity:1}.game[href]:hover .art::after{opacity:.65}.primary:hover{background:#61f7ff;border-color:#61f7ff}.secondary:hover{background:#00f0fc14}.footer a:hover{color:#00f0fc}}
+@media(min-width:2200px){.hero{min-height:850px}.brand{width:min(43vw,940px)}.description{font-size:28px}.primary,.secondary{font-size:21px;min-height:58px;padding-inline:38px}.gameLogo{width:240px;height:76px}.game[data-game=lol] .gameLogo{width:165px}.game[data-game=fc] .gameLogo{width:215px;height:70px}}
+@media(max-width:1100px) and (min-width:768px){.hero{min-height:610px}.brand{width:54vw}.description{margin-top:18px;font-size:18px}.actions{gap:12px;margin-top:18px}.primary,.secondary{padding:12px 20px;min-height:46px}.gameLogo{width:15vw;height:42px}.game[data-game=lol] .gameLogo{width:9vw}.game[data-game=fc] .gameLogo{width:13vw;height:42px}}
+@media(max-width:767px){
+ .hero{display:flex;flex-direction:column;height:auto;min-height:0;overflow:visible}
+ .games{position:relative;display:flex;inset:auto;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:16px;padding:0 16px;gap:1px;scrollbar-width:thin;scrollbar-color:#00f0fc45 transparent;background:#030d14}
+ .game,.game:first-child,.game:last-child{position:relative;inset:auto;flex:0 0 clamp(138px,38vw,210px);aspect-ratio:334.4/941;clip-path:none;scroll-snap-align:start;border-bottom:1px solid #00f0fc35}
+ .art{background-size:500% 100%;background-position:calc(var(--game-index)*25%) top}
+ .art::after{background:linear-gradient(180deg,#030d1410 10%,#030d1430 55%,#030d14cc 86%,#030d14 100%)}
+ .footballPortrait{background-position:center top;background-size:auto 85%}
+ .game .gameLogo,.game[data-game=lol] .gameLogo,.game[data-game=fc] .gameLogo{left:50%;top:87%;width:80%;height:36px;opacity:.85}
+ .game[data-game=lol] .gameLogo{width:66%;height:44px}
+ .brand{position:relative;top:auto;left:auto;transform:none;width:min(88%,480px);margin:28px auto 32px}
+ .description{font-size:16px;margin-top:18px}.actions{gap:12px;margin-top:20px}
+ .primary,.secondary{flex:1;font-size:14px;min-height:46px;padding:12px 10px;border-radius:9px}
+ .footer{min-height:60px}.footer nav{gap:24px}.footer a{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){.page *,.page *::after{transition:none;scroll-behavior:auto;animation:none}.games{scroll-snap-type:none}}
