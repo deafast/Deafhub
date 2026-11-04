@@ -14,10 +14,17 @@ for(const language of ['ru','en'])test('five-game home exposes only supported di
  for(const image of html.matchAll(/src="([^"]+)"/g))assert.ok(fs.existsSync('public'+image[1]),'missing local asset '+image[1]);
 });
 test('original artwork remains available and unchanged',()=>assert.equal(crypto.createHash('sha256').update(fs.readFileSync('public/branding/home-approved/artwork.webp')).digest('hex'),'786bf662eca17f72aa2e7f185a52ca526ae3c23fed9ae6e96fa38d83f3a327f7'));
-test('home art stays within transfer budget and Mbappe comes from recorded official source',()=>{
- for(const file of ['scene.webp','mbappe.webp'])assert.ok(fs.statSync('public/branding/home-five-games/'+file).size<500000);
+test('home uses the exact approved base, without a replacement football portrait',()=>{
+ const html=renderToStaticMarkup(React.createElement(load('components/shared/BrandPreview.tsx',{state:{language:'ru'}}).default));
  const source=JSON.parse(fs.readFileSync('public/branding/home-five-games/sources.json','utf8'));
- assert.match(source.mbappe.url,/^https:\/\/publish.realmadrid.com\//);
- assert.match(source.mbappe.originalSha256,/^[a-f0-9]{64}$/);
- assert.equal(source.mbappe.processedSha256,crypto.createHash('sha256').update(fs.readFileSync('public/branding/home-five-games/mbappe.webp')).digest('hex'));
+ const bytes=fs.readFileSync('public/branding/home-five-games/approved-base.webp');
+ assert.ok(bytes.length<500000);
+ assert.equal(source.scene.originalSha256,'c61f6c196c78189a1797055389ea660c2a10316f8393cca66007ea1726e03eef');
+ assert.equal(source.scene.processedSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.match(html,/approved-base.webp/);
+ assert.doesNotMatch(html,/mbappe.webp|scene.webp|footballPortrait|realmadrid/);
+ const masks=[...html.matchAll(/<mask id="([^"]+)"/g)].map(match=>match[1]);
+ assert.equal(masks.length,5);assert.equal(new Set(masks).size,5);
+ for(const href of html.matchAll(/<image href="([^"]+)"/g))assert.ok(fs.existsSync('public'+href[1]));
+ assert.match(html,/aria-label="EA Sports FC 27"/);
 });

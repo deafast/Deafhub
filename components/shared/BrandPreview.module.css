@@ -1,40 +1,34 @@
-.page{background:#030d14;color:#eafbff;isolation:isolate}
-.hero{position:relative;isolation:isolate;min-height:650px;height:calc(100svh - 140px);overflow:hidden;background:#030d14}
-.games{position:absolute;inset:0;isolation:isolate}
-.game{position:absolute;inset:0;display:block;color:inherit;text-decoration:none;clip-path:polygon(calc(28.5% + (var(--game-index) - 1)*20%) 0,calc(48.5% + (var(--game-index) - 1)*20%) 0,calc(29.2% + (var(--game-index) - 1)*20%) 100%,calc(9.2% + (var(--game-index) - 1)*20%) 100%)}
-.game:first-child{clip-path:polygon(0 0,28.5% 0,9.2% 100%,0 100%)}
-.game:last-child{clip-path:polygon(88.5% 0,100% 0,100% 100%,69.2% 100%)}
-.art{position:absolute;inset:0;background:url('/branding/home-five-games/scene.webp') center top/cover no-repeat;pointer-events:none}
-.art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#030d1412 0%,#030d1426 40%,#030d1473 72%,#030d1426 100%);transition:opacity 180ms ease}
-.game[data-game=fc] .art{background:linear-gradient(180deg,#030d146b,#030d14e6 75%),url('/branding/tournaments/approved-cs2-fc27/fc27-atmosphere.webp') center/cover no-repeat}
-.footballPortrait{position:absolute;inset:0;pointer-events:none;background:url('/branding/home-five-games/mbappe.webp') 78% 32%/auto 65% no-repeat;filter:brightness(.73) saturate(.72);mask-image:linear-gradient(180deg,#000 0%,#000 43%,transparent 72%)}
-.gameLogo{position:absolute;top:86%;left:var(--logo-x);transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:clamp(110px,12vw,205px);height:64px;opacity:.76;transition:opacity 180ms ease}
-.gameLogo img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
-.game[data-game=lol] .gameLogo{width:clamp(76px,8vw,140px)}
-.game[data-game=fc] .gameLogo{width:clamp(105px,11vw,180px);height:58px}
-.game[data-game=fc] .gameLogo img{filter:invert(1)}
+.page{--hero-height:clamp(540px,calc(100svh - 140px),940px);background:#030d14;color:#eafbff;isolation:isolate}
+.hero{position:relative;isolation:isolate;display:grid;grid-template-rows:minmax(0,1fr) auto 96px;height:var(--hero-height);overflow:hidden;background:radial-gradient(ellipse at 50% 20%,#09202c55,transparent 75%),#030d14}
+.games{position:absolute;top:auto;bottom:0;left:50%;aspect-ratio:1586/867;width:min(100%,calc(var(--hero-height)*1.829296));transform:translateX(-50%);isolation:isolate}
+.game{position:absolute;inset:0;display:block;color:inherit;text-decoration:none;clip-path:polygon(var(--left-top) 0,var(--right-top) 0,var(--right-bottom) 100%,var(--left-bottom) 100%)}
+.art{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
+.dividers{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.gameLogo{position:absolute;bottom:26px;left:var(--logo-x);transform:translateX(-50%);display:flex;align-items:center;justify-content:center;width:clamp(86px,9vw,144px);height:38px;opacity:.76;transition:opacity 180ms ease}
+.gameLogo img,.gameLogo>svg{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.game[data-game=lol] .gameLogo{width:clamp(66px,7vw,102px)}
+.game[data-game=fc] .gameLogo{width:clamp(90px,9vw,146px);height:38px}
+.gameLogo>svg{width:100%;height:100%}
 .game:focus-visible{outline:none}.game:focus-visible .gameLogo{outline:2px solid #00f0fc;outline-offset:10px;border-radius:3px;opacity:1}
-.brand{position:absolute;z-index:2;top:53%;left:50%;transform:translateX(-50%);width:min(48vw,740px);text-align:center;pointer-events:auto}
+.brand{position:relative;z-index:2;grid-row:2;justify-self:center;align-self:end;width:min(42vw,520px);margin-bottom:24px;text-align:center;pointer-events:auto}
 .title{margin:0;font-size:inherit;line-height:1}.wordmark{display:block;width:100%;height:auto}
-.description{margin:24px 0 0;font-size:clamp(16px,1.65vw,25px);line-height:1.5;color:#e2e8ef;text-wrap:balance}
-.actions{display:flex;justify-content:center;gap:clamp(16px,2vw,30px);margin-top:22px;pointer-events:auto}
-.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:12px 30px;border:1px solid #00f0fc;border-radius:10px;font-size:clamp(14px,1.2vw,19px);line-height:1.3;font-weight:600;text-decoration:none;transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
+.description{margin:14px 0 0;font-size:18px;line-height:1.5;color:#e2e8ef;text-wrap:balance}
+.actions{display:flex;justify-content:center;gap:18px;margin-top:18px;pointer-events:auto}
+.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 24px;border:1px solid #00f0fc;border-radius:10px;font-size:14px;line-height:1.3;font-weight:600;text-decoration:none;transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
 .primary{background:#00f0fc;color:#030d14}.secondary{color:#eafbff;background:#030d14a3}
 .primary:focus-visible,.secondary:focus-visible,.footer a:focus-visible{outline:2px solid #eafbff;outline-offset:5px}
 .footer{position:relative;min-height:64px;display:flex;align-items:center;justify-content:center;border-top:1px solid #00f0fc20;background:#030d14}
 .footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(24px,4vw,60px);padding:16px 24px}
 .footer a{font-size:14px;color:#c5d0df;text-decoration:none;transition:color 160ms ease}
-@media(hover:hover) and (pointer:fine){.game[href]:hover .gameLogo{opacity:1}.game[href]:hover .art::after{opacity:.65}.primary:hover{background:#61f7ff;border-color:#61f7ff}.secondary:hover{background:#00f0fc14}.footer a:hover{color:#00f0fc}}
-@media(min-width:2200px){.hero{min-height:850px}.brand{width:min(43vw,940px)}.description{font-size:28px}.primary,.secondary{font-size:21px;min-height:58px;padding-inline:38px}.gameLogo{width:240px;height:76px}.game[data-game=lol] .gameLogo{width:165px}.game[data-game=fc] .gameLogo{width:215px;height:70px}}
-@media(max-width:1100px) and (min-width:768px){.hero{min-height:610px}.brand{width:54vw}.description{margin-top:18px;font-size:18px}.actions{gap:12px;margin-top:18px}.primary,.secondary{padding:12px 20px;min-height:46px}.gameLogo{width:15vw;height:42px}.game[data-game=lol] .gameLogo{width:9vw}.game[data-game=fc] .gameLogo{width:13vw;height:42px}}
+@media(hover:hover) and (pointer:fine){.game[href]:hover .gameLogo{opacity:1}.primary:hover{background:#61f7ff;border-color:#61f7ff}.secondary:hover{background:#00f0fc14}.footer a:hover{color:#00f0fc}}
+@media(max-width:1100px) and (min-width:768px){.brand{width:min(50vw,460px)}.description{font-size:16px}.actions{gap:12px}.primary,.secondary{padding:10px 18px}.gameLogo{width:13vw;height:34px}.game[data-game=lol] .gameLogo{width:8vw}.game[data-game=fc] .gameLogo{width:12vw;height:34px}}
 @media(max-width:767px){
  .hero{display:flex;flex-direction:column;height:auto;min-height:0;overflow:visible}
- .games{position:relative;display:flex;inset:auto;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:16px;padding:0 16px;gap:1px;scrollbar-width:thin;scrollbar-color:#00f0fc45 transparent;background:#030d14}
+ .games{position:relative;display:flex;inset:auto;width:auto;aspect-ratio:auto;transform:none;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:16px;padding:0 16px;gap:1px;scrollbar-width:thin;scrollbar-color:#00f0fc45 transparent;background:#030d14}
  .game,.game:first-child,.game:last-child{position:relative;inset:auto;flex:0 0 clamp(138px,38vw,210px);aspect-ratio:334.4/941;clip-path:none;scroll-snap-align:start;border-bottom:1px solid #00f0fc35}
- .art{background-size:500% 100%;background-position:calc(var(--game-index)*25%) top}
- .art::after{background:linear-gradient(180deg,#030d1410 10%,#030d1430 55%,#030d14cc 86%,#030d14 100%)}
- .footballPortrait{background-position:center top;background-size:auto 85%}
- .game .gameLogo,.game[data-game=lol] .gameLogo,.game[data-game=fc] .gameLogo{left:50%;top:87%;width:80%;height:36px;opacity:.85}
+ .art{width:500%;max-width:none;left:calc(var(--game-index)*-100%)}
+ .dividers{display:none}
+ .game .gameLogo,.game[data-game=lol] .gameLogo,.game[data-game=fc] .gameLogo{left:50%;top:auto;bottom:26px;width:80%;height:36px;opacity:.85}
  .game[data-game=lol] .gameLogo{width:66%;height:44px}
  .brand{position:relative;top:auto;left:auto;transform:none;width:min(88%,480px);margin:28px auto 32px}
  .description{font-size:16px;margin-top:18px}.actions{gap:12px;margin-top:20px}

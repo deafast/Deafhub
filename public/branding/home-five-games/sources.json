@@ -1,19 +1,18 @@
 {
   "scene": {
-    "origin": "Owner-approved reference image(20261104-170554).png; background-only imagegen derivative, no UI or text",
-    "file": "scene.webp"
+    "origin": "Exact owner-supplied image(20261104-170554).png",
+    "file": "approved-base.webp",
+    "width": 1586,
+    "height": 992,
+    "originalSha256": "c61f6c196c78189a1797055389ea660c2a10316f8393cca66007ea1726e03eef",
+    "processedSha256": "3918014a4599151e91d884e0c52f9532330dece4cb1c18729199e168e0aec10d",
+    "processing": "WebP encoding only. Native SVG masks omit baked interface; characters are not redrawn or replaced."
   },
-  "mbappe": {
-    "page": "https://www.realmadrid.com/en-US/football/squad/kylian-mbappe",
-    "url": "https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/3kq9cckrnlogidldtdie2fkbl/players/mbappe/assets/MBAPPE_POSE_1500X2000.png",
-    "originalSha256": "fc3227e800e2ef9892f85397bf45b09812ee1a0b6e76fb48eafaa621dbbf2109",
-    "processing": "Resized and encoded to WebP only; face not regenerated",
-    "processedSha256": "d8c52cdc3eeffa5c3ddd6c88cf62f25445cda41c8ffb807578d448352da57ff4"
-  },
+  "replaced": "Previous derivative panorama and real football portrait are removed; only owner-supplied game artwork is rendered.",
   "logos": {
     "lol": "https://www.leagueoflegends.com/en-us/league-of-legends-downloads/",
     "valorant": "https://playvalorant.com/en-us/",
-    "valorantImage": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/7b76209193f1bfe190d3ae6ef8728328870be9c3-736x138.png",
+    "fc27": "Native SVG crop from the exact owner-supplied image",
     "other": "Existing approved repository assets, retained unchanged"
   },
   "checkedOn": "2026-11-04"
