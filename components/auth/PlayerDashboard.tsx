@@ -9,6 +9,7 @@ import HubPanel from '@/components/hub/HubPanel';
 import SteamProfile from './SteamProfile';
 import {useLanguageStore} from '@/store/useLanguageStore';
 import type {PlayerProfile} from '@/lib/profile';
+import ProfileMediaImage from './ProfileMediaImage';
 import shared from '@/components/shared/CompetitionSurface.module.css';
 import styles from './PlayerDashboard.module.css';
 const sections=['overview','stats','history','team','tournaments','wallet'] as const;
@@ -16,14 +17,22 @@ const icons=[LayoutDashboard,ChartNoAxesCombined,History,Users,Trophy,Wallet];
 export default function PlayerDashboard({profile,googleConnected,steamId}:{profile:PlayerProfile;googleConnected:boolean;steamId:string|null}){
  const ru=useLanguageStore(s=>s.language==='ru');
  const [active,setActive]=useState<typeof sections[number]>('overview');
+ const [avatarLoaded,setAvatarLoaded]=useState(false);
+ const [bannerLoaded,setBannerLoaded]=useState(false);
  const t=(r:string,e:string)=>ru?r:e;
  const labels=ru?['Обзор','Статистика','История игр','Команда','Турниры','Кошелёк']:['Overview','Statistics','Match history','Team','Tournaments','Wallet'];
  return <section className={styles.profile} data-player-profile="">
- <div className={styles.backdrop} aria-hidden="true"/>
+ <div className={styles.backdrop} aria-hidden="true">
+  <ProfileMediaImage kind="banner" loaded={bannerLoaded} onLoaded={setBannerLoaded} className={styles.customBanner}/>
+  {bannerLoaded?<div className={styles.bannerShade}/>:null}
+ </div>
  <div className={styles.inner}>
  <header className={styles.profileBanner}>
   <div className={styles.identity}>
-   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.coverAvatar}>{profile.nickname.trim()?<span aria-hidden="true">{Array.from(profile.nickname.trim())[0].toLocaleUpperCase(ru?'ru':'en')}</span>:<UserRound size={38} aria-hidden="true"/>}</div>
+   <div role="img" aria-label={t('Аватар игрока','Player avatar')} className={styles.coverAvatar}>
+    <ProfileMediaImage kind="avatar" loaded={avatarLoaded} onLoaded={setAvatarLoaded} className={styles.customAvatar}/>
+    {!avatarLoaded&&(profile.nickname.trim()?<span aria-hidden="true">{Array.from(profile.nickname.trim())[0].toLocaleUpperCase(ru?'ru':'en')}</span>:<UserRound size={38} aria-hidden="true"/>)}
+   </div>
    <div className={styles.identityDetails}>
     <div className={styles.nameRow}>
      <h1 translate="no">{profile.nickname||t('Игрок','Player')}</h1>

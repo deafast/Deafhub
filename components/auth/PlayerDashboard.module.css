@@ -23,6 +23,11 @@
         url('/branding/profile/navy-landscape.webp') center 45% / cover no-repeat;
 }
 
+.customBanner, .bannerShade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.customBanner { object-fit: cover; }
+.bannerShade { background: linear-gradient(180deg, #050e181a, #050e18e6 80%); }
+.customAvatar { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
+
 .inner { max-width: 1640px; margin-inline: auto; padding: 0 clamp(24px, 4vw, 64px) 64px; }
 .profileBanner { display: flex; align-items: flex-end; min-height: 352px; padding: 64px 0 32px; }
 .identity { display: flex; align-items: center; gap: 24px; min-width: 0; }

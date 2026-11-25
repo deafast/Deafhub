@@ -12,6 +12,7 @@ function page({ linked = false, failed = false, authenticated = true } = {}) {
         'next/navigation': { redirect: path => { throw new Error('redirect:' + path); } },
         'next/link': { default: ({ children, ...props }) => React.createElement('a', props, children) },
         '@/components/shared/LocalizedText': { default: ({ ru }) => ru },
+        '@/components/auth/ProfileMediaSettings': { default: () => null },
         '@/components/auth/ProfileForm': { default: () => React.createElement('div', { 'data-form': true }) },
         '@/components/auth/AuthPanel': { default: props => React.createElement('div', { 'data-steam-link': props.steamOnly }) },
         '@/lib/profile': { profileSchema: { safeParse: data => ({ success: true, data }) } },

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import ProfileForm from '@/components/auth/ProfileForm';
+import ProfileMediaSettings from '@/components/auth/ProfileMediaSettings';
 import AuthPanel from '@/components/auth/AuthPanel';
 import { profileSchema } from '@/lib/profile';
 import LocalizedText from '@/components/shared/LocalizedText';
@@ -22,6 +23,7 @@ export default async function ProfileSettingsPage() {
         <p className="text-xs font-bold tracking-[0.3em] text-primary"><LocalizedText ru="НАСТРОЙКИ ПРОФИЛЯ" en="PROFILE SETTINGS" /></p>
         <h1 className="mt-3 text-3xl font-black sm:text-5xl"><LocalizedText ru="Настройки профиля" en="Profile settings" /></h1>
         <div className="mt-8 rounded-3xl border border-white/10 bg-popover p-6 sm:p-8"><ProfileForm initial={initial} /></div>
+        <ProfileMediaSettings />
         <section id="steam-account" className="mt-6 rounded-3xl border border-white/10 bg-popover p-6 sm:p-8">
             <h2 className="mb-4 text-lg font-semibold"><LocalizedText ru="Игровой аккаунт" en="Gaming account" /></h2>
             {steamError ? <p role="alert"><LocalizedText ru="Не удалось проверить привязку Steam. Обновите страницу." en="Could not check the Steam connection. Reload the page." /></p>
