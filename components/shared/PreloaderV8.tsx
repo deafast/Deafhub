@@ -29,8 +29,8 @@ export default function PreloaderV8() {
     const introRef = useRef<HTMLDivElement>(null);
     const [bgReady, setBgReady] = useState(false);
 
-    const exitDelayMs = 1100;     // общий выход
-    const stopFlipMs = 650;      // стоп-кадр
+    const exitDelayMs = 2750;     // общий выход
+    const stopFlipMs = 2000;      // стоп-кадр
 
     const skipIntro = () => {
         setIsSkipped(true);
@@ -74,13 +74,12 @@ export default function PreloaderV8() {
         const ready = new Set<number>();
         const decoded = FLIP_IMAGES.map((_, index) => {
             const image = new Image();
-            image.fetchPriority = 'low';
             image.src = `/preloader/${index + 1}.webp`;
             return image.decode().then(() => { ready.add(index); }).catch(() => {});
         });
         // Never hold the page indefinitely if an image fails or the network is slow.
         const deadline = new Promise<void>((resolve) => {
-            readinessTimer = setTimeout(resolve, 250);
+            readinessTimer = setTimeout(resolve, 900);
         });
         void Promise.race([Promise.all(decoded), deadline]).then(() => {
             if (cancelled) return;
@@ -94,7 +93,7 @@ export default function PreloaderV8() {
                 if (cancelled) return;
                 const elapsed = now - started;
                 if (elapsed >= stopFlipMs || frames.length === 0) return;
-                const index = frames[Math.floor(elapsed / 100) % frames.length];
+                const index = frames[Math.floor(elapsed / 40) % frames.length];
                 if (index !== previous) {
                     introRef.current?.style.setProperty('--dh-intro-frame', FLIP_IMAGES[index]);
                     previous = index;
@@ -173,7 +172,7 @@ export default function PreloaderV8() {
                                 scale: bgReady || !isFlipping ? 1 : 0.9,
                                 opacity: bgReady || !isFlipping ? 1 : 0,
                             }}
-                            transition={{ scale: { duration: 0.65, ease: [0.23, 1, 0.32, 1] }, opacity: { duration: 0.6 } }}
+                            transition={{ scale: { duration: 2, ease: [0.23, 1, 0.32, 1] }, opacity: { duration: 0.6 } }}
                             className="relative p-4 sm:p-6 md:p-8 flex items-center justify-center overflow-visible bg-transparent"
                         >
                             <div className="relative z-10 w-[min(84vw,420px)]" style={{ aspectRatio: '610 / 445' }}>
